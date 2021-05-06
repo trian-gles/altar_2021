@@ -1,4 +1,5 @@
 from pyo import *
+from random import randrange
 import math
 
 
@@ -14,6 +15,7 @@ class DXSineModule:
         self.ratio.ctrl([SLMap(0, 8.0, 'lin', 'value', ratio)], title=f"{name} ratio")
         self.phasor = Phasor(200, mul=math.pi*2)
         self.level = Sig(level)
+        self.level.ctrl([SLMapMul(init=level)], title=f"{name} level")
         self.cos = Cos(input=self.phasor, mul=self.env)
         self.output = self.level * self.cos
         self.mixed = None
@@ -45,15 +47,16 @@ class DX7:
         DXSineModule.env.ctrl()
         self.mod_dict = {}
         for mod_num in range(6):
-            self.mod_dict[mod_num + 1] = DXSineModule(0.5)
+            self.mod_dict[mod_num + 1] = DXSineModule(mod_num + 1, 0.5 * (randrange(6) + 0.5))
         self.master_feedback = Sig(1.0)
         self.master_feedback.ctrl([SLMap(0, 8.0, 'lin', 'value', 1)], title="Master Feedback")
 
-        # Module connections are shown for each algorithm
+        # Module connections are shown for each algorithm.  0 indicates output
         self.ALGORITHMS = (
             ((1, 0), (2, 1), (6, 6), (6, 5), (5, 4), (4, 3), (3, 0)),
             ((1, 0), (2, 1), (2, 2), (6, 5), (5, 4), (4, 3), (3, 0)),
-            ((3, 2), (2, 1), (1, 0), (6, 5), (5, 4), (4, 3))
+            ((3, 2), (2, 1), (1, 0), (6, 5), (5, 4), (4, 3), (6, 6)),
+            ((3, 2), (2, 1), (1, 0), (6, 5), (5, 4), (4, 3), (6, 0))
         )
 
         self.set_algo(0)
@@ -99,7 +102,7 @@ def note():
     global pattern_count
     freq = note_to_freq(pattern[pattern_count] + 24)
     synth.noteon(freq, 1)
-    c = CallAfter(synth.noteoff, 0.5)
+    c = CallAfter(synth.noteoff, 0.3)
     pattern_count = (pattern_count + 1) % 6
 
 
@@ -108,8 +111,9 @@ def note_to_freq(pitch):
     return (a / 32) * (2 ** ((pitch - 9) / 12))
 
 
-p = Pattern(note, 1)
+p = Pattern(note, 0.5)
 p.play()
+p.ctrl()
 
 
 s.gui(locals())

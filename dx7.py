@@ -16,18 +16,25 @@ class DXSineModule:
         self.level = Sig(level)
         self.cos = Cos(input=self.phasor, mul=self.env)
         self.output = self.level * self.cos
-        self.calldecay = None
         self.mixed = None
+        self.inputs = [self.phasor]
 
-    def modulate_phase(self, modding, ctrl):
-        print(f"modulating phase of {self.name} by {modding.name}")
-        self.cos.input += (modding.output * ctrl)
+    def patch(self, modding):
+        self.inputs += modding
+
+    def configure_input(self):
+        self.cos.input = sum(self.inputs)
+
+    def reset(self):
+        self.inputs = [self.phasor]
+        self.cos.input = self.phasor
+        self.mixed = None
 
     def change_pitch(self, freq):
         self.phasor.freq = freq * self.ratio
 
-    def out(self, out_ctrl):
-        self.mixed = self.output.mix(2) * out_ctrl * 0.3
+    def out(self):
+        self.mixed = self.output.mix(2) * 0.3
         self.mixed.out()
 
 
@@ -36,70 +43,43 @@ class DX7:
         self.vel = Sig(0)
         DXSineModule.env = MidiAdsr(self.vel, attack, decay, sustain, release)
         DXSineModule.env.ctrl()
-        self.module_1 = DXSineModule("1", ratio=.5)
-        self.module_2 = DXSineModule("2", ratio=.5)
-        self.module_3 = DXSineModule("3", ratio=.5)
-        self.module_4 = DXSineModule("4", ratio=.5)
-        self.module_5 = DXSineModule("5", ratio=.5)
-        self.module_6 = DXSineModule("6", ratio=.5)
-        self.all_mods = (self.module_1, self.module_2, self.module_4, self.module_3, self.module_5, self.module_6)
+        self.mod_dict = {}
+        for mod_num in range(6):
+            self.mod_dict[mod_num + 1] = DXSineModule(0.5)
         self.master_feedback = Sig(1.0)
         self.master_feedback.ctrl([SLMap(0, 8.0, 'lin', 'value', 1)], title="Master Feedback")
 
-        # Store Sig() objects to set each module connection in a dictionary
-        self.routes = {}
-        for modding in self.all_mods:
-            for modded in self.all_mods:
-                ctrl_sig = Sig(0)
-                title = f"{modding.name}{modded.name}"
-                print(f"Storing route {title}")
-                self.routes[title] = ctrl_sig
-
-                # ctrl_sig.ctrl([SLMap(0, 8.0, 'lin', 'value', 0)], title=title + " route control")
-
-                if modding.name == modded.name:
-                    # Modules that feedback into themselves are multiplied by a master feedback control
-                    modded.modulate_phase(modded, self.routes[title] * self.master_feedback)
-                    print(f"Route {title} gets attached to master feedback")
-
-                else:
-                    modded.modulate_phase(modding, self.routes[title])
-
-            out_sig = Sig(0)
-            title = f"{modding.name}out"
-            self.routes[title] = out_sig
-            print(f"Storing route {title}")
-            modding.out(out_sig)
-            # out_sig.ctrl([SLMap(0, 1.0, 'lin', 'value', 0)], title=f"{in_mod_count} output control")
-
         # Module connections are shown for each algorithm
         self.ALGORITHMS = (
-            ('1out', '21', '66', '65', '54', '43', '3out'),
-            ('11', '1out'),
-            (),
-            ()
+            ((1, 0), (2, 1), (6, 6), (6, 5), (5, 4), (4, 3), (3, 0)),
+            ((1, 0), (2, 1), (2, 2), (6, 5), (5, 4), (4, 3), (3, 0)),
+            ((3, 2), (2, 1), (1, 0), (6, 5), (5, 4), (4, 3))
         )
 
-        self.set_algo(1)
-        print(self.routes)
+        self.set_algo(0)
 
     def set_algo(self, algo_num):
         self.reset_routes()
         print(f"Switching to algorithm {algo_num}")
         for route in self.ALGORITHMS[algo_num]:
-            print(f"Activating route {route}")
-            self.routes[route].value = 1.0
-
-
+            out_num = route[0]
+            in_num = route[1]
+            if in_num == 0:
+                self.mod_dict[out_num].out()
+            elif in_num == out_num:
+                self.mod_dict[in_num].patch(self.mod_dict[out_num].output * self.master_feedback)
+            else:
+                self.mod_dict[in_num].patch(self.mod_dict[out_num].output)
+        for mod in self.mod_dict.values():
+            mod.configure_input()
 
     def reset_routes(self):
-        print("Resetting all routes")
-        for route in self.routes.values():
-            route.value = 0
+        for mod in self.mod_dict.values():
+            mod.reset()
 
     def noteon(self, freq, vel):
         self.vel.value = vel
-        for module in self.all_mods:
+        for module in self.mod_dict.values():
             module.change_pitch(freq)
 
     def noteoff(self):

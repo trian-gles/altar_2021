@@ -1,5 +1,4 @@
 from pyo import *
-import random
 import math
 
 
@@ -10,6 +9,7 @@ class DXSineModule:
     env = None
 
     def __init__(self, name, ratio=1.0, level=1.0):
+        self.name = name
         self.ratio = Sig(ratio)
         self.ratio.ctrl([SLMap(0, 8.0, 'lin', 'value', ratio)], title=f"{name} ratio")
         self.phasor = Phasor(200, mul=math.pi*2)
@@ -17,15 +17,17 @@ class DXSineModule:
         self.cos = Cos(input=self.phasor, mul=self.env)
         self.output = self.level * self.cos
         self.calldecay = None
+        self.mixed = None
 
-    def modulate_phase(self, modulating_sig):
-        self.cos.input += modulating_sig
+    def modulate_phase(self, modding, ctrl):
+        print(f"modulating phase of {self.name} by {modding.name}")
+        self.cos.input += (modding.output * ctrl)
 
     def change_pitch(self, freq):
         self.phasor.freq = freq * self.ratio
 
-    def out(self):
-        self.mixed = self.output.mix(2) * 0.3
+    def out(self, out_ctrl):
+        self.mixed = self.output.mix(2) * out_ctrl * 0.3
         self.mixed.out()
 
 
@@ -41,32 +43,59 @@ class DX7:
         self.module_5 = DXSineModule("5", ratio=.5)
         self.module_6 = DXSineModule("6", ratio=.5)
         self.all_mods = (self.module_1, self.module_2, self.module_4, self.module_3, self.module_5, self.module_6)
-        self.master_feedback = Sig(0)
-        self.master_feedback.ctrl([SLMap(0, 8.0, 'lin', 'value', 0)], title="Master Feedback")
+        self.master_feedback = Sig(1.0)
+        self.master_feedback.ctrl([SLMap(0, 8.0, 'lin', 'value', 1)], title="Master Feedback")
 
+        # Store Sig() objects to set each module connection in a dictionary
         self.routes = {}
-        in_mod_count = 1
         for modding in self.all_mods:
-            out_mod_count = 1
             for modded in self.all_mods:
                 ctrl_sig = Sig(0)
-                title = f"{in_mod_count}{out_mod_count}"
+                title = f"{modding.name}{modded.name}"
+                print(f"Storing route {title}")
                 self.routes[title] = ctrl_sig
 
-                #ctrl_sig.ctrl([SLMap(0, 8.0, 'lin', 'value', 0)], title=title + " route control")
+                # ctrl_sig.ctrl([SLMap(0, 8.0, 'lin', 'value', 0)], title=title + " route control")
 
-                if in_mod_count == out_mod_count:
-                    modded.modulate_phase(modding.output * ctrl_sig * self.master_feedback)
+                if modding.name == modded.name:
+                    # Modules that feedback into themselves are multiplied by a master feedback control
+                    modded.modulate_phase(modded, self.routes[title] * self.master_feedback)
+                    print(f"Route {title} gets attached to master feedback")
 
                 else:
-                    modded.modulate_phase(modding.output * ctrl_sig)
+                    modded.modulate_phase(modding, self.routes[title])
 
-                out_mod_count += 1
             out_sig = Sig(0)
-            self.routes[f"{in_mod_count}out"] = out_sig
+            title = f"{modding.name}out"
+            self.routes[title] = out_sig
+            print(f"Storing route {title}")
             modding.out(out_sig)
-            #out_sig.ctrl([SLMap(0, 1.0, 'lin', 'value', 0)], title=f"{in_mod_count} output control")
-            in_mod_count += 1
+            # out_sig.ctrl([SLMap(0, 1.0, 'lin', 'value', 0)], title=f"{in_mod_count} output control")
+
+        # Module connections are shown for each algorithm
+        self.ALGORITHMS = (
+            ('1out', '21', '66', '65', '54', '43', '3out'),
+            ('11', '1out'),
+            (),
+            ()
+        )
+
+        self.set_algo(1)
+        print(self.routes)
+
+    def set_algo(self, algo_num):
+        self.reset_routes()
+        print(f"Switching to algorithm {algo_num}")
+        for route in self.ALGORITHMS[algo_num]:
+            print(f"Activating route {route}")
+            self.routes[route].value = 1.0
+
+
+
+    def reset_routes(self):
+        print("Resetting all routes")
+        for route in self.routes.values():
+            route.value = 0
 
     def noteon(self, freq, vel):
         self.vel.value = vel
@@ -82,11 +111,16 @@ c = None
 synth = DX7()
 
 
+pattern = (48, 51, 55, 56, 51, 58)
+pattern_count = 0
+
 def note():
     global c
-    freq = note_to_freq(random.randrange(12, 84))
+    global pattern_count
+    freq = note_to_freq(pattern[pattern_count] + 24)
     synth.noteon(freq, 1)
-    c = CallAfter(synth.noteoff, 1)
+    c = CallAfter(synth.noteoff, 0.5)
+    pattern_count = (pattern_count + 1) % 6
 
 
 def note_to_freq(pitch):
@@ -94,7 +128,7 @@ def note_to_freq(pitch):
     return (a / 32) * (2 ** ((pitch - 9) / 12))
 
 
-p = Pattern(note, 2)
+p = Pattern(note, 1)
 p.play()
 
 

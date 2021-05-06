@@ -9,13 +9,13 @@ s = Server().boot()
 class DXSineModule:
     env = None
 
-    def __init__(self, ratio=1.0, level=1.0):
+    def __init__(self, name, ratio=1.0, level=1.0):
         self.ratio = Sig(ratio)
-        self.ratio.ctrl([SLMap(0, 8.0, 'lin', 'value', ratio)])
+        self.ratio.ctrl([SLMap(0, 8.0, 'lin', 'value', ratio)], title=f"{name} ratio")
         self.phasor = Phasor(200, mul=math.pi*2)
         self.level = Sig(level)
         self.cos = Cos(input=self.phasor, mul=self.env)
-        self.output = self.level + self.cos
+        self.output = self.level * self.cos
         self.calldecay = None
 
     def modulate_phase(self, modulating_sig):
@@ -24,8 +24,8 @@ class DXSineModule:
     def change_pitch(self, freq):
         self.phasor.freq = freq * self.ratio
 
-    def out(self, level):
-        self.mixed = self.output.mix(2) * level * 0.3
+    def out(self):
+        self.mixed = self.output.mix(2) * 0.3
         self.mixed.out()
 
 
@@ -34,13 +34,15 @@ class DX7:
         self.vel = Sig(0)
         DXSineModule.env = MidiAdsr(self.vel, attack, decay, sustain, release)
         DXSineModule.env.ctrl()
-        self.module_1 = DXSineModule(ratio=.5)
-        self.module_2 = DXSineModule(ratio=.5)
-        self.module_3 = DXSineModule(ratio=.5)
-        self.module_4 = DXSineModule(ratio=.5)
-        self.module_5 = DXSineModule(ratio=.5)
-        self.module_6 = DXSineModule(ratio=.5)
+        self.module_1 = DXSineModule("1", ratio=.5)
+        self.module_2 = DXSineModule("2", ratio=.5)
+        self.module_3 = DXSineModule("3", ratio=.5)
+        self.module_4 = DXSineModule("4", ratio=.5)
+        self.module_5 = DXSineModule("5", ratio=.5)
+        self.module_6 = DXSineModule("6", ratio=.5)
         self.all_mods = (self.module_1, self.module_2, self.module_4, self.module_3, self.module_5, self.module_6)
+        self.master_feedback = Sig(0)
+        self.master_feedback.ctrl([SLMap(0, 8.0, 'lin', 'value', 0)], title="Master Feedback")
 
         self.routes = {}
         in_mod_count = 1
@@ -54,11 +56,7 @@ class DX7:
                 #ctrl_sig.ctrl([SLMap(0, 8.0, 'lin', 'value', 0)], title=title + " route control")
 
                 if in_mod_count == out_mod_count:
-                    feed_title = f"{in_mod_count} feedback"
-                    feed_sig = Sig(0)
-                    self.routes[feed_title] = feed_sig
-                    #self.routes[feed_title].ctrl([SLMap(0, 8.0, 'lin', 'value', 0)], title=feed_title + " control")
-                    modded.modulate_phase(modding.output * ctrl_sig * feed_sig)
+                    modded.modulate_phase(modding.output * ctrl_sig * self.master_feedback)
 
                 else:
                     modded.modulate_phase(modding.output * ctrl_sig)

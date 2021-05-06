@@ -12,10 +12,10 @@ class DXSineModule:
     def __init__(self, name, ratio=1.0, level=1.0):
         self.name = name
         self.ratio = Sig(ratio)
-        self.ratio.ctrl([SLMap(0, 8.0, 'lin', 'value', ratio)], title=f"{name} ratio")
+        # self.ratio.ctrl([SLMap(0, 8.0, 'lin', 'value', ratio)], title=f"{name} ratio")
         self.phasor = Phasor(200, mul=math.pi*2)
         self.level = Sig(level)
-        self.level.ctrl([SLMapMul(init=level)], title=f"{name} level")
+        # self.level.ctrl([SLMapMul(init=level)], title=f"{name} level")
         self.cos = Cos(input=self.phasor, mul=self.env)
         self.output = self.level * self.cos
         self.mixed = None
@@ -40,14 +40,14 @@ class DXSineModule:
         self.mixed.out()
 
 
-class DX7:
+class DX7Mono:
     def __init__(self, attack=.005, decay=.5, sustain=.5, release=1.0):
         self.vel = Sig(0)
         DXSineModule.env = MidiAdsr(self.vel, attack, decay, sustain, release)
         DXSineModule.env.ctrl()
         self.mod_dict = {}
         for mod_num in range(6):
-            self.mod_dict[mod_num + 1] = DXSineModule(mod_num + 1, 0.5 * (randrange(6) + 0.5))
+            self.mod_dict[mod_num + 1] = DXSineModule(mod_num + 1)
         self.master_feedback = Sig(1.0)
         self.master_feedback.ctrl([SLMap(0, 8.0, 'lin', 'value', 1)], title="Master Feedback")
 
@@ -89,9 +89,29 @@ class DX7:
         self.vel.value = 0
 
 
+class DX7Poly:
+    def __init__(self, voices):
+        self.voices = [DX7Mono for _ in range(voices)]
+        self.held_notes = []
+        self.voice_num = voices
+        self.active_voice_num = 0
+        self.active_voice = self.voices[0]
+
+    def noteon(self, freq, vel):
+        pass
+
+    def noteoff(self, freq):
+        pass
+
+    def set_algo(self, algo_num):
+        for voice in self.voices:
+            voice.set_algo(algo_num)
+
+
+
 c = None
 
-synth = DX7()
+synth = DX7Poly()
 
 
 pattern = (48, 51, 55, 56, 51, 58)

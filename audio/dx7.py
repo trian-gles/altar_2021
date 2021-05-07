@@ -149,35 +149,36 @@ class DX7Poly:
         self.set_algo(random.randrange(0, len(DX7Mono.ALGORITHMS)))
 
 
-c = None
-trans = 0
+if __name__ == "__main__":
+    c = None
+    trans = 0
 
-synth = DX7Poly(8)
-synth.randomize_all()
+    synth = DX7Poly(8)
+    synth.randomize_all()
 
-pattern = (48, 51, 55, 56, 51, 58)
-pattern_count = 0
+    pattern = (48, 51, 55, 56, 51, 58)
+    pattern_count = 0
 
-def note():
-    global trans
-    global c
-    global pattern_count
-    freq = note_to_freq(pattern[pattern_count] + 12 * trans)
-    synth.noteon(freq, 1)
-    pattern_count = (pattern_count + 1) % 6
-    if pattern_count == 0:
-        trans = (trans + 1) % 4
-        synth.randomize_all()
-
-
-def note_to_freq(pitch):
-    a = 440
-    return (a / 32) * (2 ** ((pitch - 9) / 12))
+    def note():
+        global trans
+        global c
+        global pattern_count
+        freq = note_to_freq(pattern[pattern_count] + 12 * trans)
+        synth.noteon(freq, 1)
+        pattern_count = (pattern_count + 1) % 6
+        if pattern_count == 0:
+            trans = (trans + 1) % 4
+            synth.randomize_all()
 
 
-p = Pattern(note, 0.2)
-p.play()
-p.ctrl()
+    def note_to_freq(pitch):
+        a = 440
+        return (a / 32) * (2 ** ((pitch - 9) / 12))
 
 
-s.gui(locals())
+    p = Pattern(note, 0.2)
+    p.play()
+    p.ctrl()
+
+
+    s.gui(locals())

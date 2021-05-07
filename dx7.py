@@ -14,7 +14,7 @@ class DXSineModule:
         self.name = name
         self.ratio = Sig(ratio)
         # self.ratio.ctrl([SLMap(0, 8.0, 'lin', 'value', ratio)], title=f"{name} ratio")
-        self.phasor = Phasor(200, mul=math.pi*2)
+        self.phasor = Phasor(200)
         self.level = Sig(level)
         # self.level.ctrl([SLMapMul(init=level)], title=f"{name} level")
         self.cos = Cos(input=self.phasor, mul=self.env)
@@ -26,7 +26,7 @@ class DXSineModule:
         self.inputs += modding
 
     def configure_input(self):
-        self.cos.input = sum(self.inputs)
+        self.cos.input = sum(self.inputs) * math.pi*2
 
     def reset(self):
         self.inputs = [self.phasor]
@@ -43,6 +43,14 @@ class DXSineModule:
 
 
 class DX7Mono:
+    # Module connections are shown for each algorithm.  0 indicates output
+    ALGORITHMS = (
+        ((1, 0), (2, 1), (6, 6), (6, 5), (5, 4), (4, 3), (3, 0)),
+        ((1, 0), (2, 1), (2, 2), (6, 5), (5, 4), (4, 3), (3, 0)),
+        ((3, 2), (2, 1), (1, 0), (6, 5), (5, 4), (4, 3), (6, 6)),
+        ((3, 2), (2, 1), (1, 0), (6, 5), (5, 4), (4, 3), (6, 0))
+    )
+
     def __init__(self):
         self.vel = Sig(0)
         self.mod_dict = {}
@@ -50,15 +58,6 @@ class DX7Mono:
             self.mod_dict[mod_num + 1] = DXSineModule(mod_num + 1)
         self.master_feedback = Sig(1.0)
         # self.master_feedback.ctrl([SLMap(0, 8.0, 'lin', 'value', 1)], title="Master Feedback")
-
-        # Module connections are shown for each algorithm.  0 indicates output
-        self.ALGORITHMS = (
-            ((1, 0), (2, 1), (6, 6), (6, 5), (5, 4), (4, 3), (3, 0)),
-            ((1, 0), (2, 1), (2, 2), (6, 5), (5, 4), (4, 3), (3, 0)),
-            ((3, 2), (2, 1), (1, 0), (6, 5), (5, 4), (4, 3), (6, 6)),
-            ((3, 2), (2, 1), (1, 0), (6, 5), (5, 4), (4, 3), (6, 0))
-        )
-
         self.set_algo(0)
 
     def set_algo(self, algo_num):
@@ -113,23 +112,34 @@ class DX7Poly:
 
     def randomize_envs(self):
         for mod_num in range(6):
-            attack = random.uniform(0.002, 0.01)
+            attack = random.uniform(0.002, 0.02)
             decay = random.uniform(0.1, 0.5)
-            sustain = random.uniform(0.3, 0.6)
+            sustain = random.uniform(0.1, 0.9)
             release = random.uniform(0.8, 1.4)
             for voice in self.voices:
                 env = voice.mod_dict[mod_num + 1].env
                 env.attack, env.decay, env.sustain, env.release = attack, decay, sustain, release
 
+    def randomize_levels(self):
+        for mod_num in range(6):
+            level = random.random()
+            for voice in self.voices:
+                voice.mod_dict[mod_num + 1].level.value = level
 
+    def randomize_all(self):
+        self.randomize_levels()
+        self.randomize_ratios()
+        self.randomize_envs()
+        self.randomize_algo()
+
+    def randomize_algo(self):
+        self.set_algo(random.randrange(0, len(DX7Mono.ALGORITHMS)))
 
 
 c = None
 
 synth = DX7Poly(8)
-synth.randomize_ratios()
-synth.randomize_envs()
-
+synth.randomize_all()
 
 pattern = (48, 51, 55, 56, 51, 58)
 pattern_count = 0

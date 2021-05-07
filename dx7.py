@@ -7,9 +7,10 @@ s = Server().boot()
 
 
 class DXSineModule:
-    env = None
 
     def __init__(self, name, ratio=1.0, level=1.0):
+        self.env = Adsr(dur=2)
+
         self.name = name
         self.ratio = Sig(ratio)
         # self.ratio.ctrl([SLMap(0, 8.0, 'lin', 'value', ratio)], title=f"{name} ratio")
@@ -34,6 +35,7 @@ class DXSineModule:
 
     def change_pitch(self, freq):
         self.phasor.freq = freq * self.ratio
+        self.env.play()
 
     def out(self):
         self.mixed = self.output.mix(2) * 0.3
@@ -41,15 +43,13 @@ class DXSineModule:
 
 
 class DX7Mono:
-    def __init__(self, attack=.005, decay=.5, sustain=.5, release=1.0):
+    def __init__(self):
         self.vel = Sig(0)
-        DXSineModule.env = MidiAdsr(self.vel, attack, decay, sustain, release)
-        DXSineModule.env.ctrl()
         self.mod_dict = {}
         for mod_num in range(6):
             self.mod_dict[mod_num + 1] = DXSineModule(mod_num + 1)
         self.master_feedback = Sig(1.0)
-        self.master_feedback.ctrl([SLMap(0, 8.0, 'lin', 'value', 1)], title="Master Feedback")
+        # self.master_feedback.ctrl([SLMap(0, 8.0, 'lin', 'value', 1)], title="Master Feedback")
 
         # Module connections are shown for each algorithm.  0 indicates output
         self.ALGORITHMS = (
@@ -91,27 +91,44 @@ class DX7Mono:
 
 class DX7Poly:
     def __init__(self, voices):
-        self.voices = [DX7Mono for _ in range(voices)]
-        self.held_notes = []
+        self.voices = [DX7Mono() for _ in range(voices)]
         self.voice_num = voices
         self.active_voice_num = 0
         self.active_voice = self.voices[0]
 
     def noteon(self, freq, vel):
-        pass
-
-    def noteoff(self, freq):
-        pass
+        self.active_voice.noteon(freq, vel) # WTF IS WRONG HERE
+        self.active_voice_num = (self.active_voice_num + 1) % self.voice_num
+        self.active_voice = self.voices[self.active_voice_num]
 
     def set_algo(self, algo_num):
         for voice in self.voices:
             voice.set_algo(algo_num)
 
+    def randomize_ratios(self):
+        for mod_num in range(6):
+            rand_ratio = (random.randrange(0, 6) / 2) + 0.5
+            for voice in self.voices:
+                voice.mod_dict[mod_num + 1].ratio.value = rand_ratio
+
+    def randomize_envs(self):
+        for mod_num in range(6):
+            attack = random.uniform(0.002, 0.01)
+            decay = random.uniform(0.1, 0.5)
+            sustain = random.uniform(0.3, 0.6)
+            release = random.uniform(0.8, 1.4)
+            for voice in self.voices:
+                env = voice.mod_dict[mod_num + 1].env
+                env.attack, env.decay, env.sustain, env.release = attack, decay, sustain, release
+
+
 
 
 c = None
 
-synth = DX7Poly()
+synth = DX7Poly(8)
+synth.randomize_ratios()
+synth.randomize_envs()
 
 
 pattern = (48, 51, 55, 56, 51, 58)
@@ -122,7 +139,6 @@ def note():
     global pattern_count
     freq = note_to_freq(pattern[pattern_count] + 24)
     synth.noteon(freq, 1)
-    c = CallAfter(synth.noteoff, 0.3)
     pattern_count = (pattern_count + 1) % 6
 
 
@@ -131,7 +147,7 @@ def note_to_freq(pitch):
     return (a / 32) * (2 ** ((pitch - 9) / 12))
 
 
-p = Pattern(note, 0.5)
+p = Pattern(note, 0.2)
 p.play()
 p.ctrl()
 

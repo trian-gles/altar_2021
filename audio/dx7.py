@@ -7,7 +7,6 @@ s = Server().boot()
 
 
 class DXSineModule:
-
     def __init__(self, name, ratio=1.0, level=1.0):
         self.env = Adsr(dur=2)
 
@@ -111,17 +110,39 @@ class DX7Poly:
         for voice in self.voices:
             voice.set_algo(algo_num)
 
+    def set_ratio(self, mod_num, new_val):
+        for voice in self.voices:
+            voice.mod_dict[mod_num + 1].ratio.value = new_val
+
+    def set_attack(self, mod_num, new_val):
+        for voice in self.voices:
+            voice.mod_dict[mod_num + 1].env.attack = new_val
+
+    def set_decay(self, mod_num, new_val):
+        for voice in self.voices:
+            voice.mod_dict[mod_num + 1].env.decay = new_val
+
+    def set_sustain(self, mod_num, new_val):
+        for voice in self.voices:
+            voice.mod_dict[mod_num + 1].env.sustain = new_val
+
+    def set_release(self, mod_num, new_val):
+        for voice in self.voices:
+            voice.mod_dict[mod_num + 1].env.release = new_val
+
+    def set_level(self, mod_num, new_val):
+        for voice in self.voices:
+            voice.mod_dict[mod_num + 1].level.value = new_val
+
     def randomize_ratios(self):
         for mod_num in range(6):
             rand_ratio = (random.randrange(0, 6) / 2) + 0.5
-            for voice in self.voices:
-                voice.mod_dict[mod_num + 1].ratio.value = rand_ratio
+            self.set_ratio(mod_num, rand_ratio)
 
     def randomize_ratios_bad(self):
         for mod_num in range(6):
             rand_ratio = (random.uniform(0, 3))
-            for voice in self.voices:
-                voice.mod_dict[mod_num + 1].ratio.value = rand_ratio
+            self.set_ratio(mod_num, rand_ratio)
 
     def randomize_envs(self):
         for mod_num in range(6):

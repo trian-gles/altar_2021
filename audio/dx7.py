@@ -1,6 +1,8 @@
 from pyo import *
 import random
 import math
+from datetime import datetime
+import json
 
 
 s = Server().boot()
@@ -100,6 +102,7 @@ class DX7Poly:
         self.voice_num = voices
         self.active_voice_num = 0
         self.active_voice = self.voices[0]
+        self.algo = 0
 
     def noteon(self, freq, vel):
         self.active_voice.noteon(freq, vel)
@@ -109,6 +112,7 @@ class DX7Poly:
     def set_algo(self, algo_num):
         for voice in self.voices:
             voice.set_algo(algo_num)
+        self.algo = algo_num
 
     def set_ratio(self, mod_num, new_val):
         for voice in self.voices:
@@ -164,13 +168,32 @@ class DX7Poly:
     def randomize_algo(self):
         self.set_algo(random.randrange(0, len(DX7Mono.ALGORITHMS)))
 
+    def save(self):
+        settings = {
+            "algo": self.algo
+        }
+        for count, mod in enumerate(self.voices[0].mod_dict.values()):
+            mod_settings = {
+                "level": mod.level.value,
+                "ratio": mod.ratio.value,
+                "attack": mod.env.attack,
+                "decay": mod.env.decay,
+                "sustain": mod.env.sustain,
+                "release": mod.env.release
+            }
+            settings[count] = mod_settings
+        with open('settings.json', 'w') as file:
+            json.dump(settings, file)
 
-def main():
+
+
+if __name__ == "__main__":
     c = None
     trans = 0
 
     synth = DX7Poly(8)
     synth.randomize_all()
+    synth.save()
 
     pattern = (48, 51, 55, 56, 51, 58)
     pattern_count = 0
@@ -196,8 +219,4 @@ def main():
     p.play()
     p.ctrl()
 
-
     s.gui(locals())
-
-if __name__ == "__main__":
-    main()

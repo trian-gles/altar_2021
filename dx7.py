@@ -1,5 +1,5 @@
 from pyo import *
-from random import randrange
+import random
 import math
 
 
@@ -48,7 +48,14 @@ class DX7Mono:
         ((1, 0), (2, 1), (6, 6), (6, 5), (5, 4), (4, 3), (3, 0)),
         ((1, 0), (2, 1), (2, 2), (6, 5), (5, 4), (4, 3), (3, 0)),
         ((3, 2), (2, 1), (1, 0), (6, 5), (5, 4), (4, 3), (6, 6)),
-        ((3, 2), (2, 1), (1, 0), (6, 5), (5, 4), (4, 3), (6, 0))
+        ((3, 2), (2, 1), (1, 0), (6, 5), (5, 4), (4, 3), (6, 0)),
+        ((2, 1), (1, 0), (4, 3), (3, 0), (6, 6), (6, 5), (5, 0)),
+        ((2, 1), (1, 0), (4, 3), (3, 0), (6, 0), (6, 5), (5, 0)),
+        ((2, 1), (1, 0), (4, 3), (3, 0), (6, 6), (6, 5), (5, 3)),
+        ((2, 1), (1, 0), (4, 3), (3, 0), (4, 4), (6, 5), (5, 3)),
+        ((2, 1), (1, 0), (4, 3), (3, 0), (2, 2), (6, 5), (5, 3)),
+        ((1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 5), (6, 6)),
+        ((1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (6, 6))
     )
 
     def __init__(self):
@@ -110,6 +117,12 @@ class DX7Poly:
             for voice in self.voices:
                 voice.mod_dict[mod_num + 1].ratio.value = rand_ratio
 
+    def randomize_ratios_bad(self):
+        for mod_num in range(6):
+            rand_ratio = (random.uniform(0, 3))
+            for voice in self.voices:
+                voice.mod_dict[mod_num + 1].ratio.value = rand_ratio
+
     def randomize_envs(self):
         for mod_num in range(6):
             attack = random.uniform(0.002, 0.02)
@@ -128,7 +141,7 @@ class DX7Poly:
 
     def randomize_all(self):
         self.randomize_levels()
-        self.randomize_ratios()
+        self.randomize_ratios_bad()
         self.randomize_envs()
         self.randomize_algo()
 
@@ -137,6 +150,7 @@ class DX7Poly:
 
 
 c = None
+trans = 0
 
 synth = DX7Poly(8)
 synth.randomize_all()
@@ -145,11 +159,15 @@ pattern = (48, 51, 55, 56, 51, 58)
 pattern_count = 0
 
 def note():
+    global trans
     global c
     global pattern_count
-    freq = note_to_freq(pattern[pattern_count] + 24)
+    freq = note_to_freq(pattern[pattern_count] + 12 * trans)
     synth.noteon(freq, 1)
     pattern_count = (pattern_count + 1) % 6
+    if pattern_count == 0:
+        trans = (trans + 1) % 4
+        synth.randomize_all()
 
 
 def note_to_freq(pitch):

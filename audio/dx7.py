@@ -102,7 +102,7 @@ class DX7Poly:
         self.active_voice = self.voices[0]
 
     def noteon(self, freq, vel):
-        self.active_voice.noteon(freq, vel) # WTF IS WRONG HERE
+        self.active_voice.noteon(freq, vel)
         self.active_voice_num = (self.active_voice_num + 1) % self.voice_num
         self.active_voice = self.voices[self.active_voice_num]
 
@@ -146,19 +146,14 @@ class DX7Poly:
 
     def randomize_envs(self):
         for mod_num in range(6):
-            attack = random.uniform(0.002, 0.02)
-            decay = random.uniform(0.1, 0.5)
-            sustain = random.uniform(0.1, 0.9)
-            release = random.uniform(0.8, 1.4)
-            for voice in self.voices:
-                env = voice.mod_dict[mod_num + 1].env
-                env.attack, env.decay, env.sustain, env.release = attack, decay, sustain, release
+            self.set_attack(mod_num, random.uniform(0.002, 0.02))
+            self.set_decay(mod_num, random.uniform(0.1, 0.5))
+            self.set_sustain(mod_num, random.uniform(0.1, 0.9))
+            self.set_release(mod_num, random.uniform(0.8, 1.4))
 
     def randomize_levels(self):
         for mod_num in range(6):
-            level = random.random()
-            for voice in self.voices:
-                voice.mod_dict[mod_num + 1].level.value = level
+            self.set_level(mod_num, random.random())
 
     def randomize_all(self):
         self.randomize_levels()

@@ -24,7 +24,7 @@ class Slider:
     dimensions = (100, 20)
     cursor = (10, 20)
 
-    def __init__(self, name, coor, callback, mod_num, min=0, max=1.0, init=1.0, step=None):
+    def __init__(self, name, coor, callback, callback_arg, min=0, max=1.0, init=1.0, step=None):
         self.rect = pg.Rect(coor, self.dimensions)
         self.cursor_rect = pg.Rect(coor, self.cursor)
         self.name = FONT.render(name, False, WHITE)
@@ -32,7 +32,7 @@ class Slider:
 
         self.value_loc = (self.rect.topright[0], self.rect.topright[1] - 20)
         self.callback = callback
-        self.mod_num = mod_num
+        self.callback_arg = callback_arg
         self.min = min
         self.max = max
         self.step = step
@@ -52,7 +52,7 @@ class Slider:
             self.value = new_val
         else:
             self.value = self.step * round(new_val/self.step)
-        self.callback(self.mod_num, new_val)
+        self.callback(self.callback_arg, new_val)
         self.display_val = FONT.render(str(self.value)[0:4], False, WHITE)
 
     def randomize(self):
@@ -63,6 +63,16 @@ class Slider:
             value_frac = (mouse_coor[0] - self.rect.left) / self.rect.width
             new_val = (value_frac * (self.max - self.min)) + self.min
             self.change_value(new_val)
+
+
+class AlgoSlider(Slider):
+    def __init__(self, coor, callback):
+        super().__init__("Algorithm", coor, callback, None, 0, 10, 0, 1)
+
+    def change_value(self, new_val):
+        self.value = int(new_val)
+        self.callback(self.value)
+        self.display_val = FONT.render(str(self.value), False, WHITE)
 
 
 class Module:
@@ -93,14 +103,15 @@ class Module:
             slider.randomize()
 
 
+
 def main():
     run = True
     clock = pg.time.Clock()
     synth = DX7Poly(4)
     modules = [Module(((mod_num * 200) + 20, 20), mod_num, synth) for mod_num in range(6)]
+    algo_slider = AlgoSlider((20, 800), synth.set_algo)
 
-
-    other_gui = []
+    other_gui = [algo_slider]
     gui_items = modules + other_gui
     s.start()
 
@@ -112,13 +123,14 @@ def main():
                 quit()
 
             if event.type == pg.MOUSEBUTTONDOWN:
-                for module in modules:
-                    module.check_mouse(mouse_pos)
+                for item in gui_items:
+                    item.check_mouse(mouse_pos)
 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
                     for module in modules:
                         module.randomize()
+                    algo_slider.randomize()
                 if event.key == pg.K_SPACE:
                     synth.noteon(220, 1)
         screen.fill(BLACK)

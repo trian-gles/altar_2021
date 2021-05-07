@@ -165,7 +165,7 @@ class DX7Poly:
         self.set_algo(random.randrange(0, len(DX7Mono.ALGORITHMS)))
 
 
-if __name__ == "__main__":
+def main():
     c = None
     trans = 0
 
@@ -198,3 +198,6 @@ if __name__ == "__main__":
 
 
     s.gui(locals())
+
+if __name__ == "__main__":
+    main()

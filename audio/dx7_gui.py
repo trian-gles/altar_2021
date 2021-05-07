@@ -70,7 +70,7 @@ class AlgoSlider(Slider):
         super().__init__("Algorithm", coor, callback, None, 0, 10, 0, 1)
 
     def change_value(self, new_val):
-        self.value = int(new_val)
+        self.value = int(new_val + 0.5)
         self.callback(self.value)
         self.display_val = FONT.render(str(self.value), False, WHITE)
 

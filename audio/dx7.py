@@ -1,7 +1,6 @@
 from pyo import *
 import random
 import math
-from datetime import datetime
 import json
 
 
@@ -70,7 +69,6 @@ class DX7Mono:
 
     def set_algo(self, algo_num):
         self.reset_routes()
-        print(f"Switching to algorithm {algo_num}")
         for route in self.ALGORITHMS[algo_num]:
             out_num = route[0]
             in_num = route[1]
@@ -185,6 +183,20 @@ class DX7Poly:
         with open('settings.json', 'w') as file:
             json.dump(settings, file)
 
+    def load(self):
+        with open('settings.json') as file:
+            settings = json.load(file)
+        self.set_algo(settings["algo"])
+        print(settings)
+        for count, mod in enumerate(self.voices[0].mod_dict.values()):
+            count_str = str(count)
+            self.set_level(count, settings[count_str]['level'])
+            self.set_ratio(count, settings[count_str]['ratio'])
+            self.set_attack(count, settings[count_str]['attack'])
+            self.set_decay(count, settings[count_str]['decay'])
+            self.set_sustain(count, settings[count_str]['sustain'])
+            self.set_release(count, settings[count_str]['release'])
+
 
 
 if __name__ == "__main__":
@@ -193,7 +205,7 @@ if __name__ == "__main__":
 
     synth = DX7Poly(8)
     synth.randomize_all()
-    synth.save()
+    synth.load()
 
     pattern = (48, 51, 55, 56, 51, 58)
     pattern_count = 0

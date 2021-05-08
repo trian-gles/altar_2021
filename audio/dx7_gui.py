@@ -1,6 +1,7 @@
 import pygame as pg
 from dx7 import DX7Poly, s
 from random import uniform
+from text import MessageButton
 import pyautogui
 
 
@@ -18,6 +19,7 @@ pg.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))
 FONT = pg.font.Font('../resources/JetBrainsMono-Medium.ttf', 12)
 pg.display.set_caption("DX7 testing GUI")
+
 
 
 class Slider:
@@ -107,11 +109,15 @@ class Module:
 def main():
     run = True
     clock = pg.time.Clock()
+
     synth = DX7Poly(4)
+
     modules = [Module(((mod_num * 200) + 20, 20), mod_num, synth) for mod_num in range(6)]
     algo_slider = AlgoSlider((20, 800), synth.set_algo)
+    save_btn = MessageButton("Save", (20, 840), synth.save, FONT)
+    load_btn = MessageButton("Load", (20, 880), synth.load, FONT)
 
-    other_gui = [algo_slider]
+    other_gui = [algo_slider, save_btn, load_btn]
     gui_items = modules + other_gui
     s.start()
 

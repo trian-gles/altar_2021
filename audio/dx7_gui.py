@@ -3,6 +3,7 @@ from dx7 import DX7Poly, s
 from random import uniform
 from text import MessageButton
 import pyautogui
+from pyo import Pattern
 
 
 WIDTH = 1920
@@ -84,11 +85,11 @@ class Module:
         self.coor = coor
 
         self.level = Slider("Level", (coor[0], coor[1]), synth.set_level, mod_num)
-        self.ratio = Slider("Ratio", (coor[0], coor[1] + self.spacing), synth.set_ratio, mod_num)
-        self.attack = Slider("Attack", (coor[0], coor[1] + self.spacing * 3), synth.set_attack, mod_num)
-        self.decay = Slider("Decay", (coor[0], coor[1] + self.spacing * 4), synth.set_decay, mod_num)
+        self.ratio = Slider("Ratio", (coor[0], coor[1] + self.spacing), synth.set_ratio, mod_num, .5, 6, 1, .5)
+        self.attack = Slider("Attack", (coor[0], coor[1] + self.spacing * 3), synth.set_attack, mod_num, 0, .1, .01)
+        self.decay = Slider("Decay", (coor[0], coor[1] + self.spacing * 4), synth.set_decay, mod_num, .1, .5, .2)
         self.sustain = Slider("Sustain", (coor[0], coor[1] + self.spacing * 5), synth.set_sustain, mod_num)
-        self.release = Slider("Release", (coor[0], coor[1] + self.spacing * 6), synth.set_release, mod_num)
+        self.release = Slider("Release", (coor[0], coor[1] + self.spacing * 6), synth.set_release, mod_num, .8, 1.4, 1)
 
         self.sliders = (self.level, self.ratio, self.attack, self.decay, self.sustain, self.release)
 
@@ -104,20 +105,50 @@ class Module:
         for slider in self.sliders:
             slider.randomize()
 
-
+pattern = (48, 51, 55, 56, 51, 58)
+pattern_count = 0
+c = None
+trans = 0
 
 def main():
     run = True
     clock = pg.time.Clock()
 
-    synth = DX7Poly(4)
+    synth = DX7Poly(8)
+    synth.randomize_all()
+    synth.load()
+
+
+
+    def note():
+        global trans
+        global c
+        global pattern_count
+        freq = note_to_freq(pattern[pattern_count] + 12 * trans)
+        synth.noteon(freq, 1)
+        pattern_count = (pattern_count + 1) % 6
+        if pattern_count == 0:
+            trans = (trans + 1) % 4
+            for module in modules:
+                module.randomize()
+
+    def note_to_freq(pitch):
+        a = 440
+        return (a / 32) * (2 ** ((pitch - 9) / 12))
+
+    p = Pattern(note, 0.2)
+
+    def play():
+        print("playing pattern")
+        p.play()
 
     modules = [Module(((mod_num * 200) + 20, 20), mod_num, synth) for mod_num in range(6)]
     algo_slider = AlgoSlider((20, 800), synth.set_algo)
     save_btn = MessageButton("Save", (20, 840), synth.save, FONT)
     load_btn = MessageButton("Load", (20, 880), synth.load, FONT)
+    pattern_btn = MessageButton("Pattern", (20, 920), play, FONT)
 
-    other_gui = [algo_slider, save_btn, load_btn]
+    other_gui = [algo_slider, save_btn, load_btn, pattern_btn]
     gui_items = modules + other_gui
     s.start()
 

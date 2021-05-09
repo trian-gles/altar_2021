@@ -116,7 +116,6 @@ def main():
 
     synth = DX7Poly(8)
     synth.randomize_all()
-    synth.load()
 
 
 

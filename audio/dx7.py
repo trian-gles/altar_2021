@@ -2,6 +2,8 @@ from pyo import *
 import random
 import math
 import json
+from tkinter import filedialog as fd
+from tkinter import Tk
 
 
 s = Server().boot()
@@ -167,6 +169,9 @@ class DX7Poly:
         self.set_algo(random.randrange(0, len(DX7Mono.ALGORITHMS)))
 
     def save(self):
+        root = Tk()
+        file = fd.asksaveasfile()
+        root.destroy()
         settings = {
             "algo": self.algo
         }
@@ -180,14 +185,16 @@ class DX7Poly:
                 "release": mod.env.release
             }
             settings[count] = mod_settings
-        with open('settings.json', 'w') as file:
-            json.dump(settings, file)
+        json.dump(settings, file)
+        file.close()
 
     def load(self):
-        with open('settings.json') as file:
-            settings = json.load(file)
+        root = Tk()
+        file = fd.askopenfile()
+        root.destroy()
+        settings = json.load(file)
+        file.close()
         self.set_algo(settings["algo"])
-        print(settings)
         for count, mod in enumerate(self.voices[0].mod_dict.values()):
             count_str = str(count)
             self.set_level(count, settings[count_str]['level'])
@@ -200,8 +207,6 @@ class DX7Poly:
 
 
 if __name__ == "__main__":
-    c = None
-    trans = 0
 
     synth = DX7Poly(8)
     synth.randomize_all()
@@ -209,7 +214,8 @@ if __name__ == "__main__":
 
     pattern = (48, 51, 55, 56, 51, 58)
     pattern_count = 0
-
+    c = None
+    trans = 0
     def note():
         global trans
         global c

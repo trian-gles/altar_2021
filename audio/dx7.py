@@ -115,27 +115,27 @@ class DX7Poly:
             voice.set_algo(algo_num)
         self.algo = algo_num
 
-    def set_ratio(self, mod_num, new_val):
+    def set_ratio(self, mod_num: int, new_val):
         for voice in self.voices:
             voice.mod_dict[mod_num + 1].ratio.value = new_val
 
-    def set_attack(self, mod_num, new_val):
+    def set_attack(self, mod_num: int, new_val):
         for voice in self.voices:
             voice.mod_dict[mod_num + 1].env.attack = new_val
 
-    def set_decay(self, mod_num, new_val):
+    def set_decay(self, mod_num: int, new_val):
         for voice in self.voices:
             voice.mod_dict[mod_num + 1].env.decay = new_val
 
-    def set_sustain(self, mod_num, new_val):
+    def set_sustain(self, mod_num: int, new_val):
         for voice in self.voices:
             voice.mod_dict[mod_num + 1].env.sustain = new_val
 
-    def set_release(self, mod_num, new_val):
+    def set_release(self, mod_num: int, new_val):
         for voice in self.voices:
             voice.mod_dict[mod_num + 1].env.release = new_val
 
-    def set_level(self, mod_num, new_val):
+    def set_level(self, mod_num: int, new_val):
         for voice in self.voices:
             voice.mod_dict[mod_num + 1].level.value = new_val
 

@@ -22,20 +22,26 @@ FONT = pg.font.Font('../resources/JetBrainsMono-Medium.ttf', 12)
 pg.display.set_caption("DX7 testing GUI")
 
 
+def note_to_freq(pitch):
+    a = 440
+    return (a / 32) * (2 ** ((pitch - 9) / 12))
+
+
 
 class Slider:
     dimensions = (100, 20)
     cursor = (10, 20)
 
-    def __init__(self, name, coor, callback, callback_arg, min=0, max=1.0, init=1.0, step=None):
+    def __init__(self, name, coor, setter, callback_arg, getter, min=0, max=1.0, init=1.0, step=None):
         self.rect = pg.Rect(coor, self.dimensions)
         self.cursor_rect = pg.Rect(coor, self.cursor)
         self.name = FONT.render(name, False, WHITE)
         self.name_loc = (self.rect.topleft[0], self.rect.topleft[1] - 20)
 
         self.value_loc = (self.rect.topright[0], self.rect.topright[1] - 20)
-        self.callback = callback
+        self.setter = setter
         self.callback_arg = callback_arg
+        self.getter = getter
         self.min = min
         self.max = max
         self.step = step
@@ -50,13 +56,16 @@ class Slider:
         pg.draw.rect(surf, WHITE, self.rect)
         pg.draw.rect(surf, LIGHT_GREY, self.cursor_rect)
 
-    def change_value(self, new_val):
+    def change_value(self, new_val: float):
         if not self.step:
             self.value = new_val
         else:
             self.value = self.step * round(new_val/self.step)
-        self.callback(self.callback_arg, new_val)
+        self.setter(self.callback_arg, new_val)
         self.display_val = FONT.render(str(self.value)[0:4], False, WHITE)
+
+    def load(self):
+        self.change_value(self.getter(self.callback_arg))
 
     def randomize(self):
         self.change_value(uniform(self.min, self.max))
@@ -74,7 +83,7 @@ class AlgoSlider(Slider):
 
     def change_value(self, new_val):
         self.value = int(new_val + 0.5)
-        self.callback(self.value)
+        self.setter(self.value)
         self.display_val = FONT.render(str(self.value), False, WHITE)
 
 
@@ -84,12 +93,17 @@ class Module:
     def __init__(self, coor: tuple, mod_num: int, synth: DX7Poly):
         self.coor = coor
 
-        self.level = Slider("Level", (coor[0], coor[1]), synth.set_level, mod_num)
-        self.ratio = Slider("Ratio", (coor[0], coor[1] + self.spacing), synth.set_ratio, mod_num, .5, 6, 1, .5)
-        self.attack = Slider("Attack", (coor[0], coor[1] + self.spacing * 3), synth.set_attack, mod_num, 0, .1, .01)
-        self.decay = Slider("Decay", (coor[0], coor[1] + self.spacing * 4), synth.set_decay, mod_num, .1, .5, .2)
-        self.sustain = Slider("Sustain", (coor[0], coor[1] + self.spacing * 5), synth.set_sustain, mod_num)
-        self.release = Slider("Release", (coor[0], coor[1] + self.spacing * 6), synth.set_release, mod_num, .8, 1.4, 1)
+        self.level = Slider("Level", (coor[0], coor[1]), synth.set_level, mod_num, synth.get_level)
+        self.ratio = Slider("Ratio", (coor[0], coor[1] + self.spacing), synth.set_ratio,
+                            mod_num, synth.get_ratio, .5, 6, 1, .5)
+        self.attack = Slider("Attack", (coor[0], coor[1] + self.spacing * 3), synth.set_attack,
+                             mod_num, synth.get_attack, 0, .1, .01)
+        self.decay = Slider("Decay", (coor[0], coor[1] + self.spacing * 4), synth.set_decay,
+                            mod_num, synth.get_decay, .1, .5, .2)
+        self.sustain = Slider("Sustain", (coor[0], coor[1] + self.spacing * 5), synth.set_sustain,
+                              mod_num, synth.get_sustain)
+        self.release = Slider("Release", (coor[0], coor[1] + self.spacing * 6),
+                              synth.set_release, mod_num, synth.get_release, .8, 1.4, 1)
 
         self.sliders = (self.level, self.ratio, self.attack, self.decay, self.sustain, self.release)
 
@@ -105,10 +119,16 @@ class Module:
         for slider in self.sliders:
             slider.randomize()
 
+    def load(self):
+        for slider in self.sliders:
+            slider.load()
+
+
 pattern = (48, 51, 55, 56, 51, 58)
 pattern_count = 0
 c = None
 trans = 0
+
 
 def main():
     run = True
@@ -131,9 +151,10 @@ def main():
             for module in modules:
                 module.randomize()
 
-    def note_to_freq(pitch):
-        a = 440
-        return (a / 32) * (2 ** ((pitch - 9) / 12))
+    def load_all():
+        synth.load()
+        for module in modules:
+            module.load()
 
     p = Pattern(note, 0.2)
 
@@ -154,7 +175,7 @@ def main():
     modules = [Module(((mod_num * 200) + 20, 20), mod_num, synth) for mod_num in range(6)]
     algo_slider = AlgoSlider((20, 800), synth.set_algo)
     save_btn = MessageButton("Save", (20, 840), synth.save, FONT)
-    load_btn = MessageButton("Load", (20, 880), synth.load, FONT)
+    load_btn = MessageButton("Load", (20, 880), load_all, FONT)
     pattern_btn = MessageButton("Pattern", (20, 920), play, FONT)
 
     other_gui = [algo_slider, save_btn, load_btn, pattern_btn]

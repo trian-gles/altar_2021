@@ -138,9 +138,19 @@ def main():
 
     p = Pattern(note, 0.2)
 
+    global playing
+    playing = False
+
     def play():
-        print("playing pattern")
-        p.play()
+        global playing
+        if playing:
+            print("stopping pattern")
+            p.stop()
+            playing = False
+        else:
+            print("playing pattern")
+            p.play()
+            playing = True
 
     modules = [Module(((mod_num * 200) + 20, 20), mod_num, synth) for mod_num in range(6)]
     algo_slider = AlgoSlider((20, 800), synth.set_algo)

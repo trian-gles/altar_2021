@@ -71,6 +71,7 @@ class DX7Mono:
 
     def set_algo(self, algo_num):
         self.reset_routes()
+        self.algo_num = algo_num
         for route in self.ALGORITHMS[algo_num]:
             out_num = route[0]
             in_num = route[1]
@@ -137,6 +138,27 @@ class DX7Poly:
     def set_level(self, mod_num, new_val):
         for voice in self.voices:
             voice.mod_dict[mod_num + 1].level.value = new_val
+
+    def get_algo(self):
+        return self.voices[0].algo_num
+
+    def get_ratio(self, mod_num):
+        return self.voices[0].mod_dict[mod_num + 1].ratio.value
+
+    def get_attack(self, mod_num):
+        return self.voices[0].mod_dict[mod_num + 1].env.attack
+
+    def get_decay(self, mod_num):
+        return self.voices[0].mod_dict[mod_num + 1].env.decay
+
+    def get_sustain(self, mod_num):
+        return self.voices[0].mod_dict[mod_num + 1].env.sustain
+
+    def get_release(self, mod_num):
+        return self.voices[0].mod_dict[mod_num + 1].env.release
+
+    def get_level(self, mod_num):
+        return self.voices[0].mod_dict[mod_num + 1].level.value
 
     def randomize_ratios(self):
         for mod_num in range(6):
@@ -223,6 +245,7 @@ if __name__ == "__main__":
         freq = note_to_freq(pattern[pattern_count] + 12 * trans)
         synth.noteon(freq, 1)
         pattern_count = (pattern_count + 1) % 6
+        print(synth.get_attack(0))
         if pattern_count == 0:
             trans = (trans + 1) % 4
             synth.randomize_all()

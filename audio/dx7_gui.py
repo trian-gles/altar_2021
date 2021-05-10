@@ -89,6 +89,7 @@ class AlgoSlider(Slider):
     def load(self):
         self.change_value(self.getter())
 
+
 class Module:
     spacing = 40
 

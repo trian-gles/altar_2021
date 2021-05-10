@@ -21,5 +21,9 @@ class TestDX7(unittest.TestCase):
         self.synth.set_attack(4, .2)
         self.assertEqual(.2, self.synth.get_attack(4))
 
+    def test_poly(self):
+        self.synth.noteon(40, 1)
+        self.assertEqual(self.synth.active_voice, self.synth.voices[1])
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,4 +1,6 @@
 import pygame as pg
+import pyautogui
+import os
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -10,6 +12,40 @@ RED = (255, 0, 0)
 
 pg.init()
 
+
+def load_resource(filename):
+    return os.path.join('resources', filename)
+
+
+def load_image(filename):
+    return pg.image.load(load_resource(filename))
+
+
 screen = pg.display.set_mode((WIDTH, HEIGHT))
-FONT = pg.font.Font('../resources/JetBrainsMono-Medium.ttf', 12)
+FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 12)
+BACKGROUND = pg.image.load(load_resource("gameboard.jpg"))
 pg.display.set_caption("DX7 testing GUI")
+
+
+def main():
+    run = True
+    clock = pg.time.Clock()
+    mouse_pos = pg.mouse.get_pos()
+
+    while run:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                quit()
+
+        screen.blit(BACKGROUND, (0, 0))
+        pg.display.update()
+        clock.tick(30)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+

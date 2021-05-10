@@ -32,7 +32,7 @@ class Slider:
     dimensions = (100, 20)
     cursor = (10, 20)
 
-    def __init__(self, name, coor, setter, callback_arg, getter, min=0, max=1.0, init=1.0, step=None):
+    def __init__(self, name, coor, setter, callback_arg, getter, min=0.0, max=1.0, init=1.0, step=None):
         self.rect = pg.Rect(coor, self.dimensions)
         self.cursor_rect = pg.Rect(coor, self.cursor)
         self.name = FONT.render(name, False, WHITE)
@@ -78,14 +78,16 @@ class Slider:
 
 
 class AlgoSlider(Slider):
-    def __init__(self, coor, callback):
-        super().__init__("Algorithm", coor, callback, None, 0, 10, 0, 1)
+    def __init__(self, coor, callback, getter):
+        super().__init__("Algorithm", coor, callback, None, getter, 0, 10, 0, 1)
 
     def change_value(self, new_val):
         self.value = int(new_val + 0.5)
         self.setter(self.value)
         self.display_val = FONT.render(str(self.value), False, WHITE)
 
+    def load(self):
+        self.change_value(self.getter())
 
 class Module:
     spacing = 40
@@ -155,6 +157,7 @@ def main():
         synth.load()
         for module in modules:
             module.load()
+        algo_slider.load()
 
     p = Pattern(note, 0.2)
 
@@ -173,7 +176,7 @@ def main():
             playing = True
 
     modules = [Module(((mod_num * 200) + 20, 20), mod_num, synth) for mod_num in range(6)]
-    algo_slider = AlgoSlider((20, 800), synth.set_algo)
+    algo_slider = AlgoSlider((20, 800), synth.set_algo, synth.get_algo)
     save_btn = MessageButton("Save", (20, 840), synth.save, FONT)
     load_btn = MessageButton("Load", (20, 880), load_all, FONT)
     pattern_btn = MessageButton("Pattern", (20, 920), play, FONT)

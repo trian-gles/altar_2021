@@ -1,6 +1,7 @@
 import pygame as pg
 import pyautogui
 import os
+from gui_items import Card
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -30,14 +31,23 @@ pg.display.set_caption("DX7 testing GUI")
 def main():
     run = True
     clock = pg.time.Clock()
-    mouse_pos = pg.mouse.get_pos()
+    test_card = Card((100, 100))
+    hover_items = (test_card,)
+    gui_items = hover_items
 
     while run:
+        # check the mouse position for all hoverable items
+        mouse_pos = pg.mouse.get_pos()
+        for item in hover_items:
+            item.check_mouse(mouse_pos)
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 quit()
 
         screen.blit(BACKGROUND, (0, 0))
+        for item in gui_items:
+            item.draw(screen)
         pg.display.update()
         clock.tick(30)
 

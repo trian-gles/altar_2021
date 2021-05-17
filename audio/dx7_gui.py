@@ -153,6 +153,7 @@ def main():
             trans = (trans + 1) % 4
             for module in modules:
                 module.randomize()
+            algo_slider.randomize()
 
     def load_all():
         synth.load()

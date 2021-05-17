@@ -1,7 +1,7 @@
 import pygame as pg
 import pyautogui
 import os
-from gui_items import Card
+from gui_items import Card, DropZone, HandZone
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -31,8 +31,11 @@ pg.display.set_caption("DX7 testing GUI")
 def main():
     run = True
     clock = pg.time.Clock()
-    test_card = Card((100, 100))
-    hover_items = (test_card,)
+    drop_c = DropZone((750, 245))
+    drop_r = DropZone((175, 665))
+    drop_l = DropZone((1330, 665))
+    hand = HandZone((685, 850))
+    hover_items = (drop_c, drop_r, drop_l, hand)
     gui_items = hover_items
 
     while run:

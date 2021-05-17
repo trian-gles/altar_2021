@@ -1,1 +1,1 @@
-from .card import Card, DropZone, HandZone
+from .cardhover import CardHover, DropZone, HandZone

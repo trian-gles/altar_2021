@@ -1,7 +1,7 @@
 import pygame as pg
 import pyautogui
 import os
-from gui_items import Card, DropZone, HandZone
+from gui_items import CardHover, DropZone, HandZone
 
 WIDTH = 1920
 HEIGHT = 1080

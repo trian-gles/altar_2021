@@ -19,11 +19,10 @@ class CardZone:
 
     def try_click(self):
         for space in self.card_spaces:
-            if space.card:
-                # check if the selected space is highlighted and has a card, then return it
-                result = space.card.try_click()
-                if result:
-                    return result
+            # check if the selected space is highlighted and has a card, then return it
+            result = space.try_click()
+            if result:
+                return result
 
     def drop_card(self, card):
         for space in self.card_spaces:
@@ -89,7 +88,18 @@ class CardSpace(BasicCard):
         if self.hover:
             picked_card = self.card
             self.card = None
+            print("Calling pickup card")
             return picked_card
+
+    def try_click(self):
+        if self.card:
+            if self.hover and not self.card.clicked:
+                self.card.clicked = True
+                picked_card = self.card
+                self.card = None
+                return picked_card
+            elif not self.card.clicked:
+                self.card.clicked = False
 
     def draw(self, surf: pg.Surface):
         if self.card:
@@ -136,11 +146,12 @@ class DrawSpace(BasicCard):
 
     def try_click(self):
         if self.cards:
-            # check if there are any cards, return the top
-            result = self.cards[0].try_click()
-            if result:
-                self.cards.pop(0)
-                return result
+            if self.hover and not self.cards[0].clicked:
+                self.cards[0].clicked = True
+                picked_card = self.cards.pop(0)
+                return picked_card
+            elif not self.cards[0].clicked:
+                self.cards[0].clicked = False
 
     def draw(self, surf: pg.Surface):
         if self.cards:
@@ -176,13 +187,6 @@ class MoveableCard(BasicCard):
         self.clicked = False
         if self.flipped:
             self.flip()
-
-    def try_click(self):
-        if self.hover and not self.clicked:
-            self.clicked = True
-            return self
-        elif not self.clicked:
-            self.clicked = False
 
     def flip(self):
         self.flipped = not self.flipped

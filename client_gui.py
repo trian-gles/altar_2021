@@ -1,7 +1,7 @@
 import pygame as pg
 import pyautogui
 import os
-from gui_items import CardSpace, DropZone, HandZone
+from gui_items import DiscardSpace, DropZone, HandZone
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -35,7 +35,8 @@ def main():
     drop_r = DropZone((175, 665))
     drop_l = DropZone((1330, 665))
     hand = HandZone((685, 850))
-    hover_items = (drop_c, drop_r, drop_l, hand)
+    discard = DiscardSpace((50, 50))
+    hover_items = (drop_c, drop_r, drop_l, discard, hand)
     gui_items = hover_items
     held_card = None
 
@@ -49,11 +50,13 @@ def main():
             if event.type == pg.QUIT:
                 quit()
             if event.type == pg.MOUSEBUTTONDOWN:
+                # try to pick up a card
                 if not held_card:
                     for item in hover_items:
                         new_card = item.try_click()
                         if new_card:
                             held_card = new_card
+                # try to drop a card
                 else:
                     for item in hover_items:
                         result = item.drop_card(held_card)

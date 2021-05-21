@@ -1,1 +1,1 @@
-from .cardspace import CardSpace, DropZone, HandZone
+from .cardspace import CardSpace, DropZone, HandZone, DiscardSpace

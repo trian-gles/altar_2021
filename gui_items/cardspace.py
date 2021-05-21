@@ -99,10 +99,23 @@ class CardSpace(BasicCard):
             pg.draw.rect(surf, (255, 255, 255), self.rect, width=3, border_radius=5)
 
 
+class DiscardSpace(CardSpace):
+    def draw(self, surf: pg.Surface):
+        if self.hover:
+            pg.draw.rect(surf, (255, 255, 255), self.rect, width=3, border_radius=5)
+
+    def pickup_card(self):
+        pass
+
+    def try_click(self):
+        pass
+
+
 class MoveableCard(BasicCard):
-    def __init__(self, coor):
+    def __init__(self, coor, id_num=0):
         super(MoveableCard, self).__init__(coor)
         self.graphic = pg.image.load(os.path.join('cards', 'test_card.jpg'))
+        self.id_num = id_num
         self.clicked = False
 
     def check_mouse(self, mouse_coor):

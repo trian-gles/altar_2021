@@ -40,10 +40,17 @@ class DropZone(CardZone):
     def __init__(self, coor):
         super(DropZone, self).__init__(coor, num_cards=3)
 
+    def return_content(self):
+        map_obj = map(lambda space: space.return_content(), self.card_spaces)
+        return tuple(map_obj)
+
 
 class HandZone(CardZone):
     def __init__(self, coor):
         super(HandZone, self).__init__(coor, num_cards=4)
+
+    def return_content(self):
+        pass
 
 
 class BasicCard:
@@ -100,6 +107,12 @@ class CardSpace(BasicCard):
                 return picked_card
             elif not self.card.clicked:
                 self.card.clicked = False
+
+    def return_content(self):
+        if self.card:
+            return self.card.id_num
+        else:
+            return None
 
     def draw(self, surf: pg.Surface):
         if self.card:
@@ -164,6 +177,12 @@ class DrawSpace(BasicCard):
 
     def drop_card(self, card):
         pass
+
+    def return_content(self):
+        if self.cards:
+            return tuple(map(lambda card: card.id_num, self.cards))
+        else:
+            return None
 
 
 class MoveableCard(BasicCard):

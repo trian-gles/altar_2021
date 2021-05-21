@@ -2,6 +2,7 @@ import pygame as pg
 import pyautogui
 import os
 from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace
+from audio import AudioManager
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -22,10 +23,23 @@ def load_image(filename):
     return pg.image.load(load_resource(filename))
 
 
+def get_content(items):
+    content = tuple(map(lambda item: item.return_content(), items))
+    audio.input(content[0:3])
+    return content
+
+
+def set_content(items, content: list):
+    for i, item in enumerate(items):
+        item.set_content(content[i])
+
+
 screen = pg.display.set_mode((WIDTH, HEIGHT))
 FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 12)
 BACKGROUND = pg.image.load(load_resource("gameboard.jpg"))
 pg.display.set_caption("DX7 testing GUI")
+
+audio = AudioManager()
 
 
 def main():
@@ -52,7 +66,7 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 quit()
-            if event.type == pg.MOUSEBUTTONDOWN:
+            elif event.type == pg.MOUSEBUTTONDOWN:
                 # try to pick up a card
                 if not held_card:
                     for item in hover_items:
@@ -67,6 +81,10 @@ def main():
                             # check if the card was successfully dropped
                             held_card = None
                             break
+
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    get_content(gui_items)
 
         screen.blit(BACKGROUND, (0, 0))
         for item in gui_items:

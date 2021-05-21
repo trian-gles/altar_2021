@@ -110,13 +110,23 @@ class DiscardSpace(CardSpace):
     def try_click(self):
         pass
 
+    def drop_card(self, card):
+        if self.hover:
+            self.card = card
+            card.drop(self.rect.topleft)
+            card.flip()
+            return True
+
 
 class MoveableCard(BasicCard):
-    def __init__(self, coor, id_num=0):
+    flip_graphic = pg.image.load(os.path.join('cards', 'flip_card.jpg'))
+
+    def __init__(self, coor, id_num=0, flip=False):
         super(MoveableCard, self).__init__(coor)
         self.graphic = pg.image.load(os.path.join('cards', 'test_card.jpg'))
         self.id_num = id_num
         self.clicked = False
+        self.flipped = flip
 
     def check_mouse(self, mouse_coor):
         if not self.clicked:
@@ -135,8 +145,14 @@ class MoveableCard(BasicCard):
         elif not self.clicked:
             self.clicked = False
 
+    def flip(self):
+        self.flipped = not self.flipped
+
     def draw(self, surf: pg.Surface):
         pg.draw.rect(surf, (0, 0, 0), self.rect, width=0, border_radius=5)
-        surf.blit(self.graphic, self.rect)
+        if self.flipped:
+            surf.blit(self.flip_graphic, self.rect)
+        else:
+            surf.blit(self.graphic, self.rect)
         pg.draw.rect(surf, (55, 55, 55), self.rect, width=3, border_radius=5)
 

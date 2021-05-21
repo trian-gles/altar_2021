@@ -194,4 +194,3 @@ class MoveableCard(BasicCard):
         else:
             surf.blit(self.graphic, self.rect)
         pg.draw.rect(surf, (55, 55, 55), self.rect, width=3, border_radius=5)
-

@@ -46,6 +46,8 @@ def main():
         mouse_pos = pg.mouse.get_pos()
         for item in hover_items:
             item.check_mouse(mouse_pos)
+        if held_card:
+            held_card.check_mouse(mouse_pos)
 
         for event in pg.event.get():
             if event.type == pg.QUIT:

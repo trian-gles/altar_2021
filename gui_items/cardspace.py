@@ -72,7 +72,7 @@ class BasicCard:
 class CardSpace(BasicCard):
     def __init__(self, coor):
         super().__init__(coor)
-        self.card = MoveableCard(coor)
+        self.card = None
 
     def check_mouse(self, mouse_coor):
         super().check_mouse(mouse_coor)
@@ -118,6 +118,43 @@ class DiscardSpace(CardSpace):
             return True
 
 
+class DrawSpace(BasicCard):
+    def __init__(self, coor):
+        super(DrawSpace, self).__init__(coor)
+        self.cards = [MoveableCard(coor, i, True) for i in range(52)]
+
+    def check_mouse(self, mouse_coor):
+        super().check_mouse(mouse_coor)
+        if self.cards:
+            self.cards[0].check_mouse(mouse_coor)
+
+    def pickup_card(self):
+        if self.hover and self.cards:
+            picked_card = self.cards.pop()
+            print(self.cards)
+            return picked_card
+
+    def try_click(self):
+        if self.cards:
+            # check if there are any cards, return the top
+            result = self.cards[0].try_click()
+            if result:
+                self.cards.pop(0)
+                return result
+
+    def draw(self, surf: pg.Surface):
+        if self.cards:
+            self.cards[0].draw(surf)
+        else:
+            print("Out of cards to draw")
+
+        if self.hover:
+            pg.draw.rect(surf, (255, 255, 255), self.rect, width=3, border_radius=5)
+
+    def drop_card(self, card):
+        pass
+
+
 class MoveableCard(BasicCard):
     flip_graphic = pg.image.load(os.path.join('cards', 'flip_card.jpg'))
 
@@ -137,6 +174,8 @@ class MoveableCard(BasicCard):
     def drop(self, coor):
         self.rect.topleft = coor
         self.clicked = False
+        if self.flipped:
+            self.flip()
 
     def try_click(self):
         if self.hover and not self.clicked:

@@ -1,7 +1,7 @@
 import pygame as pg
 import pyautogui
 import os
-from gui_items import DiscardSpace, DropZone, HandZone
+from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -36,7 +36,8 @@ def main():
     drop_l = DropZone((1330, 665))
     hand = HandZone((685, 850))
     discard = DiscardSpace((50, 50))
-    hover_items = (drop_c, drop_r, drop_l, discard, hand)
+    draw = DrawSpace((WIDTH - 150, 50))
+    hover_items = (drop_c, drop_r, drop_l, discard, hand, draw)
     gui_items = hover_items
     held_card = None
 
@@ -68,6 +69,8 @@ def main():
         screen.blit(BACKGROUND, (0, 0))
         for item in gui_items:
             item.draw(screen)
+        if held_card:
+            held_card.draw(screen)
         pg.display.update()
         clock.tick(30)
 

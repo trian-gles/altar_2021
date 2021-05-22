@@ -1,6 +1,6 @@
 import pygame as pg
 from dx7 import DX7Poly, s
-from random import uniform
+from random import uniform, randrange
 from text import MessageButton
 import pyautogui
 from pyo import Pattern
@@ -146,9 +146,16 @@ def main():
         global trans
         global c
         global pattern_count
+        hold = False
+        if randrange(6) == 1:
+            hold = True
+        p.time = 0.2
+        if hold:
+            p.time = 0.6
         freq = note_to_freq(pattern[pattern_count] + 12 * trans)
         synth.noteon(freq, 1)
-        pattern_count = (pattern_count + 1) % 6
+        if not hold:
+            pattern_count = (pattern_count + 1) % 6
         if pattern_count == 0:
             trans = (trans + 1) % 4
             for module in modules:

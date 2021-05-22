@@ -65,6 +65,7 @@ def main():
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
+                audio.close()
                 quit()
             elif event.type == pg.MOUSEBUTTONDOWN:
                 # try to pick up a card

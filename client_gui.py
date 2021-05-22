@@ -25,13 +25,18 @@ def load_image(filename):
 
 def get_content(items):
     content = tuple(map(lambda item: item.return_content(), items))
-    audio.input(content[0:3])
     return content
 
 
 def set_content(items, content: list):
     for i, item in enumerate(items):
         item.set_content(content[i])
+
+
+def end_turn(gui_items):
+    # updates the audio manager when cards are dropped
+    content = get_content(gui_items)
+    audio.input(content[0:3])
 
 
 screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -81,6 +86,7 @@ def main():
                         if result:
                             # check if the card was successfully dropped
                             held_card = None
+                            end_turn(gui_items)
                             break
 
             elif event.type == pg.KEYDOWN:

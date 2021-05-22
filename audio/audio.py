@@ -1,6 +1,7 @@
 from pyo import *
 from .dx7 import DX7Poly
-from .audio_cards import ALL_CARDS
+from .audio_cards import ALL_CARDS, AudioCard
+from time import time
 
 
 
@@ -21,27 +22,43 @@ class AudioManager:
 
 class Zone:
     def __init__(self):
-        self.dx7 = DX7Poly(8)
+        self.dx7 = DX7Poly(4)
         self.trans = 0
         self.count = 0
         self.pattern_count = 0
-        self.pattern = Pattern(self.play, 0.2)
+        self.pattern = Pattern(self.play, 1)
+        self.card_nums = []
         self.applied_cards = []
         self.notes = (48, 51, 55, 56, 51, 58)
+        self.last_time = time()
 
     def input(self, msg):
         for card_num in msg:
             if card_num or card_num == 0:
                 self.apply_card(card_num)
+        for card in self.applied_cards:
+            if card.index not in msg:
+                self.remove_card(card)
+        if self.applied_cards and not self.pattern.isPlaying():
+            self.pattern.play()
+        elif not self.applied_cards and self.pattern.isPlaying():
+            self.pattern.stop()
+        print(self.applied_cards)
 
     def apply_card(self, card_num):
-        self.applied_cards.append(ALL_CARDS[card_num])
-        print(self.applied_cards)
-        if self.applied_cards and not self.pattern.isPlaying():
-            print("Playing zone")
-            self.pattern.play()
+        # check if the card is not yet accounted for in the hand and then apply it
+        if ALL_CARDS[card_num] not in self.applied_cards:
+            self.applied_cards.append(ALL_CARDS[card_num])
+            print(f"Applying a card {ALL_CARDS[card_num]}")
+            ALL_CARDS[card_num].apply(self.dx7, self.pattern)
+
+    def remove_card(self, card: AudioCard):
+        card.remove(self.dx7, self.pattern)
+        self.applied_cards.remove(card)
 
     def play(self):
+        print(self.last_time - time())
+        self.last_time = time()
         self.dx7.randomize_all()
         self.dx7.noteon(220, 1)
 

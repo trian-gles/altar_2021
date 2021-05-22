@@ -19,7 +19,7 @@ class Zone:
 
     def input(self, msg):
         for card_num in msg:
-            if card_num:
+            if card_num or card_num == 0:
                 self.apply_card(card_num)
 
     def apply_card(self, card_num):

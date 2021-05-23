@@ -15,12 +15,17 @@ class AudioManager:
         # Messages should be a tuple of three tuples, each inner tuple providing three elements of instructions ((1, 2, 3), (None, 5, 8), (2, 5, 8))
         for i, zone in enumerate(self.zones):
             zone.input(msg[i])
+            zone.dx7.randomize_all()
 
     def close(self):
         self.server.stop()
 
 
 class Zone:
+    glob_pattern = (48, 51, 55, 56, 51, 58)
+    glob_pat_count = 0
+    # shared global pattern that the three zones with loop through together
+
     def __init__(self):
         self.dx7 = DX7Poly(4)
         self.trans = 0
@@ -71,7 +76,9 @@ class Zone:
             for cb in self.callbacks:
                 cb(self.dx7, self.pattern)
         self.last_time = time()
-        self.dx7.noteon(220, 1)
+        freq = note_to_freq(self.glob_pattern[Zone.glob_pat_count])
+        self.dx7.noteon(freq, 1)
+        Zone.glob_pat_count = (Zone.glob_pat_count + 1) % 6
 
 
 
@@ -89,3 +96,8 @@ class ZoneThree(Zone):
 
 class Node:
     pass
+
+
+def note_to_freq(pitch):
+    a = 440
+    return (a / 32) * (2 ** ((pitch - 9) / 12))

@@ -1,6 +1,6 @@
 from pyo import *
 from .dx7 import DX7Poly
-
+from random import uniform
 
 ALL_CARDS = []
 
@@ -10,11 +10,15 @@ class AudioCard:
         ALL_CARDS.append(self)
         self.index = ALL_CARDS.index(self)
         self.orig_param = None
+        self.cb = None
 
     def apply(self, dx7: DX7Poly, pat: Pattern):
         pass
 
     def remove(self, dx7: DX7Poly, pat: Pattern):
+        pass
+
+    def callback(self, dx7: DX7Poly, pat: Pattern):
         pass
 
     def __repr__(self):
@@ -35,4 +39,14 @@ class Card1(AudioCard):
         pat.time = self.orig_param
 
 
-audio_cards = [Card0(), Card1()] + [AudioCard() for _ in range(50)]
+class Card2(AudioCard):
+    def __init__(self):
+        super(Card2, self).__init__()
+        self.cb = self.callback
+
+    def callback(self, dx7: DX7Poly, pat: Pattern):
+        print("Calling card 2 callback")
+        pat.time = uniform(0, 1)
+
+
+audio_cards = [Card0(), Card1(), Card2()] + [AudioCard() for _ in range(49)]

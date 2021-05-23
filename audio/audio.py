@@ -31,6 +31,8 @@ class Zone:
         self.applied_cards = []
         self.notes = (48, 51, 55, 56, 51, 58)
         self.last_time = time()
+        self.card_callback = None
+        self.callbacks = []
 
     def input(self, msg):
         for card_num in msg:
@@ -48,18 +50,27 @@ class Zone:
     def apply_card(self, card_num):
         # check if the card is not yet accounted for in the hand and then apply it
         if ALL_CARDS[card_num] not in self.applied_cards:
-            self.applied_cards.append(ALL_CARDS[card_num])
-            print(f"Applying a card {ALL_CARDS[card_num]}")
-            ALL_CARDS[card_num].apply(self.dx7, self.pattern)
+            new_card = ALL_CARDS[card_num]
+            self.applied_cards.append(new_card)
+            print(f"Applying a card {new_card}")
+            new_card.apply(self.dx7, self.pattern)
+
+            if new_card.cb:
+                self.callbacks.append(new_card.cb)
 
     def remove_card(self, card: AudioCard):
         card.remove(self.dx7, self.pattern)
+        if card.cb in self.callbacks:
+            self.callbacks.remove(card.cb)
+
         self.applied_cards.remove(card)
 
     def play(self):
         print(self.last_time - time())
+        if self.callbacks:
+            for cb in self.callbacks:
+                cb(self.dx7, self.pattern)
         self.last_time = time()
-        self.dx7.randomize_all()
         self.dx7.noteon(220, 1)
 
 

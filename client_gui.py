@@ -3,6 +3,26 @@ import pyautogui
 import os
 from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace
 from audio import AudioManager
+import argparse
+from random import randrange
+from socks import Client
+
+
+parser = argparse.ArgumentParser(description='Main script for piece')
+parser.add_argument('-name', help='username for debug and logging purposes', default=f"USER {randrange(0, 100000)}")
+parser.add_argument('--local', action='store_true',
+                    help='run the gui in single player setup')
+parser.add_argument('--wind', action='store_true', help='run the gui in a windowed display')
+parser.add_argument('--audio', action='store_true', help='connect the audio engine to this client instance')
+
+args = parser.parse_args()
+
+USERNAME = args.name
+AUDIO = args.audio
+LOCAL = args.local
+
+if not LOCAL:
+    client = Client(USERNAME)
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -25,10 +45,13 @@ def load_image(filename):
 
 def get_content(items):
     content = tuple(map(lambda item: item.return_content(), items))
+    print(content)
     return content
 
 
-def set_content(items, content: list):
+def set_content(items, content: tuple):
+    if AUDIO:
+        audio.input(content[0:3])
     for i, item in enumerate(items):
         item.set_content(content[i])
 
@@ -36,7 +59,10 @@ def set_content(items, content: list):
 def end_turn(gui_items):
     # updates the audio manager when cards are dropped
     content = get_content(gui_items)
-    audio.input(content[0:3])
+    if AUDIO:
+        audio.input(content[0:3])
+    if not LOCAL:
+        client.end_turn(content)
 
 
 screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -44,7 +70,8 @@ FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 12)
 BACKGROUND = pg.image.load(load_resource("gameboard.jpg"))
 pg.display.set_caption("DX7 testing GUI")
 
-audio = AudioManager()
+if AUDIO:
+    audio = AudioManager()
 
 
 def main():
@@ -56,7 +83,8 @@ def main():
     hand = HandZone((685, 850))
     discard = DiscardSpace((50, 50))
     draw = DrawSpace((WIDTH - 150, 50))
-    hover_items = (drop_c, drop_r, drop_l, discard, hand, draw)
+    getset_items = (drop_c, drop_r, drop_l, draw)
+    hover_items = (discard, hand) + getset_items
     gui_items = hover_items
     held_card = None
 
@@ -70,7 +98,8 @@ def main():
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                audio.close()
+                if AUDIO:
+                    audio.close()
                 quit()
             elif event.type == pg.MOUSEBUTTONDOWN:
                 # try to pick up a card
@@ -86,12 +115,17 @@ def main():
                         if result:
                             # check if the card was successfully dropped
                             held_card = None
-                            end_turn(gui_items)
+                            end_turn(getset_items)
                             break
 
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
-                    get_content(gui_items)
+                    set_content(getset_items, ((3, None, 0), (None, None, 2), (None, 1, 4), (5, 6)))
+
+        if not LOCAL:
+            client_msg = client.listen()
+            if client_msg:
+                print(client_msg)
 
         screen.blit(BACKGROUND, (0, 0))
         for item in gui_items:

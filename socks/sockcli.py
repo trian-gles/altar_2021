@@ -14,6 +14,7 @@ class Client:
         self.client_socket.connect((Client.IP, Client.PORT))
         self.client_socket.setblocking(False)
         self.send_message(username)
+        print(f"User {username} listening on IP {self.IP}, PORT {self.PORT}")
 
     def send_message(self, message):
         enc_message = message.encode('utf-8')
@@ -31,6 +32,10 @@ class Client:
 
     def send_quit(self):
         msg_dict = {"method": "quit"}
+        self.send_pickle(msg_dict)
+
+    def end_turn(self, content: tuple):
+        msg_dict = {"method": "end_turn", "content": content}
         self.send_pickle(msg_dict)
 
     def listen(self):

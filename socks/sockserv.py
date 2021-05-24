@@ -1,7 +1,6 @@
 import socket
 import select
 import pickle
-import threading
 import os
 from random import choice, shuffle
 import logging
@@ -20,14 +19,12 @@ class Server:
         self.server_socket.listen()
 
         self.sockets_list = [self.server_socket]
-        self.clients = {}
+        self.clients = {} # dictionary containing socket objects that point to usernames
 
         self.deal_time = deal_time
         self.pass_time = pass_time
 
-        self.cards = list(range(42))
-        shuffle(self.cards)
-        # The mode will go from "sleep" to "deal" to "pass" to "finish"
+        # The mode will go from "sleep" to "play" to "finish"
         self.mode = "sleep"
 
     def print_log(self, msg):
@@ -53,6 +50,7 @@ class Server:
             return False
 
     def register_client(self):
+        # add the client to the list of sockets and dictionary of clients
         client_socket, client_addr = self.server_socket.accept()
 
         user = self.receive_message(client_socket)
@@ -60,13 +58,13 @@ class Server:
             return
 
         self.sockets_list.append(client_socket)
-        user["cards"] = 0
         self.clients[client_socket] = user
 
         self.print_log(f"accepted new connection from \
         {client_addr[0]}: {client_addr[1]} username = {user['data'].decode('utf-8')}")
 
     def remove_client(self, notified_socket):
+        # disconnect from the indicated socket
         self.print_log(f"Closed connection from {self.clients[notified_socket]['data'].decode('utf-8')}")
 
         if self.clients[notified_socket]['data'].decode('utf-8') == "debug":
@@ -76,9 +74,20 @@ class Server:
         del self.clients[notified_socket]
 
     def handle_exception_socks(self, exception_sockets):
+        # delete sockets throwing errors
         for notified_socket in exception_sockets:
             self.sockets_list.remove(notified_socket)
             del self.clients[notified_socket]
+
+    def end_turn_update(self, notified_socket, content: dict):
+        # tells the passed client what the to update to the indicated board status
+        send_to_index = self.sockets_list.index(notified_socket) + 1
+        content_dict = {"method": "update", "content": content,
+                        "sender": "GOTTA FIGURE THIS OUT"}
+        for sock in self.sockets_list:
+            if sock not in [notified_socket, self.server_socket]:
+                self.send_pickle(content_dict, sock)
+
 
     def listen(self):
         read_sockets, _, exception_sockets = select.select(self.sockets_list, [], self.sockets_list)
@@ -97,15 +106,18 @@ class Server:
                 user = self.clients[notified_socket]
                 username = user['data'].decode('utf-8')
                 msg_dict = pickle.loads(message['data'])
-                send_to_index = self.sockets_list.index(notified_socket) + 1
+
                 self.print_log(f"received message from {user['data'].decode('utf-8')}: {msg_dict}")
 
                 if msg_dict["method"] == "quit":
                     os._exit(0)
                 elif msg_dict["method"] == "start":
                     if self.mode == "sleep":
-                        self.mode = "deal"
+                        self.mode = "play"
                         self.print_log(f"User {username} has initiated the piece")
+                elif msg_dict["method"] == "end_turn":
+                    self.end_turn_update(notified_socket, msg_dict["content"])
+
 
 
 if __name__ == "__main__":

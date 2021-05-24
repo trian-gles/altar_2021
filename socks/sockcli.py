@@ -50,6 +50,9 @@ class Client:
                 pick_length = int(pick_header.decode("utf-8").strip())
                 message_dict = pickle.loads(self.client_socket.recv(pick_length))
 
+                if message_dict:
+                    return message_dict
+
         except IOError as e:
             if e.errno != errno.EAGAIN and e.errno != errno.EWOULDBLOCK:
                 print("Reading error : " + str(e))

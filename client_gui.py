@@ -2,7 +2,6 @@ import pygame as pg
 import pyautogui
 import os
 from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace
-from audio import AudioManager
 import argparse
 from random import randrange
 from socks import Client
@@ -23,6 +22,9 @@ LOCAL = args.local
 
 if not LOCAL:
     client = Client(USERNAME)
+
+if AUDIO:
+    from audio import AudioManager
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -45,7 +47,6 @@ def load_image(filename):
 
 def get_content(items):
     content = tuple(map(lambda item: item.return_content(), items))
-    print(content)
     return content
 
 
@@ -68,7 +69,7 @@ def end_turn(gui_items):
 screen = pg.display.set_mode((WIDTH, HEIGHT))
 FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 12)
 BACKGROUND = pg.image.load(load_resource("gameboard.jpg"))
-pg.display.set_caption("DX7 testing GUI")
+pg.display.set_caption(f"ALTAR CLIENT username = {USERNAME}")
 
 if AUDIO:
     audio = AudioManager()
@@ -125,7 +126,9 @@ def main():
         if not LOCAL:
             client_msg = client.listen()
             if client_msg:
-                print(client_msg)
+                if client_msg["method"] == 'update':
+                    print(client_msg['content'])
+                    set_content(getset_items, client_msg["content"])
 
         screen.blit(BACKGROUND, (0, 0))
         for item in gui_items:

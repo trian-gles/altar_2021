@@ -24,7 +24,7 @@ class Server:
         self.deal_time = deal_time
         self.pass_time = pass_time
 
-        # The mode will go from "sleep" to "play" to "finish"
+        # The mode will go from "sleep" to "play" to "finish" to "quit"
         self.mode = "sleep"
 
     def print_log(self, msg):
@@ -66,10 +66,6 @@ class Server:
     def remove_client(self, notified_socket):
         # disconnect from the indicated socket
         self.print_log(f"Closed connection from {self.clients[notified_socket]['data'].decode('utf-8')}")
-
-        if self.clients[notified_socket]['data'].decode('utf-8') == "debug":
-            quit()
-
         self.sockets_list.remove(notified_socket)
         del self.clients[notified_socket]
 
@@ -110,7 +106,7 @@ class Server:
                 self.print_log(f"received message from {user['data'].decode('utf-8')}: {msg_dict}")
 
                 if msg_dict["method"] == "quit":
-                    os._exit(0)
+                    self.mode = "quit"
                 elif msg_dict["method"] == "start":
                     if self.mode == "sleep":
                         self.mode = "play"
@@ -124,3 +120,5 @@ if __name__ == "__main__":
     server = Server()
     while True:
         server.listen()
+        if server.mode == "quit":
+            break

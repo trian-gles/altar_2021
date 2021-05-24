@@ -1,7 +1,7 @@
 import pygame as pg
 import pyautogui
 import os
-from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace
+from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace, MessageButton
 import argparse
 from random import randrange
 from socks import Client
@@ -11,14 +11,18 @@ parser = argparse.ArgumentParser(description='Main script for piece')
 parser.add_argument('-name', help='username for debug and logging purposes', default=f"USER {randrange(0, 100000)}")
 parser.add_argument('--local', action='store_true',
                     help='run the gui in single player setup')
-parser.add_argument('--wind', action='store_true', help='run the gui in a windowed display')
+parser.add_argument('--fullscreen', action='store_true', help='run the gui in a fullscreen display')
 parser.add_argument('--audio', action='store_true', help='connect the audio engine to this client instance')
+parser.add_argument('--admin', action='store_true',
+                    help="When the player designated as 'ADMIN' exits, the server will restart")
 
 args = parser.parse_args()
 
 USERNAME = args.name
 AUDIO = args.audio
 LOCAL = args.local
+ADMIN = args.admin
+FULLSCREEN = args.fullscreen
 
 if not LOCAL:
     client = Client(USERNAME)
@@ -66,7 +70,20 @@ def end_turn(gui_items):
         client.end_turn(content)
 
 
-screen = pg.display.set_mode((WIDTH, HEIGHT))
+def quit_all():
+    if AUDIO:
+        audio.close()
+    if ADMIN and not LOCAL:
+        client.send_quit()
+    quit()
+
+
+if FULLSCREEN:
+    screen = pg.display.set_mode((WIDTH, HEIGHT), pg.FULLSCREEN)
+else:
+    screen = pg.display.set_mode((WIDTH, HEIGHT))
+
+
 FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 12)
 BACKGROUND = pg.image.load(load_resource("gameboard.jpg"))
 pg.display.set_caption(f"ALTAR CLIENT username = {USERNAME}")
@@ -84,9 +101,22 @@ def main():
     hand = HandZone((685, 850))
     discard = DiscardSpace((50, 50))
     draw = DrawSpace((WIDTH - 150, 50))
+
+    # GUI items that have get and set methods
     getset_items = (drop_c, drop_r, drop_l, draw)
+
+    # All items that track mouse movement
     hover_items = (discard, hand) + getset_items
+
+    if ADMIN:
+        # buttons only viewable by those with admin designation
+        quit_btn = MessageButton("QUIT", (50, 350), quit_all, FONT)
+        start_btn = MessageButton("START", (50, 400), client.send_start, FONT)
+        hover_items += (quit_btn, start_btn)
+
+    # All GUI items
     gui_items = hover_items
+
     held_card = None
 
     while run:
@@ -97,11 +127,10 @@ def main():
         if held_card:
             held_card.check_mouse(mouse_pos)
 
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                if AUDIO:
-                    audio.close()
-                quit()
+                quit_all()
             elif event.type == pg.MOUSEBUTTONDOWN:
                 # try to pick up a card
                 if not held_card:

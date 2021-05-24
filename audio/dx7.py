@@ -98,7 +98,8 @@ class DX7Mono:
 
 
 class DX7Poly:
-    def __init__(self, voices):
+    def __init__(self, voices, rand_seed: int = 10):
+        random.seed(rand_seed)
         self.voices = [DX7Mono() for _ in range(voices)]
         self.voice_num = voices
         self.active_voice_num = 0
@@ -232,7 +233,7 @@ if __name__ == "__main__":
     s.boot()
     synth = DX7Poly(8)
     synth.randomize_all()
-    synth.load()
+    #synth.load()
 
     pattern = (48, 51, 55, 56, 51, 58)
     pattern_count = 0

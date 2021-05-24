@@ -46,8 +46,7 @@ class DropZone(CardZone):
 
     def set_content(self, card_nums):
         for i, card_num in enumerate(card_nums):
-            if card_num:
-                self.card_spaces[i].set_content(card_num)
+            self.card_spaces[i].set_content(card_num)
 
 
 class HandZone(CardZone):
@@ -123,7 +122,10 @@ class CardSpace(BasicCard):
             return None
 
     def set_content(self, card_num):
-        self.card = MoveableCard(self.rect.topleft, card_num)
+        if card_num or card_num == 0:
+            self.card = MoveableCard(self.rect.topleft, card_num)
+        else:
+            self.card = None
 
     def draw(self, surf: pg.Surface):
         if self.card:
@@ -196,7 +198,8 @@ class DrawSpace(BasicCard):
             return None
 
     def set_content(self, card_nums):
-        self.cards = [MoveableCard(self.rect.topleft, card_num, True) for card_num in card_nums]
+        if card_nums:
+            self.cards = [MoveableCard(self.rect.topleft, card_num, True) for card_num in card_nums]
 
 
 class MoveableCard(BasicCard):

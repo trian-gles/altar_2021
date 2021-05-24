@@ -16,6 +16,7 @@ LIGHT_GREY = (191, 191, 191)
 RED = (255, 0, 0)
 
 pg.init()
+s.boot()
 
 screen = pg.display.set_mode((WIDTH, HEIGHT))
 FONT = pg.font.Font('../resources/JetBrainsMono-Medium.ttf', 12)

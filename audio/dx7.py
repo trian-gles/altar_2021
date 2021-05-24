@@ -6,7 +6,7 @@ from tkinter import filedialog as fd
 from tkinter import Tk
 
 
-s = Server().boot()
+s = Server()
 
 
 class DXSineModule:
@@ -229,7 +229,7 @@ class DX7Poly:
 
 
 if __name__ == "__main__":
-
+    s.boot()
     synth = DX7Poly(8)
     synth.randomize_all()
     synth.load()

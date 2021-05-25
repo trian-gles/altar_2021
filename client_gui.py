@@ -157,6 +157,7 @@ def main():
             if client_msg:
                 if client_msg["method"] == 'update':
                     print(client_msg['content'])
+                    print(client_msg['current_player'])
                     set_content(getset_items, client_msg["content"])
 
         screen.blit(BACKGROUND, (0, 0))

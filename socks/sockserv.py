@@ -3,6 +3,7 @@ import select
 import pickle
 import os
 from random import choice, shuffle
+from itertools import cycle
 import logging
 import datetime
 
@@ -19,12 +20,14 @@ class Server:
         self.server_socket.listen()
 
         self.sockets_list = [self.server_socket]
-        self.clients = {} # dictionary containing socket objects that point to usernames
 
-        self.deal_time = deal_time
-        self.pass_time = pass_time
+        # dictionary containing socket objects that point to usernames
+        self.clients = {}
 
+        # circular list to be later created
+        self.turn_iter = None
         # The mode will go from "sleep" to "play" to "finish" to "quit"
+
         self.mode = "sleep"
 
     def print_log(self, msg):
@@ -75,15 +78,21 @@ class Server:
             self.sockets_list.remove(notified_socket)
             del self.clients[notified_socket]
 
-    def end_turn_update(self, notified_socket, content: dict):
-        # tells the passed client what the to update to the indicated board status
-        send_to_index = self.sockets_list.index(notified_socket) + 1
-        content_dict = {"method": "update", "content": content,
-                        "sender": "GOTTA FIGURE THIS OUT"}
-        for sock in self.sockets_list:
-            if sock not in [notified_socket, self.server_socket]:
-                self.send_pickle(content_dict, sock)
+    def start_piece(self):
+        self.mode = "play"
+        self.turn_iter = cycle(self.sockets_list[1:])
+        deck = tuple(range(52))
+        init_content = ((None, None, None), (None, None, None), (None, None, None), deck)
+        self.new_turn_update(init_content)
 
+    def new_turn_update(self, gui_content: tuple):
+        current_sock = next(self.turn_iter)
+        current_name = self.clients[current_sock]['data'].decode('utf-8')
+        content_dict = {"method": "update", "content": gui_content,
+                        "current_player": current_name}
+        for sock in self.sockets_list:
+            if sock != self.server_socket:
+                self.send_pickle(content_dict, sock)
 
     def listen(self):
         read_sockets, _, exception_sockets = select.select(self.sockets_list, [], self.sockets_list)
@@ -109,11 +118,10 @@ class Server:
                     self.mode = "quit"
                 elif msg_dict["method"] == "start":
                     if self.mode == "sleep":
-                        self.mode = "play"
+                        self.start_piece()
                         self.print_log(f"User {username} has initiated the piece")
                 elif msg_dict["method"] == "end_turn":
-                    self.end_turn_update(notified_socket, msg_dict["content"])
-
+                    self.new_turn_update(msg_dict["content"])
 
 
 if __name__ == "__main__":

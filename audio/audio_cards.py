@@ -171,4 +171,4 @@ class Card9(AudioCard):
 
 
 
-audio_cards = [AudioCard(), Card9(), Card7B(), Card8(), Card7(), Card6(), Card5(), Card3(), Card1(), Card2(), Card4()]
+audio_cards = [AudioCard(), Card9(), Card6(), Card8(), Card7(), Card6(), Card5(), Card3(), Card1(), Card2(), Card4()]

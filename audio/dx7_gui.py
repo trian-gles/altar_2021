@@ -64,7 +64,7 @@ class Slider:
             self.value = new_val
         else:
             self.value = self.step * round(new_val/self.step)
-        self.setter(self.callback_arg, new_val)
+        self.setter(self.callback_arg, self.value)
         self.display_val = FONT.render(str(self.value)[0:4], False, WHITE)
 
     def load(self):

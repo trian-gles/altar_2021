@@ -191,10 +191,7 @@ class DX7Poly:
     def randomize_algo(self):
         self.set_algo(random.randrange(0, len(DX7Mono.ALGORITHMS)))
 
-    def save(self):
-        root = Tk()
-        file = fd.asksaveasfile()
-        root.destroy()
+    def save(self, file):
         settings = {
             "algo": self.algo
         }
@@ -211,10 +208,7 @@ class DX7Poly:
         json.dump(settings, file)
         file.close()
 
-    def load(self):
-        root = Tk()
-        file = fd.askopenfile()
-        root.destroy()
+    def load(self, file):
         settings = json.load(file)
         file.close()
         self.set_algo(settings["algo"])

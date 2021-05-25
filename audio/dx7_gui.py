@@ -4,6 +4,8 @@ from random import uniform, randrange
 from text import MessageButton
 import pyautogui
 from pyo import Pattern
+from tkinter import filedialog as fd
+from tkinter import Tk
 
 
 WIDTH = 1920
@@ -141,8 +143,6 @@ def main():
     synth = DX7Poly(8)
     synth.randomize_all()
 
-
-
     def note():
         global trans
         global c
@@ -159,15 +159,26 @@ def main():
             pattern_count = (pattern_count + 1) % 6
         if pattern_count == 0:
             trans = (trans + 1) % 4
-            for module in modules:
-                module.randomize()
-            algo_slider.randomize()
+
+    def randomize():
+        for module in modules:
+            module.randomize()
+        algo_slider.randomize()
 
     def load_all():
-        synth.load()
+        root = Tk()
+        file = fd.askopenfile()
+        root.destroy()
+        synth.load(file)
         for module in modules:
             module.load()
         algo_slider.load()
+
+    def save_all():
+        root = Tk()
+        file = fd.asksaveasfile()
+        root.destroy()
+        synth.save(file)
 
     p = Pattern(note, 0.2)
 
@@ -187,11 +198,12 @@ def main():
 
     modules = [Module(((mod_num * 200) + 20, 20), mod_num, synth) for mod_num in range(6)]
     algo_slider = AlgoSlider((20, 800), synth.set_algo, synth.get_algo)
-    save_btn = MessageButton("Save", (20, 840), synth.save, FONT)
+    save_btn = MessageButton("Save", (20, 840), save_all, FONT)
     load_btn = MessageButton("Load", (20, 880), load_all, FONT)
     pattern_btn = MessageButton("Pattern", (20, 920), play, FONT)
+    random_btn = MessageButton("Randomize", (20, 960), randomize, FONT)
 
-    other_gui = [algo_slider, save_btn, load_btn, pattern_btn]
+    other_gui = [algo_slider, save_btn, load_btn, pattern_btn, random_btn]
     gui_items = modules + other_gui
     s.start()
 

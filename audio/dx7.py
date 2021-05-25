@@ -10,7 +10,7 @@ s = Server()
 
 
 class DXSineModule:
-    def __init__(self, name, ratio=1.0, level=1.0):
+    def __init__(self, name: str, ratio: float = 1.0, level: float = 1.0):
         self.env = Adsr(dur=2)
 
         self.name = name

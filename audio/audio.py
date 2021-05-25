@@ -10,12 +10,14 @@ class AudioManager:
         self.server = Server().boot()
         self.server.start()
         self.zones = (ZoneOne(), ZoneTwo(), ZoneThree())
+        for zone in self.zones:
+            zone.dx7.randomize_all()
 
     def input(self, msg):
         # Messages should be a tuple of three tuples, each inner tuple providing three elements of instructions ((1, 2, 3), (None, 5, 8), (2, 5, 8))
         for i, zone in enumerate(self.zones):
             zone.input(msg[i])
-            zone.dx7.randomize_all()
+
 
     def close(self):
         self.server.stop()

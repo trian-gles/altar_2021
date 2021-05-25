@@ -1,6 +1,6 @@
 from pyo import *
 from .dx7 import DX7Poly
-from random import uniform, choice
+from random import uniform, choice, getrandbits
 
 ALL_CARDS = []
 
@@ -11,6 +11,9 @@ class AudioCard:
         self.index = ALL_CARDS.index(self)
         self.orig_param = None
         self.cb = self.callback
+        self.levels = None
+        self.ratios = None
+        self.algo = None
 
     def apply(self, dx7: DX7Poly, pat: Pattern):
         pass
@@ -20,6 +23,17 @@ class AudioCard:
 
     def callback(self, dx7: DX7Poly, pat: Pattern):
         pass
+
+    def set_levels(self, dx7: DX7Poly):
+        for i, level in enumerate(self.levels):
+            dx7.set_level(i, level)
+
+    def set_ratios(self, dx7: DX7Poly):
+        for i, ratio in enumerate(self.ratios):
+            dx7.set_ratio(i, ratio)
+
+    def set_algo(self, dx7: DX7Poly):
+        dx7.set_algo(self.algo)
 
     def __repr__(self):
         return f"<Card Num {self.index}>"
@@ -103,6 +117,17 @@ class Card6(AudioCard):
             dx7.set_ratio(i, int(ratio))
 
 
+class Card6B(AudioCard):
+    # round ratios
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
+        print(self.orig_ratios)
+
+        for i, ratio in enumerate(self.orig_ratios):
+            if getrandbits(1):
+                dx7.set_ratio(i, int(ratio))
+
+
 class Card7(AudioCard):
     # round ratios to .5
     def apply(self, dx7: DX7Poly, pat: Pattern):
@@ -113,5 +138,37 @@ class Card7(AudioCard):
             new_rat = int(ratio * 2) / 2
             dx7.set_ratio(i, new_rat)
 
+class Card7B(AudioCard):
+    # round some ratios to .5
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
+        print(self.orig_ratios)
 
-audio_cards = [Card3(), Card7(), Card6(), Card5(), Card3(), Card1(), Card2(), Card4()]
+        for i, ratio in enumerate(self.orig_ratios):
+            new_rat = int(ratio * 2) / 2
+            if getrandbits(1):
+                dx7.set_ratio(i, new_rat)
+
+class Card8(AudioCard):
+    # completely destroy ratios
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
+        print(self.orig_ratios)
+
+        for i, ratio in enumerate(self.orig_ratios):
+            new_rat = ratio + uniform(-.5, .5)
+            dx7.set_ratio(i, new_rat)
+
+class Card9(AudioCard):
+    # static card
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.levels = (.13, .9, .93, .8, .87, .16)
+        self.ratios = (1.3, 1.2, 5.6, 1.1, 6.1, 6.1)
+        self.algo = 2
+        self.set_levels(dx7)
+        self.set_ratios(dx7)
+        self.set_algo(dx7)
+
+
+
+audio_cards = [AudioCard(), Card9(), Card7B(), Card8(), Card7(), Card6(), Card5(), Card3(), Card1(), Card2(), Card4()]

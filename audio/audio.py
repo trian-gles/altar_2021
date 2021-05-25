@@ -2,6 +2,7 @@ from pyo import *
 from .dx7 import DX7Poly
 from .audio_cards import ALL_CARDS, AudioCard
 from time import time
+from random import uniform
 
 
 
@@ -12,6 +13,8 @@ class AudioManager:
         self.zones = (ZoneOne(), ZoneTwo(), ZoneThree())
         for zone in self.zones:
             zone.dx7.randomize_all()
+            for i in range(6):
+                zone.dx7.set_level(i, uniform(0, .4))
 
     def input(self, msg):
         # Messages should be a tuple of three tuples, each inner tuple providing three elements of instructions ((1, 2, 3), (None, 5, 8), (2, 5, 8))

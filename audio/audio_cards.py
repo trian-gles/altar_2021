@@ -175,5 +175,11 @@ class Card9(AudioCard):
         self.set_ratios(dx7)
         self.set_algo(dx7)
 
+class Card10(AudioCard):
+    # random card
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        dx7.randomize_all()
+        pat.time = uniform(0, 1)
 
-audio_cards = [AudioCard(), Card9(), Card6(), Card8(), Card7(), Card6(), Card5(), Card3(), Card1(), Card2(), Card4()]
+
+audio_cards = [Card0(), Card1(), Card2(), Card3(), Card4(), Card5(), Card6(), Card7(), Card8(), Card9(), Card10()]

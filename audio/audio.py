@@ -12,6 +12,7 @@ class AudioManager:
         self.server = Server().boot()
         self.server.start()
         self.zones = (ZoneOne(), ZoneTwo(), ZoneThree())
+        print(ALL_CARDS)
         for zone in self.zones:
             zone.dx7.randomize_all()
             for i in range(6):

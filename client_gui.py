@@ -101,33 +101,42 @@ def main():
     hand = HandZone((685, 850))
     discard = DiscardSpace((50, 50))
     draw = DrawSpace((WIDTH - 150, 50))
+    debug_text = Text("Please wait for the ADMIN player to initiate the piece", (740, 50), FONT)
 
     # GUI items that have get and set methods
     getset_items = (drop_c, drop_r, drop_l, draw)
 
     # All items that track mouse movement
     hover_items = (discard, hand) + getset_items
+    # All GUI items
+    gui_items = hover_items + (debug_text,)
+
+    admin_btns = None
 
     if ADMIN:
         # buttons only viewable by those with admin designation
         quit_btn = MessageButton("QUIT", (50, 400), quit_all, FONT)
         start_btn = MessageButton("START", (50, 350), client.send_start, FONT)
-        hover_items += (quit_btn, start_btn)
-
-    debug_text = Text("Please wait for the ADMIN player to initiate the piece", (740, 50), FONT)
-    if LOCAL:
-        debug_text.change_msg("RUNNING IN LOCAL MODE")
-
-    # All GUI items
-    gui_items = hover_items + (debug_text,)
+        admin_btns = (quit_btn, start_btn)
+        gui_items += admin_btns
 
     held_card = None
+
+    piece_started = False
+
+    if LOCAL:
+        debug_text.change_msg("RUNNING IN LOCAL MODE")
+        piece_started = True
 
     while run:
         # check the mouse position for all hoverable items
         mouse_pos = pg.mouse.get_pos()
         for item in hover_items:
             item.check_mouse(mouse_pos)
+            if ADMIN:
+                for btn in admin_btns:
+                    btn.check_mouse(mouse_pos)
+
         if held_card:
             held_card.check_mouse(mouse_pos)
 
@@ -135,21 +144,25 @@ def main():
             if event.type == pg.QUIT:
                 quit_all()
             elif event.type == pg.MOUSEBUTTONDOWN:
-                # try to pick up a card
-                if not held_card:
-                    for item in hover_items:
-                        new_card = item.try_click()
-                        if new_card:
-                            held_card = new_card
-                # try to drop a card
-                else:
-                    for item in hover_items:
-                        result = item.drop_card(held_card)
-                        if result:
-                            # check if the card was successfully dropped
-                            held_card = None
-                            end_turn(getset_items)
-                            break
+                if ADMIN:
+                    for btn in admin_btns:
+                        btn.try_click()
+                if piece_started:
+                    # try to pick up a card
+                    if not held_card:
+                        for item in hover_items:
+                            new_card = item.try_click()
+                            if new_card:
+                                held_card = new_card
+                    # try to drop a card
+                    else:
+                        for item in hover_items:
+                            result = item.drop_card(held_card)
+                            if result:
+                                # check if the card was successfully dropped
+                                held_card = None
+                                end_turn(getset_items)
+                                break
 
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
@@ -159,6 +172,7 @@ def main():
             client_msg = client.listen()
             if client_msg:
                 if client_msg["method"] == 'update':
+                    piece_started = True
                     debug_text.change_msg(client_msg['current_player'] + "'s turn")
                     set_content(getset_items, client_msg["content"])
 

@@ -1,7 +1,7 @@
 import pygame as pg
 import pyautogui
 import os
-from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace, MessageButton
+from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace, MessageButton, Text
 import argparse
 from random import randrange
 from socks import Client
@@ -110,12 +110,16 @@ def main():
 
     if ADMIN:
         # buttons only viewable by those with admin designation
-        quit_btn = MessageButton("QUIT", (50, 350), quit_all, FONT)
-        start_btn = MessageButton("START", (50, 400), client.send_start, FONT)
+        quit_btn = MessageButton("QUIT", (50, 400), quit_all, FONT)
+        start_btn = MessageButton("START", (50, 350), client.send_start, FONT)
         hover_items += (quit_btn, start_btn)
 
+    debug_text = Text("Please wait for the ADMIN player to initiate the piece", (740, 50), FONT)
+    if LOCAL:
+        debug_text.change_msg("RUNNING IN LOCAL MODE")
+
     # All GUI items
-    gui_items = hover_items
+    gui_items = hover_items + (debug_text,)
 
     held_card = None
 
@@ -126,7 +130,6 @@ def main():
             item.check_mouse(mouse_pos)
         if held_card:
             held_card.check_mouse(mouse_pos)
-
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -156,8 +159,7 @@ def main():
             client_msg = client.listen()
             if client_msg:
                 if client_msg["method"] == 'update':
-                    print(client_msg['content'])
-                    print(client_msg['current_player'])
+                    debug_text.change_msg(client_msg['current_player'] + "'s turn")
                     set_content(getset_items, client_msg["content"])
 
         screen.blit(BACKGROUND, (0, 0))

@@ -109,7 +109,7 @@ class Card6(AudioCard):
             dx7.set_ratio(i, int(ratio))
 
 
-class Card6B(AudioCard):
+class Card7(AudioCard):
     # round some ratios
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
@@ -120,7 +120,7 @@ class Card6B(AudioCard):
                 dx7.set_ratio(i, int(ratio))
 
 
-class Card7(AudioCard):
+class Card8(AudioCard):
     # round ratios to .5
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
@@ -131,7 +131,7 @@ class Card7(AudioCard):
             dx7.set_ratio(i, new_rat)
 
 
-class Card7B(AudioCard):
+class Card9(AudioCard):
     # round some ratios to .5
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
@@ -143,7 +143,7 @@ class Card7B(AudioCard):
                 dx7.set_ratio(i, new_rat)
 
 
-class Card8(AudioCard):
+class Card10(AudioCard):
     # completely destroy ratios
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
@@ -154,7 +154,7 @@ class Card8(AudioCard):
             dx7.set_ratio(i, new_rat)
 
 
-class Card8B(AudioCard):
+class Card11(AudioCard):
     # completely destroy some ratios
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
@@ -165,7 +165,7 @@ class Card8B(AudioCard):
             dx7.set_ratio(i, new_rat)
 
 
-class Card9(AudioCard):
+class Card12(AudioCard):
     # static card
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.levels = (.13, .9, .93, .8, .87, .16)
@@ -175,11 +175,13 @@ class Card9(AudioCard):
         self.set_ratios(dx7)
         self.set_algo(dx7)
 
-class Card10(AudioCard):
+
+class Card13(AudioCard):
     # random card
     def apply(self, dx7: DX7Poly, pat: Pattern):
         dx7.randomize_all()
         pat.time = uniform(0, 1)
 
 
-audio_cards = [Card0(), Card1(), Card2(), Card3(), Card4(), Card5(), Card6(), Card7(), Card8(), Card9(), Card10()]
+audio_cards = [Card0(), Card1(), Card2(), Card3(), Card4(), Card5(), Card6(), Card7(), Card8(), Card9(), Card10(),
+               Card11(), Card12(), Card13()]

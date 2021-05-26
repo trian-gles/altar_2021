@@ -205,9 +205,16 @@ class DrawSpace(BasicCard):
 class MoveableCard(BasicCard):
     flip_graphic = pg.image.load(os.path.join('cards', 'flip_card.jpg'))
 
+    image_list = ["random", "double_speed", "random_speeds", "long_sustain", "short_attacks", "random", "int_ratios",
+                  "some_int_ratios", "5_ratios", "some_5_ratios", "rand_ratios", "some_rand_ratios", "white_noise_card",
+                  "random"]
+
     def __init__(self, coor, id_num=0, flip=False):
         super(MoveableCard, self).__init__(coor)
-        self.graphic = pg.image.load(os.path.join('cards', 'test_card.jpg'))
+        if id_num < 13: # need to draw more cards
+            self.graphic = pg.image.load(os.path.join('cards', self.image_list[id_num] + '.PNG'))
+        else:
+            self.graphic = pg.image.load(os.path.join('cards', "random" + '.PNG'))
         self.id_num = id_num
         self.clicked = False
         self.flipped = flip

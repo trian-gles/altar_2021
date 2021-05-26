@@ -1,6 +1,8 @@
 import pygame as pg
 import os
 
+# Spaces containing multiple cards
+
 
 class CardZone:
     SPACE_MARGIN = 15
@@ -58,6 +60,14 @@ class HandZone(CardZone):
 
     def set_content(self, card_nums):
         pass
+    
+    def draw(self, surf):
+        for card_space in self.card_spaces:
+            pg.draw.rect(surf, (60, 60, 60), card_space.rect, width=3, border_radius=5)
+        super(HandZone, self).draw(surf)
+
+
+# Smaller card units
 
 
 class BasicCard:

@@ -50,8 +50,10 @@ class MessageButton(MessageBox):
     def check_mouse(self, mouse_coor):
         if self.rect.collidepoint(mouse_coor):
             self.hover = True
+            self.bkg_color = (125, 125, 125)
         else:
             self.hover = False
+            self.bkg_color = (0, 0, 0)
 
     def try_click(self):
         if self.hover:

@@ -3,6 +3,7 @@ from .dx7 import DX7Poly
 from .audio_cards import ALL_CARDS, AudioCard
 from time import time
 from random import uniform
+import os
 
 
 
@@ -21,9 +22,9 @@ class AudioManager:
         for i, zone in enumerate(self.zones):
             zone.input(msg[i])
 
-
     def close(self):
         self.server.stop()
+
 
 
 class Zone:
@@ -85,14 +86,23 @@ class Zone:
         self.dx7.noteon(freq, 1)
         Zone.glob_pat_count = (Zone.glob_pat_count + 1) % 6
 
+    def load(self, filename):
+        path = os.path.join("audio/settings", filename)
+        file = open(path)
+        self.dx7.load(file)
+
 
 
 class ZoneOne(Zone):
-    pass
+    def __init__(self):
+        super().__init__()
+        self.load("soft_steel_perc.json")
 
 
 class ZoneTwo(Zone):
-    pass
+    def __init__(self):
+        super().__init__()
+        self.load("organ_bell.json")
 
 
 class ZoneThree(Zone):

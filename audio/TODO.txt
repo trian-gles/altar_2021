@@ -1,0 +1,7 @@
+ - Add more cards
+ - Add more images to cards
+ - Center items on GUI
+ - write markdown score
+ - set up remote server
+ - experiment ALOT more
+ - make piece end when cards run out

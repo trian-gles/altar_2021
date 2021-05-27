@@ -1,5 +1,6 @@
 import pygame as pg
 import os
+from random import shuffle
 
 # Spaces containing multiple cards
 
@@ -167,7 +168,8 @@ class DiscardSpace(CardSpace):
 class DrawSpace(BasicCard):
     def __init__(self, coor):
         super(DrawSpace, self).__init__(coor)
-        self.cards = [MoveableCard(coor, i, True) for i in range(52)]
+        self.cards = [MoveableCard(coor, i, True) for i in range(15)]
+        shuffle(self.cards)
 
     def check_mouse(self, mouse_coor):
         super().check_mouse(mouse_coor)
@@ -192,8 +194,6 @@ class DrawSpace(BasicCard):
     def draw(self, surf: pg.Surface):
         if self.cards:
             self.cards[0].draw(surf)
-        else:
-            print("Out of cards to draw")
 
         if self.hover:
             pg.draw.rect(surf, (255, 255, 255), self.rect, width=3, border_radius=5)
@@ -221,10 +221,7 @@ class MoveableCard(BasicCard):
 
     def __init__(self, coor, id_num=0, flip=False):
         super(MoveableCard, self).__init__(coor)
-        if id_num < 13: # need to draw more cards
-            self.graphic = pg.image.load(os.path.join('cards', self.image_list[id_num] + '.PNG'))
-        else:
-            self.graphic = pg.image.load(os.path.join('cards', "random" + '.PNG'))
+        self.graphic = pg.image.load(os.path.join('cards', self.image_list[id_num] + '.PNG'))
         self.id_num = id_num
         self.clicked = False
         self.flipped = flip

@@ -26,6 +26,7 @@ FULLSCREEN = args.fullscreen
 
 if not LOCAL:
     client = Client(USERNAME)
+    AUDIO = True
 
 if AUDIO:
     from audio import AudioManager

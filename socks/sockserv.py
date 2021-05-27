@@ -35,6 +35,7 @@ class Server:
         logging.debug(str(datetime.datetime.now()) + " : " + msg)
 
     def send_pickle(self, content_dict, send_sock):
+        print(f"sending message {content_dict}")
         dict_pick = pickle.dumps(content_dict)
         pick_mess = bytes(f"{len(dict_pick):<{Server.HEADER_LENGTH}}", "utf-8") + dict_pick
         send_sock.send(pick_mess)
@@ -90,10 +91,17 @@ class Server:
         current_name = self.clients[current_sock]['data'].decode('utf-8')
         content_dict = {"method": "update", "content": gui_content,
                         "current_player": current_name}
-        print(gui_content)
         for sock in self.sockets_list:
             if sock != self.server_socket:
                 self.send_pickle(content_dict, sock)
+
+    def quit(self):
+        self.mode = "quit"
+        content_dict = {"method": "quit"}
+        for sock in self.sockets_list:
+            if sock != self.server_socket:
+                self.send_pickle(content_dict, sock)
+        quit()
 
     def listen(self):
         read_sockets, _, exception_sockets = select.select(self.sockets_list, [], self.sockets_list)
@@ -116,7 +124,7 @@ class Server:
                 self.print_log(f"received message from {user['data'].decode('utf-8')}: {msg_dict}")
 
                 if msg_dict["method"] == "quit":
-                    self.mode = "quit"
+                    self.quit()
                 elif msg_dict["method"] == "start":
                     if self.mode == "sleep":
                         self.start_piece()

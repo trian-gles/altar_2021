@@ -74,8 +74,6 @@ def end_turn(gui_items):
 def quit_all():
     if AUDIO:
         audio.close()
-    if ADMIN and not LOCAL:
-        client.send_quit()
     quit()
 
 
@@ -116,7 +114,7 @@ def main():
 
     if ADMIN:
         # buttons only viewable by those with admin designation
-        quit_btn = MessageButton("QUIT", (50, 400), quit_all, FONT)
+        quit_btn = MessageButton("QUIT", (50, 400), client.send_quit, FONT)
         start_btn = MessageButton("START", (50, 350), client.send_start, FONT)
         admin_btns = (quit_btn, start_btn)
         gui_items += admin_btns
@@ -176,6 +174,8 @@ def main():
                     piece_started = True
                     debug_text.change_msg(client_msg['current_player'] + "'s turn")
                     set_content(getset_items, client_msg["content"])
+                elif client_msg["method"] == 'quit':
+                    quit_all()
 
         screen.blit(BACKGROUND, (0, 0))
         for item in gui_items:

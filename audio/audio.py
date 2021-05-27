@@ -97,16 +97,19 @@ class ZoneOne(Zone):
         self.load("soft_steel_perc.json")
 
 
+
 class ZoneTwo(Zone):
     def __init__(self):
         super().__init__()
         self.load("organ_bell.json")
+        self.pattern.time = .75
 
 
 class ZoneThree(Zone):
     def __init__(self):
         super().__init__()
         self.load("harmonica.json")
+        self.pattern.time = 1.5
 
 
 class Node:

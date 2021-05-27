@@ -179,12 +179,71 @@ class Card13(AudioCard):
 
 
 class Card14(AudioCard):
-    # octave down NEEDS IMAGE
+    # octave down
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
         for i, ratio in enumerate(self.orig_ratios):
             dx7.set_ratio(i, ratio / 2)
 
 
+class Card15(AudioCard):
+    # normal speed
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.orig_param = pat.time
+        pat.time = 1
+
+
+class Card16(AudioCard):
+    # many octaves up
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
+
+        for i, ratio in enumerate(self.orig_ratios):
+            dx7.set_ratio(i, ratio * 20)
+
+
+class Card17(AudioCard):
+    # many octaves down
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
+
+        for i, ratio in enumerate(self.orig_ratios):
+            dx7.set_ratio(i, ratio / 8)
+
+
+class Card18(AudioCard):
+    # quiet
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.orig_levs = [dx7.get_level(i) for i in range(6)]
+
+        for i, lev in enumerate(self.orig_levs):
+            new_lev = lev / 10
+            dx7.set_level(i, new_lev)
+
+
+class Card19(AudioCard):
+    # silence
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.orig_levs = [dx7.get_level(i) for i in range(6)]
+
+        for i, lev in enumerate(self.orig_levs):
+            new_lev = lev / 10
+            dx7.set_level(i, new_lev)
+
+    def remove(self, dx7: DX7Poly, pat: Pattern):
+        for i, lev in enumerate(self.orig_levs):
+            dx7.set_level(i, lev)
+
+
+class Card20(AudioCard):
+    # randomizes every cycle
+    def __init__(self):
+        super().__init__()
+        self.cb = self.callback
+
+    def callback(self, dx7: DX7Poly, pat: Pattern):
+        dx7.randomize_all()
+
+
 audio_cards = [Card0(), Card1(), Card2(), Card3(), Card4(), Card5(), Card6(), Card7(), Card8(), Card9(), Card10(),
-               Card11(), Card12(), Card13(), Card14()]
+               Card11(), Card12(), Card13(), Card14(), Card15(), Card16(), Card17(), Card18(), Card19(), Card20()]

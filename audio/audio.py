@@ -12,9 +12,8 @@ class AudioManager:
         self.server = Server().boot()
         self.server.start()
         self.zones = (ZoneOne(), ZoneTwo(), ZoneThree())
-        print(ALL_CARDS)
         for zone in self.zones:
-            zone.dx7.randomize_all()
+            #zone.dx7.randomize_all()
             for i in range(6):
                 zone.dx7.set_level(i, uniform(0, .4))
 
@@ -78,7 +77,7 @@ class Zone:
         self.applied_cards.remove(card)
 
     def play(self):
-        print(self.last_time - time())
+        # print(self.last_time - time())
         if self.callbacks:
             for cb in self.callbacks:
                 cb(self.dx7, self.pattern)
@@ -107,7 +106,9 @@ class ZoneTwo(Zone):
 
 
 class ZoneThree(Zone):
-    pass
+    def __init__(self):
+        super().__init__()
+        self.load("harmonica.json")
 
 
 class Node:

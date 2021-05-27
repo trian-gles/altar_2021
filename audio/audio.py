@@ -62,7 +62,6 @@ class Zone:
         if ALL_CARDS[card_num] not in self.applied_cards:
             new_card = ALL_CARDS[card_num]
             self.applied_cards.append(new_card)
-            print(f"Applying a card {new_card}")
             new_card.apply(self.dx7, self.pattern)
 
             if new_card.cb:

@@ -1,7 +1,7 @@
 import pygame as pg
 import pyautogui
 import os
-from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace, MessageButton, Text
+from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace, MessageButton, CenterText
 import argparse
 from random import randrange
 from socks import Client
@@ -101,7 +101,7 @@ def main():
     hand = HandZone((685, 850))
     discard = DiscardSpace((50, 50))
     draw = DrawSpace((WIDTH - 150, 50))
-    debug_text = Text("Please wait for the ADMIN player to initiate the piece", (740, 50), FONT)
+    debug_text = CenterText("Please wait for the ADMIN player to initiate the piece", (960, 50), FONT)
 
     # GUI items that have get and set methods
     getset_items = (drop_c, drop_r, drop_l, draw)

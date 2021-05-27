@@ -40,8 +40,10 @@ class AudioCard:
 
 
 class Card0(AudioCard):
-    # standard arp pattern
-    pass
+    # half speed arp pattern
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.orig_param = pat.time
+        pat.time = pat.time * 2
 
 
 class Card1(AudioCard):
@@ -90,7 +92,7 @@ class Card4(AudioCard):
 
 
 class Card5(AudioCard):
-    # octave doubler
+    # octave up NEEDS IMAGE
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
         print(self.orig_ratios)
@@ -181,6 +183,16 @@ class Card13(AudioCard):
     def apply(self, dx7: DX7Poly, pat: Pattern):
         dx7.randomize_all()
         pat.time = uniform(0, 1)
+
+
+class Card14(AudioCard):
+    # octave down NEEDS IMAGE
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
+        print(self.orig_ratios)
+
+        for i, ratio in enumerate(self.orig_ratios):
+            dx7.set_ratio(i, ratio / 2)
 
 
 audio_cards = [Card0(), Card1(), Card2(), Card3(), Card4(), Card5(), Card6(), Card7(), Card8(), Card9(), Card10(),

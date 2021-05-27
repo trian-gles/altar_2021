@@ -215,9 +215,9 @@ class DrawSpace(BasicCard):
 class MoveableCard(BasicCard):
     flip_graphic = pg.image.load(os.path.join('cards', 'flip_card.jpg'))
 
-    image_list = ["random", "double_speed", "random_speeds", "long_sustain", "short_attacks", "random", "int_ratios",
+    image_list = ["half_speed", "double_speed", "random_speeds", "long_sustain", "short_attacks", "octave_up", "int_ratios",
                   "some_int_ratios", "5_ratios", "some_5_ratios", "rand_ratios", "some_rand_ratios", "white_noise_card",
-                  "random"]
+                  "random", "octave_down"]
 
     def __init__(self, coor, id_num=0, flip=False):
         super(MoveableCard, self).__init__(coor)

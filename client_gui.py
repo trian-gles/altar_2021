@@ -90,7 +90,6 @@ pg.display.set_caption(f"ALTAR CLIENT username = {USERNAME}")
 
 if AUDIO:
     audio = AudioManager()
-    print("running audio")
 
 
 def main():

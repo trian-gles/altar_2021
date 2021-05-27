@@ -56,7 +56,6 @@ class Zone:
             self.pattern.play()
         elif not self.applied_cards and self.pattern.isPlaying():
             self.pattern.stop()
-        print(self.applied_cards)
 
     def apply_card(self, card_num):
         # check if the card is not yet accounted for in the hand and then apply it

@@ -60,7 +60,6 @@ class Card2(AudioCard):
         self.cb = self.callback
 
     def callback(self, dx7: DX7Poly, pat: Pattern):
-        print("Calling card 2 callback")
         pat.time = uniform(0, 1)
 
 
@@ -68,7 +67,6 @@ class Card3(AudioCard):
     # soft swelling tones
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_attack = [dx7.get_attack(i) for i in range(6)]
-        print(self.orig_attack)
         for i in range(6):
             dx7.set_attack(i, random.uniform(1, 2))
         for i in range(6):
@@ -95,7 +93,6 @@ class Card5(AudioCard):
     # octave up NEEDS IMAGE
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
-        print(self.orig_ratios)
 
         for i, ratio in enumerate(self.orig_ratios):
             dx7.set_ratio(i, ratio * 2)
@@ -105,7 +102,6 @@ class Card6(AudioCard):
     # round ratios
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
-        print(self.orig_ratios)
 
         for i, ratio in enumerate(self.orig_ratios):
             dx7.set_ratio(i, int(ratio))
@@ -126,7 +122,6 @@ class Card8(AudioCard):
     # round ratios to .5
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
-        print(self.orig_ratios)
 
         for i, ratio in enumerate(self.orig_ratios):
             new_rat = int(ratio * 2) / 2
@@ -149,7 +144,6 @@ class Card10(AudioCard):
     # completely destroy ratios
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
-        print(self.orig_ratios)
 
         for i, ratio in enumerate(self.orig_ratios):
             new_rat = ratio + uniform(-.5, .5)
@@ -160,7 +154,6 @@ class Card11(AudioCard):
     # completely destroy some ratios
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
-        print(self.orig_ratios)
 
         for i, ratio in enumerate(self.orig_ratios):
             new_rat = ratio + uniform(-.5, .5)
@@ -189,8 +182,6 @@ class Card14(AudioCard):
     # octave down NEEDS IMAGE
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
-        print(self.orig_ratios)
-
         for i, ratio in enumerate(self.orig_ratios):
             dx7.set_ratio(i, ratio / 2)
 

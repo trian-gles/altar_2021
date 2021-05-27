@@ -81,7 +81,7 @@ class Server:
     def start_piece(self):
         self.mode = "play"
         self.turn_iter = cycle(self.sockets_list[1:])
-        deck = tuple(range(52))
+        deck = tuple(range(15))
         init_content = ((None, None, None), (None, None, None), (None, None, None), deck)
         self.new_turn_update(init_content)
 
@@ -90,6 +90,7 @@ class Server:
         current_name = self.clients[current_sock]['data'].decode('utf-8')
         content_dict = {"method": "update", "content": gui_content,
                         "current_player": current_name}
+        print(gui_content)
         for sock in self.sockets_list:
             if sock != self.server_socket:
                 self.send_pickle(content_dict, sock)

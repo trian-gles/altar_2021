@@ -4,6 +4,7 @@ from .audio_cards import ALL_CARDS, AudioCard
 from time import time
 from random import uniform
 import os
+import psutil
 
 
 
@@ -21,6 +22,11 @@ class AudioManager:
         # Messages should be a tuple of three tuples, each inner tuple providing three elements of instructions ((1, 2, 3), (None, 5, 8), (2, 5, 8))
         for i, zone in enumerate(self.zones):
             zone.input(msg[i])
+
+        print(psutil.cpu_stats())
+
+    def test_lag(self):
+        pass
 
     def close(self):
         self.server.stop()

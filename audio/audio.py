@@ -22,8 +22,24 @@ class AudioManager:
         # Messages should be a tuple of three tuples, each inner tuple providing three elements of instructions ((1, 2, 3), (None, 5, 8), (2, 5, 8))
         for i, zone in enumerate(self.zones):
             zone.input(msg[i])
-
+        for zone_msg in msg:
+            if 21 in zone_msg:
+                self.randomize_all()
+            elif 22 in zone_msg:
+                self.make_tonal_all()
         print(psutil.cpu_stats())
+
+    def randomize_all(self):
+        for zone in self.zones:
+            zone.dx7.randomize_all()
+            zone.pattern.time = uniform(.2, 1.5)
+
+    def make_tonal_all(self):
+        for zone in self.zones:
+            orig_ratios = [zone.dx7.get_ratio(i) for i in range(6)]
+            for i, ratio in enumerate(orig_ratios):
+                new_rat = int(ratio * 2) / 2
+                zone.dx7.set_ratio(i, new_rat)
 
     def test_lag(self):
         pass

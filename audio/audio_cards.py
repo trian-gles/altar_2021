@@ -35,6 +35,11 @@ class AudioCard:
     def set_algo(self, dx7: DX7Poly):
         dx7.set_algo(self.algo)
 
+    def load(self, filename, dx7: DX7Poly):
+        path = os.path.join("audio/settings", filename)
+        file = open(path)
+        dx7.load(file)
+
     def __repr__(self):
         return f"<Card Num {self.index}>"
 
@@ -245,5 +250,37 @@ class Card20(AudioCard):
         dx7.randomize_all()
 
 
+class Card21(AudioCard):
+    # moon card
+    pass
+
+
+class Card22(AudioCard):
+    # sun card
+    pass
+
+
+class Card23(AudioCard):
+    # change algo
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.orig_algo = dx7.get_algo()
+        new_algo = (self.orig_algo + 5) % 11
+        print(f"Changing algo from {self.orig_algo} to {new_algo}")
+        dx7.set_algo(new_algo)
+
+
+class Card24(AudioCard):
+    # algo every cycle
+    # still need to make this
+    pass
+
+
+class Card25(AudioCard):
+    # sharp attacks card
+    def apply(self, dx7: DX7Poly, pat: Pattern):
+        self.load("sharp_attacks.json", dx7)
+
+
 audio_cards = [Card0(), Card1(), Card2(), Card3(), Card4(), Card5(), Card6(), Card7(), Card8(), Card9(), Card10(),
-               Card11(), Card12(), Card13(), Card14(), Card15(), Card16(), Card17(), Card18(), Card19(), Card20()]
+               Card11(), Card12(), Card13(), Card14(), Card15(), Card16(), Card17(), Card18(), Card19(), Card20(),
+               Card21(), Card22(), Card23(), Card24(), Card25()]

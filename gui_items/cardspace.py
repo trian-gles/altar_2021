@@ -220,12 +220,19 @@ class MoveableCard(BasicCard):
                   "random", "octave_down", "normal_speed", "many_octaves_up", "many_octaves_down", "quiet", "silence",
                   "random_every_cycle", "moon_card", "sunrise_card", "change_algo", "algo_every_cycle", "sharp_attacks"]
 
+    bkg_color = (0, 0, 0)
+    border_color = (55, 55, 55)
+
     def __init__(self, coor, id_num=0, flip=False):
         super(MoveableCard, self).__init__(coor)
         self.graphic = pg.image.load(os.path.join('cards', self.image_list[id_num] + '.PNG'))
         self.id_num = id_num
         self.clicked = False
         self.flipped = flip
+        if self.image_list[id_num] == "moon_card":
+            self.bkg_color = (173, 35, 0)
+        elif self.image_list[id_num] == "sunrise_card":
+            self.bkg_color = (105, 233, 240)
 
     def check_mouse(self, mouse_coor):
         if not self.clicked:
@@ -243,9 +250,11 @@ class MoveableCard(BasicCard):
         self.flipped = not self.flipped
 
     def draw(self, surf: pg.Surface):
-        pg.draw.rect(surf, (0, 0, 0), self.rect, width=0, border_radius=5)
+
         if self.flipped:
+            pg.draw.rect(surf, (0, 0, 0), self.rect, width=0, border_radius=5)
             surf.blit(self.flip_graphic, self.rect)
         else:
+            pg.draw.rect(surf, self.bkg_color, self.rect, width=0, border_radius=5)
             surf.blit(self.graphic, self.rect)
         pg.draw.rect(surf, (55, 55, 55), self.rect, width=3, border_radius=5)

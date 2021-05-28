@@ -40,14 +40,19 @@ class Slider:
         self.cursor_rect = pg.Rect(coor, self.cursor)
         self.name = FONT.render(name, False, WHITE)
         self.name_loc = (self.rect.topleft[0], self.rect.topleft[1] - 20)
-
         self.value_loc = (self.rect.topright[0], self.rect.topright[1] - 20)
+
         self.setter = setter
         self.callback_arg = callback_arg
         self.getter = getter
+
         self.min = min
         self.max = max
+
+        # save the step value in two places for when step is switched off
         self.step = step
+        self.prev_step = step
+
         self.change_value(init)
 
     def draw(self, surf):
@@ -66,6 +71,15 @@ class Slider:
             self.value = self.step * round(new_val/self.step)
         self.setter(self.callback_arg, self.value)
         self.display_val = FONT.render(str(self.value)[0:4], False, WHITE)
+
+    def step_switch(self):
+        print("Switching step")
+        print(self.step)
+        if self.step:
+            self.step = None
+            print("Turning off step")
+        else:
+            self.step = self.prev_step
 
     def load(self):
         self.change_value(self.getter(self.callback_arg))
@@ -129,6 +143,9 @@ class Module:
         for slider in self.sliders:
             slider.load()
 
+    def ratio_step_switch(self):
+        self.ratio.step_switch()
+
 
 pattern = (48, 51, 55, 56, 51, 58)
 pattern_count = 0
@@ -180,6 +197,12 @@ def main():
         root.destroy()
         synth.save(file)
 
+    def step_switch():
+        for mod in modules:
+            mod.ratio_step_switch()
+
+        print("Step switch pressed")
+
     p = Pattern(note, 0.2)
 
     global playing
@@ -202,21 +225,28 @@ def main():
     load_btn = MessageButton("Load", (20, 880), load_all, FONT)
     pattern_btn = MessageButton("Pattern", (20, 920), play, FONT)
     random_btn = MessageButton("Randomize", (20, 960), randomize, FONT)
+    step_btn = MessageButton("Step", (20, 1000), step_switch, FONT)
 
-    other_gui = [algo_slider, save_btn, load_btn, pattern_btn, random_btn]
-    gui_items = modules + other_gui
+    sliders = modules + [algo_slider]
+
+    buttons = [save_btn, load_btn, pattern_btn, random_btn, step_btn]
+    draw_items = sliders + buttons
     s.start()
 
     while run:
         mouse_pos = pg.mouse.get_pos()
+        for item in buttons:
+            item.check_mouse(mouse_pos)
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 s.stop()
                 quit()
 
             if event.type == pg.MOUSEBUTTONDOWN:
-                for item in gui_items:
-                    item.check_mouse(mouse_pos)
+                for slider in sliders:
+                    slider.check_mouse(mouse_pos)
+                for button in buttons:
+                    button.try_click()
 
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
@@ -226,7 +256,7 @@ def main():
                 if event.key == pg.K_SPACE:
                     synth.noteon(220, 1)
         screen.fill(BLACK)
-        for item in gui_items:
+        for item in draw_items:
             item.draw(screen)
         pg.display.update()
         clock.tick(30)

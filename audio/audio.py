@@ -38,7 +38,7 @@ class AudioManager:
         for zone in self.zones:
             orig_ratios = [zone.dx7.get_ratio(i) for i in range(6)]
             for i, ratio in enumerate(orig_ratios):
-                new_rat = int(ratio * 2) / 2
+                new_rat = int(ratio)
                 zone.dx7.set_ratio(i, new_rat)
 
     def test_lag(self):
@@ -50,9 +50,9 @@ class AudioManager:
 
 
 class Zone:
-    glob_pattern = (48, 51, 55, 56, 51, 58)
+    glob_pattern = [48, 51, 55, 56, None, None, 51, 58]
     glob_pat_count = 0
-    # shared global pattern that the three zones with loop through together
+    # shared global pattern that the three zones will loop through together
 
     def __init__(self):
         self.dx7 = DX7Poly(4)
@@ -102,8 +102,9 @@ class Zone:
             for cb in self.callbacks:
                 cb(self.dx7, self.pattern)
         self.last_time = time()
-        freq = note_to_freq(self.glob_pattern[Zone.glob_pat_count])
-        self.dx7.noteon(freq, 1)
+        if self.glob_pattern[Zone.glob_pat_count]:
+            freq = note_to_freq(self.glob_pattern[Zone.glob_pat_count])
+            self.dx7.noteon(freq, 1)
         Zone.glob_pat_count = (Zone.glob_pat_count + 1) % 6
 
     def load(self, filename):

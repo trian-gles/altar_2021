@@ -241,7 +241,7 @@ class Card19(AudioCard):
 
 
 class Card20(AudioCard):
-    # randomizes every cycle
+    # randomizes every note
     def __init__(self):
         super().__init__()
         self.cb = self.callback
@@ -265,14 +265,23 @@ class Card23(AudioCard):
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.orig_algo = dx7.get_algo()
         new_algo = (self.orig_algo + 5) % 11
-        print(f"Changing algo from {self.orig_algo} to {new_algo}")
         dx7.set_algo(new_algo)
 
 
 class Card24(AudioCard):
     # algo every cycle
     # still need to make this
-    pass
+    def __init__(self):
+        super().__init__()
+        self.cb = self.callback
+        self.count = 0
+
+    def callback(self, dx7: DX7Poly, pat: Pattern):
+        self.count = (self.count + 1) % 4
+        if self.count == 0:
+            self.orig_algo = dx7.get_algo()
+            new_algo = (self.orig_algo + 5) % 11
+            dx7.set_algo(new_algo)
 
 
 class Card25(AudioCard):

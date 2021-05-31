@@ -147,9 +147,16 @@ class CardSpace(BasicCard):
 
 
 class DiscardSpace(CardSpace):
+    def __init__(self, coor):
+        super(DiscardSpace, self).__init__(coor)
+        self.graphic = pg.image.load(os.path.join('cards', 'discard.png'))
+
     def draw(self, surf: pg.Surface):
+        surf.blit(self.graphic, self.rect)
         if self.hover:
             pg.draw.rect(surf, (255, 255, 255), self.rect, width=3, border_radius=5)
+        else:
+            pg.draw.rect(surf, (55, 55, 55), self.rect, width=3, border_radius=5)
 
     def pickup_card(self):
         pass

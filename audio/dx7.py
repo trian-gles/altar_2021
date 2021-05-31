@@ -99,7 +99,7 @@ class DX7Mono:
 
 class DX7Poly:
     def __init__(self, voices, rand_seed: int = 10):
-        random.seed(rand_seed)
+        #random.seed(rand_seed)
         self.voices = [DX7Mono() for _ in range(voices)]
         self.voice_num = voices
         self.active_voice_num = 0

@@ -175,7 +175,7 @@ class DiscardSpace(CardSpace):
 class DrawSpace(BasicCard):
     def __init__(self, coor):
         super(DrawSpace, self).__init__(coor)
-        self.cards = [MoveableCard(coor, i, True) for i in range(26)]
+        self.cards = [MoveableCard(coor, i, True) for i in range(27)]
         shuffle(self.cards)
 
     def check_mouse(self, mouse_coor):
@@ -225,7 +225,8 @@ class MoveableCard(BasicCard):
     image_list = ["half_speed", "double_speed", "random_speeds", "long_sustain", "short_attacks", "octave_up", "int_ratios",
                   "some_int_ratios", "5_ratios", "some_5_ratios", "rand_ratios", "some_rand_ratios", "white_noise_card",
                   "random", "octave_down", "normal_speed", "many_octaves_up", "many_octaves_down", "quiet", "silence",
-                  "random_every_cycle", "moon_card", "sunrise_card", "change_algo", "algo_every_cycle", "sharp_attacks"]
+                  "random_every_cycle", "moon_card", "sunrise_card", "change_algo", "algo_every_cycle", "sharp_attacks",
+                  "tree_card"]
 
     bkg_color = (0, 0, 0)
     border_color = (55, 55, 55)
@@ -240,6 +241,8 @@ class MoveableCard(BasicCard):
             self.bkg_color = (173, 35, 0)
         elif self.image_list[id_num] == "sunrise_card":
             self.bkg_color = (105, 233, 240)
+        elif self.image_list[id_num] == "tree_card":
+            self.bkg_color = (0, 74, 35)
 
     def check_mouse(self, mouse_coor):
         if not self.clicked:

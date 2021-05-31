@@ -13,6 +13,7 @@ class AudioManager:
         self.server = Server().boot()
         self.server.start()
         self.zones = (ZoneOne(), ZoneTwo(), ZoneThree())
+        self.added_gaps = False
         for zone in self.zones:
             #zone.dx7.randomize_all()
             for i in range(6):
@@ -22,12 +23,17 @@ class AudioManager:
         # Messages should be a tuple of three tuples, each inner tuple providing three elements of instructions ((1, 2, 3), (None, 5, 8), (2, 5, 8))
         for i, zone in enumerate(self.zones):
             zone.input(msg[i])
+
+        # special cards affecting all zones
         for zone_msg in msg:
             if 21 in zone_msg:
                 self.randomize_all()
             elif 22 in zone_msg:
                 self.make_tonal_all()
-        print(psutil.cpu_stats())
+            if 26 in zone_msg:
+                self.add_gaps()
+            else:
+                self.remove_gaps()
 
     def randomize_all(self):
         for zone in self.zones:
@@ -41,6 +47,19 @@ class AudioManager:
                 new_rat = int(ratio)
                 zone.dx7.set_ratio(i, new_rat)
 
+    def add_gaps(self):
+        if not self.added_gaps:
+            for _ in range(3):
+                for loc in (1, 5, 6, 8):
+                    Zone.glob_pattern.insert(loc, None)
+            self.added_gaps = True
+
+    def remove_gaps(self):
+        if self.added_gaps:
+            Zone.glob_pattern = [48, 51, 55, 56, 51, 58]
+            self.added_gaps = False
+
+
     def test_lag(self):
         pass
 
@@ -50,7 +69,7 @@ class AudioManager:
 
 
 class Zone:
-    glob_pattern = [48, 51, 55, 56, None, None, 51, 58]
+    glob_pattern = [48, 51, 55, 56, 51, 58]
     glob_pat_count = 0
     # shared global pattern that the three zones will loop through together
 
@@ -102,10 +121,14 @@ class Zone:
             for cb in self.callbacks:
                 cb(self.dx7, self.pattern)
         self.last_time = time()
+
+        if Zone.glob_pat_count >= len(Zone.glob_pattern):
+            Zone.glob_pat_count = 0
         if self.glob_pattern[Zone.glob_pat_count]:
             freq = note_to_freq(self.glob_pattern[Zone.glob_pat_count])
             self.dx7.noteon(freq, 1)
-        Zone.glob_pat_count = (Zone.glob_pat_count + 1) % 6
+        Zone.glob_pat_count += 1
+
 
     def load(self, filename):
         path = os.path.join("audio/settings", filename)

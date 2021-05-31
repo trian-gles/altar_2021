@@ -289,7 +289,11 @@ class Card25(AudioCard):
     def apply(self, dx7: DX7Poly, pat: Pattern):
         self.load("sharp_attacks.json", dx7)
 
+class Card26(AudioCard):
+    # tree card
+    pass
+
 
 audio_cards = [Card0(), Card1(), Card2(), Card3(), Card4(), Card5(), Card6(), Card7(), Card8(), Card9(), Card10(),
                Card11(), Card12(), Card13(), Card14(), Card15(), Card16(), Card17(), Card18(), Card19(), Card20(),
-               Card21(), Card22(), Card23(), Card24(), Card25()]
+               Card21(), Card22(), Card23(), Card24(), Card25(), Card26()]

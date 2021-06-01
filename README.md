@@ -3,6 +3,7 @@
 ## About
 Altar is a musical piece for 1+ laptop performers.
 Inspired by card games, indie video games, and electronic music.  Built with Pygame and PYO.
+Performers take turns moving cards around a gameboard that reacts musically to these actions. 
 ## Setup
 
 Requires python 3.8+
@@ -76,6 +77,7 @@ python client_gui.py --audio -name marke
 ```
 
 ## Inside the game
+On their turn players can click on any card to move it elsewhere.
 The full board:
 
 ![Image](resources/full_board.jpg)
@@ -84,7 +86,8 @@ The draw pile. Click on a card to pick it up and drag it to your hand or a music
 
 ![Image](resources/draw_pile.jpg)
 
-Your hand, of cards only you can see or use.  Click one to pick it up and move it elsewhere: 
+Your hand, of cards only you can see or use.  Putting cards here will (usually) not affect the audio engine.
+Click one to pick it up and move it elsewhere: 
 
 ![Image](resources/hand.jpg)
 
@@ -93,13 +96,19 @@ playing.  Click on a card to move it:
 
 ![Image](resources/zone.jpg)
 
+
+The discard area.  Putting a card here deletes it.  Cards can also be deleted by dropping them on top of each other.
+
+![Image](resources/discard.jpg)
+
 Text appearing only in multiplayer mode annoucing whose turn is up:
 
 ![Image](resources/debug_txt.jpg)
 
 ## Coming soon:
+- A nice UI for configuring the piece
 
-- A GUI designed specifically for audience viewing
+- Visuals designed specifically for audience viewing
 
 - Animations that respond to the musical content of the zones
 
@@ -108,3 +117,5 @@ Text appearing only in multiplayer mode annoucing whose turn is up:
 ## !!SPOILERS!!
 
 - Cards can be applied multiple times on the same zone by removing them and putting them back
+- Not all zones have to be active simultaneously.  Sometimes the engine will make noise with completely empty zones!
+- Colored cards affect all zones

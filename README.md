@@ -42,7 +42,9 @@ and the piece will begin.
 
 ##Multiplayer Launch
 
-In multiplayer mode, one performer should be designated as the ADMIN by adding the `--admin` flag.  This player will be
+Leaving out the `--local` flag will connect to an already configured external server.
+
+In this mode, one performer should be designated as the ADMIN by adding the `--admin` flag.  This player will be
 given special START and QUIT controls to start the piece after all performers have joined, and to end the program for all
 performers.
 
@@ -63,7 +65,7 @@ Tristan acts as the ADMIN:
 python client_gui.py --admin -name tristan
 ```
 
-Isolde's hooks her laptop up to the ship's soundsystem for all to hear:
+Isolde's hooks her laptop up to the ship's sound system for all to hear:
 ```
 python client_gui.py --audio -name isolde
 ```

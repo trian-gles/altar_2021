@@ -30,6 +30,13 @@ class Server:
 
         self.mode = "sleep"
 
+    def reset(self):
+        self.print_log("Resetting server...")
+        self.sockets_list = [self.server_socket]
+        self.clients = {}
+        self.turn_iter = None
+        self.mode = "sleep"
+
     def print_log(self, msg):
         print(msg)
         logging.debug(str(datetime.datetime.now()) + " : " + msg)
@@ -101,7 +108,6 @@ class Server:
         for sock in self.sockets_list:
             if sock != self.server_socket:
                 self.send_pickle(content_dict, sock)
-        quit()
 
     def listen(self):
         read_sockets, _, exception_sockets = select.select(self.sockets_list, [], self.sockets_list)

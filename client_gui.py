@@ -25,7 +25,7 @@ ADMIN = args.admin
 FULLSCREEN = args.fullscreen
 
 if not LOCAL:
-    client = Client(USERNAME)
+    client = Client(USERNAME, ip="172.104.21.51")
 else:
     AUDIO = True
 

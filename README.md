@@ -40,7 +40,7 @@ python client_gui.py --local
 
 and the piece will begin.
 
-##Multiplayer Launch
+## Multiplayer Launch
 
 Leaving out the `--local` flag will connect to an already configured external server.
 

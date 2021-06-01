@@ -1,5 +1,5 @@
 import pygame as pg
-import pyautogui
+import sys
 import os
 from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace, MessageButton, CenterText
 import argparse
@@ -23,6 +23,14 @@ AUDIO = args.audio
 LOCAL = args.local
 ADMIN = args.admin
 FULLSCREEN = args.fullscreen
+
+if sys.platform == 'win32':
+    # On Windows, the monitor scaling can be set to something besides normal 100%.
+    import ctypes
+    try:
+        ctypes.windll.user32.SetProcessDPIAware()
+    except AttributeError:
+        pass # Windows XP doesn't support monitor scaling, so just do nothing.
 
 if not LOCAL:
     client = Client(USERNAME, ip="172.104.21.51")

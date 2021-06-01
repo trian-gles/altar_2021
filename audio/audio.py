@@ -4,7 +4,6 @@ from .audio_cards import ALL_CARDS, AudioCard
 from time import time
 from random import uniform
 import os
-import psutil
 
 
 

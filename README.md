@@ -28,7 +28,7 @@ Use this button on the top right of this github page:
 Once the code is downloaded, from the root altar directory install the required python packages:
 
 ```
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Single Player Launch

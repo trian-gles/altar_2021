@@ -1,7 +1,8 @@
 import pygame as pg
 import sys
 import os
-from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace, MessageButton, CenterText, ScreenFlasher, BoltManager
+from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
+                       MessageButton, CenterText, ScreenFlasher, BoltManager, BoltSpots)
 import argparse
 from random import randrange
 from socks import Client
@@ -131,7 +132,7 @@ def main():
     # GFX generators
     screen_flasher = ScreenFlasher(screen)
     screen_flasher.init_color((0, 0, 0))
-    bolt_gen = BoltManager(pg.Rect(750, 245, 500, 200))
+    bolt_gen = BoltSpots(pg.Rect(750, 245, 500, 200))
     gfx_gens = (screen_flasher, bolt_gen)
 
     gui_items += gfx_gens

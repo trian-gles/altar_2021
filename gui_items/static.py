@@ -15,7 +15,7 @@ class BoltSpots:
     # small spots for bolts to spawn
     def __init__(self, bounds: pg.rect):
         self.bounds = bounds
-        self.spots = [BoltManager(self.rand_rect()) for _ in range(2)]
+        self.spots = [BoltManager(self.rand_rect()) for _ in range(3)]
 
     def rand_rect(self):
         x = randrange(self.bounds.left, self.bounds.left + self.bounds.width)
@@ -31,7 +31,7 @@ class BoltManager:
     def __init__(self, bounds: pg.rect):
         self.bounds = bounds
         self.bolts = []
-        for _ in range(12):
+        for _ in range(5):
             self.new_bolt()
 
     def reprocess(self):

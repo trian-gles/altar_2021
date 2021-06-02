@@ -142,16 +142,7 @@ class Bolt:
 
 
 if __name__ == "__main__":
-    pg.init()
-    screen = pg.display.set_mode((500, 500))
-    bs_bounds = screen.get_rect()
+    import gfx_tester
+    bs_bounds = pg.rect.Rect(0, 0, 200, 200)
     bs = BoltSpots(bs_bounds)
-    while True:
-        clock = pg.time.Clock()
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                quit()
-        screen.fill((0, 0, 0))
-        bs.draw(screen)
-        pg.display.update()
-        clock.tick(30)
+    gfx_tester.main(bs)

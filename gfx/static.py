@@ -1,7 +1,5 @@
 import pygame as pg
 from random import randrange, getrandbits
-import sys
-
 
 class BoltSpots:
     # small spots for bolts to spawn

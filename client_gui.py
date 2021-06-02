@@ -2,7 +2,8 @@ import pygame as pg
 import sys
 import os
 from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
-                       MessageButton, CenterText, ScreenFlasher, BoltManager, BoltSpots)
+                       MessageButton, CenterText)
+from gfx import ScreenFlasher, BoltSpots
 import argparse
 from random import randrange
 from socks import Client

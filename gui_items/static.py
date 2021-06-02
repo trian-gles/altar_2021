@@ -57,18 +57,19 @@ class Bolt:
     def __init__(self, start: tuple, finish: tuple):
         self.color = (255, 255, 255)
         self.segment_num = 6
-        self.primary_points = self.return_points(start, finish)
-        self.second_points = self.get_sec_points(start, finish)
-        self.all_points = self.combine_points(self.primary_points, self.second_points)
+        self.prim_points = self.return_points(list(start), list(finish))
+        self.sec_points = self.get_sec_points(list(start), list(finish))
+        self.all_points = []
+        self.combine_points()
 
-    def get_sec_points(self, start: tuple, finish: tuple):
+    def get_sec_points(self, start: list, finish: list):
         x_trans = randrange(-20, 20)
         y_trans = randrange(-20, 20)
-        second_start = (start[0] + x_trans, start[1] + y_trans)
-        second_finish = (finish[0] + x_trans, finish[1] + y_trans)
+        second_start = [start[0] + x_trans, start[1] + y_trans]
+        second_finish = [finish[0] + x_trans, finish[1] + y_trans]
         return self.return_points(second_start, second_finish)
 
-    def return_points(self, start: tuple, finish: tuple):
+    def return_points(self, start: list, finish: list):
         slope = (start[0] - finish[0]) / (start[1] - finish[1])
         y_inter = ((start[0] * finish[1]) - (start[1] * finish[0])) / (start[0] - finish[0])
 
@@ -78,19 +79,25 @@ class Bolt:
         segment_len = x_length / self.segment_num
 
         x_coors = [x_start + (segment_len * i) for i in range(self.segment_num)] + [x_end]
-        points = [(x, x * slope + y_inter) for x in x_coors]
+        points = [[x, x * slope + y_inter] for x in x_coors]
         return points
 
-    def combine_points(self, prim_points, sec_points):
-        all_points = []
-        for i in range(len(prim_points)):
-            all_points.append(prim_points[i])
-            all_points.append(sec_points[i])
+    def combine_points(self):
+        self.all_points = []
+        for i in range(len(self.prim_points)):
+            self.all_points.append(self.prim_points[i])
+            self.all_points.append(self.sec_points[i])
 
-        return all_points
+    def animate(self):
+        for point_grp in (self.prim_points, self.sec_points):
+            wiggle_x = randrange(-5, 5)
+            wiggle_y = randrange(-5, 5)
+            for point in point_grp:
+                point[0] += wiggle_x
+                point[1] += wiggle_y
 
     def draw(self, surf: pg.Surface):
-
+        self.animate()
         pg.draw.lines(surf, self.color, False, self.all_points)
 
 

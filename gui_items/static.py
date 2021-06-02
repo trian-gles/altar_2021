@@ -12,8 +12,19 @@ if sys.platform == 'win32':
 
 
 class BoltSpots:
-    # maybe there should be individual spots that bolts spawn in?
-    pass
+    # small spots for bolts to spawn
+    def __init__(self, bounds: pg.rect):
+        self.bounds = bounds
+        self.spots = [BoltManager(self.rand_rect()) for _ in range(2)]
+
+    def rand_rect(self):
+        x = randrange(self.bounds.left, self.bounds.left + self.bounds.width)
+        y = randrange(self.bounds.top, self.bounds.top + self.bounds.height)
+        return pg.rect.Rect(x, y, 20, 20)
+
+    def draw(self, surf: pg.Surface):
+        for spot in self.spots:
+            spot.draw(surf)
 
 
 class BoltManager:
@@ -40,7 +51,6 @@ class BoltManager:
         x = randrange(self.bounds.left, self.bounds.left + self.bounds.width)
         y = randrange(self.bounds.top, self.bounds.top + self.bounds.height)
         point_1 = (x, y)
-        print(point_1)
 
         x_length = randrange(1, 100)
         y_length = randrange(1, 100)
@@ -76,9 +86,6 @@ class Bolt:
         self.act_sec = self.sec_points.copy()
 
         self.combine_points()
-        print(f"Start = {self.start}")
-        print(f"First primary = {self.prim_points[0]}")
-        print(f"First point = {self.all_points[0]}")
 
     def build_points(self):
         self.segment_num = randrange(3, 10)
@@ -137,14 +144,14 @@ class Bolt:
 if __name__ == "__main__":
     pg.init()
     screen = pg.display.set_mode((500, 500))
-    bm_bounds = pg.rect.Rect(100, 100, 20, 20)
-    bm = BoltManager(bm_bounds)
+    bs_bounds = screen.get_rect()
+    bs = BoltSpots(bs_bounds)
     while True:
         clock = pg.time.Clock()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 quit()
         screen.fill((0, 0, 0))
-        bm.draw(screen)
+        bs.draw(screen)
         pg.display.update()
         clock.tick(30)

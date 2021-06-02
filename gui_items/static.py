@@ -56,10 +56,26 @@ class BoltManager:
 class Bolt:
     def __init__(self, start: tuple, finish: tuple):
         self.color = (255, 255, 255)
+        self.all_points = []
         self.segment_num = 6
         self.prim_points = self.return_points(list(start), list(finish))
         self.sec_points = self.get_sec_points(list(start), list(finish))
-        self.all_points = []
+
+        self.start = start
+        self.finish = finish
+
+        # the actual drawn points will jump around the originals
+        self.act_prim = self.prim_points.copy()
+        self.act_sec = self.sec_points.copy()
+
+        self.combine_points()
+
+    def build_points(self):
+        self.segment_num = randrange(6, 10)
+        self.prim_points = self.return_points(list(self.start), list(self.finish))
+        self.sec_points = self.get_sec_points(list(self.start), list(self.finish))
+
+
         self.combine_points()
 
     def get_sec_points(self, start: list, finish: list):
@@ -89,12 +105,20 @@ class Bolt:
             self.all_points.append(self.sec_points[i])
 
     def animate(self):
-        for point_grp in (self.prim_points, self.sec_points):
-            wiggle_x = randrange(-5, 5)
-            wiggle_y = randrange(-5, 5)
-            for point in point_grp:
-                point[0] += wiggle_x
-                point[1] += wiggle_y
+        if randrange(3) == 0:
+            self.build_points()
+
+        wiggle_x = randrange(-5, 5)
+        wiggle_y = randrange(-5, 5)
+        for i, point in enumerate(self.act_prim):
+            point[0] = self.prim_points[i][0] + wiggle_x
+            point[1] = self.prim_points[i][1] + wiggle_y
+
+        wiggle_x = randrange(-5, 5)
+        wiggle_y = randrange(-5, 5)
+        for i, point in enumerate(self.act_sec):
+            point[0] = self.sec_points[i][0] + wiggle_x
+            point[1] = self.sec_points[i][1] + wiggle_y
 
     def draw(self, surf: pg.Surface):
         self.animate()

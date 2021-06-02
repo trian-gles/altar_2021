@@ -11,6 +11,11 @@ if sys.platform == 'win32':
         pass # Windows XP doesn't support monitor scaling, so just do nothing.
 
 
+class BoltSpots:
+    # maybe there should be individual spots that bolts spawn in?
+    pass
+
+
 class BoltManager:
     def __init__(self, bounds: pg.rect):
         self.bounds = bounds
@@ -35,6 +40,7 @@ class BoltManager:
         x = randrange(self.bounds.left, self.bounds.left + self.bounds.width)
         y = randrange(self.bounds.top, self.bounds.top + self.bounds.height)
         point_1 = (x, y)
+        print(point_1)
 
         x_length = randrange(1, 100)
         y_length = randrange(1, 100)
@@ -62,6 +68,7 @@ class Bolt:
         self.sec_points = self.get_sec_points(list(start), list(finish))
 
         self.start = start
+
         self.finish = finish
 
         # the actual drawn points will jump around the originals
@@ -69,6 +76,9 @@ class Bolt:
         self.act_sec = self.sec_points.copy()
 
         self.combine_points()
+        print(f"Start = {self.start}")
+        print(f"First primary = {self.prim_points[0]}")
+        print(f"First point = {self.all_points[0]}")
 
     def build_points(self):
         self.segment_num = randrange(3, 10)
@@ -86,7 +96,7 @@ class Bolt:
 
     def return_points(self, start: list, finish: list):
         slope = (start[0] - finish[0]) / (start[1] - finish[1])
-        y_inter = ((start[0] * finish[1]) - (start[1] * finish[0])) / (start[0] - finish[0])
+        y_inter = start[1] - (slope * start[0])
 
         x_start = start[0]
         x_end = finish[0]
@@ -127,7 +137,7 @@ class Bolt:
 if __name__ == "__main__":
     pg.init()
     screen = pg.display.set_mode((500, 500))
-    bm_bounds = screen.get_rect()
+    bm_bounds = pg.rect.Rect(100, 100, 20, 20)
     bm = BoltManager(bm_bounds)
     while True:
         clock = pg.time.Clock()

@@ -140,8 +140,9 @@ class Zone:
         self.dx7.load(file)
 
     def check_status(self):
-        msg = [self.check_atonal(), self.check_levels(), self.check_register()]
-        return msg
+        if self.pattern.isPlaying():
+            msg = [self.check_atonal(), self.check_levels(), self.check_register()]
+            return msg
 
     def check_atonal(self):
         ratios = [self.dx7.get_ratio(i) for i in range(6)]

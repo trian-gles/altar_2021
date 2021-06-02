@@ -24,15 +24,15 @@ class AudioManager:
             zone.input(msg[i])
 
         # special cards affecting all zones
-        for zone_msg in msg:
-            if 21 in zone_msg:
-                self.randomize_all()
-            elif 22 in zone_msg:
-                self.make_tonal_all()
-            if 26 in zone_msg:
-                self.add_gaps()
-            else:
-                self.remove_gaps()
+        full_msg = msg[0] + msg[1] + msg[2]
+        if 21 in full_msg:
+            self.randomize_all()
+        elif 22 in full_msg:
+            self.make_tonal_all()
+        if 26 in full_msg:
+            self.add_gaps()
+        else:
+            self.remove_gaps()
 
         self.check_status()
 

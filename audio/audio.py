@@ -168,7 +168,7 @@ class Zone:
         levels = [self.dx7.get_level(i) for i in range(6)]
         if mean(levels) > 0.6:
             return "static"
-        elif mean(levels) < 0.3:
+        elif mean(levels) < 0.1:
             return "quiet"
 
 

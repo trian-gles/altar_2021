@@ -1,36 +1,23 @@
 import pygame as pg
 from random import randrange
+from .gfx_base import GfxBase
 
 
-class DustManager:
+class DustManager(GfxBase):
     def __init__(self, x_min, x_max, y_min, y_max):
-        self.dust = []
-        self.x_min = x_min
-        self.x_max = x_max
-        self.y_min = y_min
-        self.y_max = y_max
+        super(DustManager, self).__init__(x_min, x_max, y_min, y_max)
 
         for _ in range(12):
-            self.spawn_part()
+            self.spawn_part(DustPart)
 
-    def spawn_part(self):
-        x = randrange(self.x_min, self.x_max)
-        y = randrange(self.y_min, self.y_max)
-        self.dust.append(DustPart((x, y)))
-
-    def reprocess(self):
+    def update(self):
         # check to see if to add a new particle or to remove an old one
         if randrange(0, 4) == 0:
-            if self.dust:
-                self.dust.pop(0)
+            if self.parts:
+                self.parts.pop(0)
         elif randrange(0, 4) in (1, 2):
-            if len(self.dust) < 40:
-                self.spawn_part()
-
-    def draw(self, surf: pg.Surface):
-        self.reprocess()
-        for d in self.dust:
-            d.draw(surf)
+            if len(self.parts) < 40:
+                self.spawn_part(DustPart)
 
 
 class DustPart:

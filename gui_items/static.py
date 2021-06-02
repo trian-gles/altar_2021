@@ -57,7 +57,7 @@ class Bolt:
     def __init__(self, start: tuple, finish: tuple):
         self.color = (255, 255, 255)
         self.all_points = []
-        self.segment_num = 6
+        self.segment_num = 3
         self.prim_points = self.return_points(list(start), list(finish))
         self.sec_points = self.get_sec_points(list(start), list(finish))
 
@@ -71,10 +71,9 @@ class Bolt:
         self.combine_points()
 
     def build_points(self):
-        self.segment_num = randrange(6, 10)
+        self.segment_num = randrange(3, 10)
         self.prim_points = self.return_points(list(self.start), list(self.finish))
         self.sec_points = self.get_sec_points(list(self.start), list(self.finish))
-
 
         self.combine_points()
 

@@ -4,7 +4,7 @@ from .audio_cards import ALL_CARDS, AudioCard
 from time import time
 from random import uniform
 import os
-
+from numpy import mean
 
 
 class AudioManager:
@@ -34,6 +34,8 @@ class AudioManager:
             else:
                 self.remove_gaps()
 
+        self.check_status()
+
     def randomize_all(self):
         for zone in self.zones:
             zone.dx7.randomize_all()
@@ -57,6 +59,10 @@ class AudioManager:
         if self.added_gaps:
             Zone.glob_pattern = [48, 51, 55, 56, 51, 58]
             self.added_gaps = False
+
+    def check_status(self):
+        for zone in self.zones:
+            print(zone.check_status())
 
 
     def test_lag(self):
@@ -128,11 +134,41 @@ class Zone:
             self.dx7.noteon(freq, 1)
         Zone.glob_pat_count += 1
 
-
     def load(self, filename):
         path = os.path.join("audio/settings", filename)
         file = open(path)
         self.dx7.load(file)
+
+    def check_status(self):
+        msg = [self.check_atonal(), self.check_levels(), self.check_register()]
+        return msg
+
+    def check_atonal(self):
+        ratios = [self.dx7.get_ratio(i) for i in range(6)]
+        total_offset = 0
+        for r in ratios:
+            offset = (r * 2) - (round(r * 2))
+            total_offset += offset
+
+        if total_offset > .3:
+            return "atonal"
+        if total_offset == 0:
+            return "tonal"
+
+    def check_register(self):
+        ratios = [self.dx7.get_ratio(i) for i in range(6)]
+        avg_rat = mean(ratios)
+        if avg_rat > 10:
+            return "high"
+        elif avg_rat < 1:
+            return "low"
+
+    def check_levels(self):
+        levels = [self.dx7.get_level(i) for i in range(6)]
+        if mean(levels) > 0.6:
+            return "static"
+        elif mean(levels) < 0.3:
+            return "quiet"
 
 
 

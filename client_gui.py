@@ -1,7 +1,7 @@
 import pygame as pg
 import sys
 import os
-from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace, MessageButton, CenterText
+from gui_items import DiscardSpace, DropZone, HandZone, DrawSpace, MessageButton, CenterText, ScreenFlasher
 import argparse
 from random import randrange
 from socks import Client
@@ -128,6 +128,12 @@ def main():
         admin_btns = (quit_btn, start_btn)
         gui_items += admin_btns
 
+    # GFX generators
+    screen_flasher = ScreenFlasher(screen)
+    screen_flasher.init_color((0, 0, 0))
+
+    gui_items += (screen_flasher,)
+
     held_card = None
 
     piece_started = False
@@ -166,8 +172,15 @@ def main():
                     else:
                         for item in hover_items:
                             result = item.drop_card(held_card)
+                            # check if the card was successfully dropped
                             if result:
-                                # check if the card was successfully dropped
+                                # for certain cards, fill the screen
+                                if held_card.id_num == 26:
+                                    screen_flasher.init_color((11, 82, 3))
+                                elif held_card.id_num == 22:
+                                    screen_flasher.init_color((141, 252, 243))
+                                elif held_card.id_num == 21:
+                                    screen_flasher.init_color((166, 0, 0))
                                 held_card = None
                                 end_turn(getset_items)
                                 break

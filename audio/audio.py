@@ -61,8 +61,10 @@ class AudioManager:
             self.added_gaps = False
 
     def check_status(self):
+        full_msg = ()
         for zone in self.zones:
-            print(zone.check_status())
+            full_msg += (zone.check_status(),)
+        return full_msg
 
 
     def test_lag(self):
@@ -141,7 +143,7 @@ class Zone:
 
     def check_status(self):
         if self.pattern.isPlaying():
-            msg = [self.check_atonal(), self.check_levels(), self.check_register()]
+            msg = (self.check_atonal(), self.check_levels(), self.check_register())
             return msg
 
     def check_atonal(self):

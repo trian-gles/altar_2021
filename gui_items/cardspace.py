@@ -42,6 +42,8 @@ class CardZone:
 class DropZone(CardZone):
     def __init__(self, coor):
         super(DropZone, self).__init__(coor, num_cards=3)
+        print(self.card_spaces[0].rect.topleft)
+        print(self.card_spaces[2].rect.bottomright)
 
     def return_content(self):
         map_obj = map(lambda space: space.return_content(), self.card_spaces)

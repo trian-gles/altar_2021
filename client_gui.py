@@ -3,7 +3,7 @@ import sys
 import os
 from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
                        MessageButton, CenterText)
-from gfx import ScreenFlasher, BoltSpots, DustManager, DiamondManager
+from gfx import ScreenFlasher, GfxManager
 import argparse
 from random import randrange
 from socks import Client
@@ -73,11 +73,12 @@ def set_content(items, content: tuple):
         item.set_content(content[i])
 
 
-def end_turn(gui_items):
+def end_turn(gui_items, gfxman: GfxManager):
     # updates the audio manager when cards are dropped
     content = get_content(gui_items)
     if AUDIO:
         audio.input(content[0:3])
+        gfxman.input(audio.check_status())
     if not LOCAL:
         client.end_turn(content)
 
@@ -105,9 +106,12 @@ if AUDIO:
 def main():
     run = True
     clock = pg.time.Clock()
-    drop_c = DropZone((750, 245))
-    drop_r = DropZone((175, 665))
-    drop_l = DropZone((1330, 665))
+
+    zone_coors = ((750, 245), (175, 665), (1330, 665))
+
+    drop_c = DropZone(zone_coors[0])
+    drop_r = DropZone(zone_coors[1])
+    drop_l = DropZone(zone_coors[2])
     hand = HandZone((685, 850))
     discard = DiscardSpace((50, 50))
     draw = DrawSpace((WIDTH - 150, 50))
@@ -133,13 +137,14 @@ def main():
     # GFX generators
     screen_flasher = ScreenFlasher(screen)
     screen_flasher.init_color((0, 0, 0))
-
-    gfx_gens = (screen_flasher,)
+    gfx_man = GfxManager(zone_coors)
+    gfx_gens = (screen_flasher, gfx_man)
 
     gui_items += gfx_gens
 
     held_card = None
 
+    # wait for the server to send the start message
     piece_started = False
 
     if LOCAL:
@@ -186,7 +191,7 @@ def main():
                                 elif held_card.id_num == 21:
                                     screen_flasher.init_color((166, 0, 0))
                                 held_card = None
-                                end_turn(getset_items)
+                                end_turn(getset_items, gfx_man)
                                 break
 
             elif event.type == pg.KEYDOWN:

@@ -6,18 +6,18 @@ class GfxManager:
     def __init__(self, zone_coors: tuple):
         self.zones = []
         for zone_coor in zone_coors:
-            new_zone = GfxZone(self.get_bounds(zone_coor))
+            new_zone = GfxZone(*self.get_bounds(zone_coor))
             self.zones.append(new_zone)
 
     def input(self, msg):
         for i, zone_msg in enumerate(msg):
-            self.zones[i].input(msg)
+            self.zones[i].input(zone_msg)
 
     def get_bounds(self, coor):
         x_min = coor[0]
         x_max = coor[0] + 420
         y_min = coor[1]
-        y_max = coor(1) + 200
+        y_max = coor[1] + 200
         return x_min, x_max, y_min, y_max
 
     def draw(self, surf: pg.Surface):
@@ -48,12 +48,15 @@ class GfxZone:
         self.run = False
 
     def input(self, msg: list):
+        print(msg)
         if not msg:
             self.stop()
             return
 
+        self.start()
+
         if msg[0] == 'tonal':
-            pass
+            print("Tonal message")
         elif msg[0] == "atonal":
             pass
         else:
@@ -64,7 +67,10 @@ class GfxZone:
             self.bolt.stop()
         elif msg[1] == "static":
             self.bolt.start()
-            self.dust.start()
+            self.dust.stop()
+        else:
+            self.dust.stop()
+            self.bolt.stop()
 
         if msg[2] == "high":
             self.diamond.start()

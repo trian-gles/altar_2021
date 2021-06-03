@@ -133,11 +133,8 @@ def main():
     # GFX generators
     screen_flasher = ScreenFlasher(screen)
     screen_flasher.init_color((0, 0, 0))
-    dia_gen = DiamondManager(1330, 1830, 665, 815)
-    bolt_gen = BoltSpots(pg.Rect(750, 245, 500, 200))
-    dust_gen = DustManager(175, 625, 665, 715)
 
-    gfx_gens = (bolt_gen, dust_gen, dia_gen, screen_flasher)
+    gfx_gens = (screen_flasher,)
 
     gui_items += gfx_gens
 

@@ -1,9 +1,9 @@
-import gfx_base
+from .gfx_base import GfxBase
 import pygame as pg
 from random import randrange
 
 
-class EyeManager(gfx_base.GfxBase):
+class EyeManager(GfxBase):
     def __init__(self, x_min, x_max, y_min, y_max):
         super().__init__(x_min, x_max, y_min, y_max)
 
@@ -15,6 +15,7 @@ class EyeManager(gfx_base.GfxBase):
         elif randrange(0, 4) in (1, 2):
             if len(self.parts) < 10 and self.run:
                 self.spawn_part(EyePart)
+
 
 class EyePart:
     img = pg.image.load("particles/eye_part.png")

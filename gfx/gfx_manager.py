@@ -1,5 +1,5 @@
 import pygame as pg
-from gfx import DustManager, DiamondManager, SmokeManager, BoltSpots
+from gfx import DustManager, DiamondManager, SmokeManager, BoltSpots, EyeManager
 
 
 class GfxManager:
@@ -32,8 +32,9 @@ class GfxZone:
         self.smoke = SmokeManager(*bounds)
         self.dust = DustManager(*bounds)
         self.bolt = BoltSpots(*bounds)
+        self.eye = EyeManager(*bounds)
 
-        self.all_managers = (self.diamond, self.smoke, self.dust, self.bolt)
+        self.all_managers = (self.diamond, self.smoke, self.dust, self.bolt, self.eye)
 
         self.run = False
 
@@ -57,11 +58,11 @@ class GfxZone:
         self.start()
 
         if msg[0] == 'tonal':
-            pass
+            self.eye.stop()
         elif msg[0] == "atonal":
-            pass
+            self.eye.start()
         else:
-            pass
+            self.eye.stop()
 
         if msg[1] == "quiet":
             self.dust.start()

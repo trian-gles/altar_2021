@@ -37,4 +37,5 @@ class DustPart:
 if __name__ == "__main__":
     import gfx_tester
     dm = DustManager(0, 200, 300, 350)
+    dm.start()
     gfx_tester.main(dm)

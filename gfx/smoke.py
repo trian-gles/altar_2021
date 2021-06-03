@@ -1,5 +1,5 @@
 import pygame as pg
-from gfx_base import GfxBase
+from .gfx_base import GfxBase
 import os
 from random import randrange
 
@@ -41,4 +41,5 @@ class SmokePart:
 if __name__ == "__main__":
     import gfx_tester
     dm = SmokeManager(0, 200, 300, 350)
+    dm.start()
     gfx_tester.main(dm)

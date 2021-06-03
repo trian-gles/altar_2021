@@ -9,16 +9,24 @@ class GfxBase:
         self.x_max = x_max
         self.y_min = y_min
         self.y_max = y_max
+        self.run = False
 
     def spawn_part(self, part: type):
         x = randrange(self.x_min, self.x_max)
         y = randrange(self.y_min, self.y_max)
         self.parts.append(part((x, y)))
 
+    def start(self):
+        self.run = True
+
+    def stop(self):
+        self.run = False
+
     def update(self):
         pass
 
     def draw(self, surf: pg.Surface):
-        self.update()
-        for part in self.parts:
-            part.draw(surf)
+        if self.run:
+            self.update()
+            for part in self.parts:
+                part.draw(surf)

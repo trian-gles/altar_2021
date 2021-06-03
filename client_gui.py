@@ -7,6 +7,7 @@ from gfx import ScreenFlasher, GfxManager, EyeAnimation
 import argparse
 from random import randrange
 from socks import Client
+import cProfile as profile
 
 
 parser = argparse.ArgumentParser(description='Main script for piece')
@@ -147,11 +148,13 @@ def main():
     # wait for the server to send the start message
     piece_started = False
 
+    run = True
+
     if LOCAL:
         debug_text.change_msg("RUNNING IN LOCAL MODE")
         piece_started = True
 
-    while 1:
+    while run:
         # check the mouse position for all hoverable items
         mouse_pos = pg.mouse.get_pos()
         for item in hover_items:
@@ -196,7 +199,7 @@ def main():
 
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
-                    set_content(getset_items, ((3, None, 0), (None, None, 2), (None, 1, 4), (5, 6)))
+                    run = False
 
         if not LOCAL:
             client_msg = client.listen()
@@ -218,7 +221,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    profile.run('main()')
 
 
 

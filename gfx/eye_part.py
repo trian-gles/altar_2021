@@ -1,6 +1,7 @@
 from .gfx_base import GfxBase
 import pygame as pg
 from random import randrange
+import cProfile as profile
 
 
 class EyeManager(GfxBase):
@@ -39,6 +40,9 @@ class EyePart:
 
 if __name__ == "__main__":
     import gfx_tester
-    dm = EyeManager(0, 200, 300, 350)
-    dm.start()
-    gfx_tester.main(dm)
+    def main():
+        dm = EyeManager(0, 200, 300, 350)
+        dm.start()
+        gfx_tester.main(dm)
+
+    profile.run('main()')

@@ -4,7 +4,6 @@ from random import shuffle
 
 # Spaces containing multiple cards
 
-
 class CardZone:
     SPACE_MARGIN = 15
 
@@ -236,6 +235,7 @@ class MoveableCard(BasicCard):
     def __init__(self, coor, id_num=0, flip=False):
         super(MoveableCard, self).__init__(coor)
         self.graphic = pg.image.load(os.path.join('cards', self.image_list[id_num] + '.PNG'))
+        self.graphic.convert()
         self.id_num = id_num
         self.clicked = False
         self.flipped = flip
@@ -270,3 +270,6 @@ class MoveableCard(BasicCard):
             pg.draw.rect(surf, self.bkg_color, self.rect, width=0, border_radius=5)
             surf.blit(self.graphic, self.rect)
         pg.draw.rect(surf, (55, 55, 55), self.rect, width=3, border_radius=5)
+
+#    3744    0.008    0.000   10.763    0.003 cardspace.py:37(draw) # maybe the hand should only appear on mouseover?
+

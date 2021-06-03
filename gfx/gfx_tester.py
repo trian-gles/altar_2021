@@ -13,7 +13,8 @@ if sys.platform == 'win32':
 def main(tested_item):
     pg.init()
     screen = pg.display.set_mode((1920, 1080))
-    while True:
+    step = 0
+    while step < 200:
         clock = pg.time.Clock()
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -21,4 +22,5 @@ def main(tested_item):
         screen.fill((0, 0, 0))
         tested_item.draw(screen)
         pg.display.update()
+        step += 1
         clock.tick(30)

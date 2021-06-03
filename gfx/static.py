@@ -1,20 +1,18 @@
 import pygame as pg
 from random import randrange, getrandbits
+from .gfx_base import GfxBase
 
-class BoltSpots:
+
+class BoltSpots(GfxBase):
     # small spots for bolts to spawn
-    def __init__(self, bounds: pg.rect):
-        self.bounds = bounds
-        self.spots = [BoltManager(self.rand_rect()) for _ in range(3)]
+    def __init__(self, x_min, x_max, y_min, y_max):
+        super(BoltSpots, self).__init__(x_min, x_max, y_min, y_max)
+        self.parts = [BoltManager(self.rand_rect()) for _ in range(3)]
 
     def rand_rect(self):
-        x = randrange(self.bounds.left, self.bounds.left + self.bounds.width)
-        y = randrange(self.bounds.top, self.bounds.top + self.bounds.height)
+        x = randrange(self.x_min, self.x_max)
+        y = randrange(self.y_min, self.y_max)
         return pg.rect.Rect(x, y, 20, 20)
-
-    def draw(self, surf: pg.Surface):
-        for spot in self.spots:
-            spot.draw(surf)
 
 
 class BoltManager:
@@ -133,6 +131,6 @@ class Bolt:
 
 if __name__ == "__main__":
     import gfx_tester
-    bs_bounds = pg.rect.Rect(0, 0, 200, 200)
-    bs = BoltSpots(bs_bounds)
+    bs = BoltSpots(0, 200, 300, 350)
+    bs.start()
     gfx_tester.main(bs)

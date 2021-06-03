@@ -3,7 +3,7 @@ import sys
 import os
 from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
                        MessageButton, CenterText)
-from gfx import ScreenFlasher, GfxManager
+from gfx import ScreenFlasher, GfxManager, EyeAnimation
 import argparse
 from random import randrange
 from socks import Client
@@ -135,9 +135,10 @@ def main():
 
     # GFX generators
     screen_flasher = ScreenFlasher(screen)
-    screen_flasher.init_color((0, 0, 0))
+    eye_anim = EyeAnimation()
+    eye_anim.play()
     gfx_man = GfxManager(zone_coors)
-    gfx_gens = (screen_flasher, gfx_man)
+    gfx_gens = (gfx_man, screen_flasher, eye_anim)
 
     gui_items += gfx_gens
 

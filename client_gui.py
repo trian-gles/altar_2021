@@ -104,7 +104,6 @@ if AUDIO:
 
 
 def main():
-    run = True
     clock = pg.time.Clock()
 
     zone_coors = ((750, 245), (175, 665), (1330, 665))
@@ -151,7 +150,7 @@ def main():
         debug_text.change_msg("RUNNING IN LOCAL MODE")
         piece_started = True
 
-    while run:
+    while 1:
         # check the mouse position for all hoverable items
         mouse_pos = pg.mouse.get_pos()
         for item in hover_items:

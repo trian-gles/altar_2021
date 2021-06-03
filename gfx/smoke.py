@@ -1,7 +1,7 @@
 import pygame as pg
 from .gfx_base import GfxBase
 import os
-from random import randrange
+from random import randrange, choice
 
 
 class SmokeManager(GfxBase):
@@ -19,11 +19,14 @@ class SmokeManager(GfxBase):
 
 
 class SmokePart:
+    filenames = ["smoke_" + str(i + 1) + ".PNG" for i in range(4)]
+    file_obs = [pg.image.load(os.path.join('smoke_img', filename)) for filename in filenames]
+
     def __init__(self, coor):
         self.vel = pg.math.Vector2((0, -1))
         self.coor = pg.math.Vector2(coor)
-        filename = "smoke_" + str(randrange(1, 5)) + ".PNG"
-        self.img = pg.image.load(os.path.join('smoke_img', filename))
+
+        self.img = choice(self.file_obs)
         self.alpha = 255
 
     def update(self):

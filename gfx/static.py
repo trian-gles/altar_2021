@@ -14,9 +14,10 @@ class BoltSpots(GfxBase):
         y = randrange(self.y_min, self.y_max)
         return pg.rect.Rect(x, y, 20, 20)
 
-    def stop(self):
-        super(BoltSpots, self).stop()
-        print("Stopping bolts")
+    def draw(self, surf: pg.Surface):
+        if self.run:
+            super().draw(surf)
+
 
 
 class BoltManager:

@@ -26,7 +26,6 @@ class GfxBase:
         pass
 
     def draw(self, surf: pg.Surface):
-        if self.run:
-            self.update()
-            for part in self.parts:
-                part.draw(surf)
+        self.update()
+        for part in self.parts:
+            part.draw(surf)

@@ -13,7 +13,7 @@ class DiamondManager(GfxBase):
             if self.parts:
                 self.parts.pop(0)
         elif randrange(0, 4) in (1, 2):
-            if len(self.parts) < 40:
+            if len(self.parts) < 40 and self.run:
                 self.spawn_part(Diamond)
 
 

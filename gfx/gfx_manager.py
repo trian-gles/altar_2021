@@ -46,9 +46,10 @@ class GfxZone:
 
     def stop(self):
         self.run = False
+        for manager in self.all_managers:
+            manager.stop()
 
     def input(self, msg: list):
-        print(msg)
         if not msg:
             self.stop()
             return
@@ -83,9 +84,8 @@ class GfxZone:
             self.smoke.stop()
 
     def draw(self, surf: pg.Surface):
-        if self.run:
-            for manager in self.all_managers:
-                manager.draw(surf)
+        for manager in self.all_managers:
+            manager.draw(surf)
 
 
 if __name__ == "__main__":

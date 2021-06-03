@@ -14,7 +14,7 @@ class SmokeManager(GfxBase):
             if self.parts:
                 self.parts.pop(0)
         elif randrange(0, 4) in (1, 2):
-            if len(self.parts) < 40:
+            if len(self.parts) < 20 and self.run:
                 self.spawn_part(SmokePart)
 
 

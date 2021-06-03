@@ -7,16 +7,13 @@ class DustManager(GfxBase):
     def __init__(self, x_min, x_max, y_min, y_max):
         super(DustManager, self).__init__(x_min, x_max, y_min, y_max)
 
-        for _ in range(12):
-            self.spawn_part(DustPart)
-
     def update(self):
         # check to see if to add a new particle or to remove an old one
         if randrange(0, 4) == 0:
             if self.parts:
                 self.parts.pop(0)
         elif randrange(0, 4) in (1, 2):
-            if len(self.parts) < 40:
+            if (len(self.parts) < 40) and self.run:
                 self.spawn_part(DustPart)
 
 

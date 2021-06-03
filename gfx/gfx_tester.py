@@ -12,7 +12,7 @@ if sys.platform == 'win32':
 
 def main(tested_item):
     pg.init()
-    screen = pg.display.set_mode((400, 400))
+    screen = pg.display.set_mode((1920, 1080))
     while True:
         clock = pg.time.Clock()
         for event in pg.event.get():

@@ -30,7 +30,7 @@ class EyeAnimation:
 
         elif self.framenum > 20:
             if self.alpha > 2:
-                self.alpha -= 3
+                self.alpha -= 5
             else:
                 self.alpha = 0
             self.frame.set_alpha(self.alpha)

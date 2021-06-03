@@ -57,7 +57,7 @@ class GfxZone:
         self.start()
 
         if msg[0] == 'tonal':
-            print("Tonal message")
+            pass
         elif msg[0] == "atonal":
             pass
         else:

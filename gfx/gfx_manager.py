@@ -2,6 +2,29 @@ import pygame as pg
 from gfx import DustManager, DiamondManager, SmokeManager, BoltSpots
 
 
+class GfxManager:
+    def __init__(self, zone_coors: tuple):
+        self.zones = []
+        for zone_coor in zone_coors:
+            new_zone = GfxZone(self.get_bounds(zone_coor))
+            self.zones.append(new_zone)
+
+    def input(self, msg):
+        for i, zone_msg in enumerate(msg):
+            self.zones[i].input(msg)
+
+    def get_bounds(self, coor):
+        x_min = coor[0]
+        x_max = coor[0] + 420
+        y_min = coor[1]
+        y_max = coor(1) + 200
+        return x_min, x_max, y_min, y_max
+
+    def draw(self, surf: pg.Surface):
+        for zone in self.zones:
+            zone.draw(surf)
+
+
 class GfxZone:
     def __init__(self, x_min, x_max, y_min, y_max):
         bounds = (x_min, x_max, y_min, y_max)
@@ -12,11 +35,23 @@ class GfxZone:
 
         self.all_managers = (self.diamond, self.smoke, self.dust, self.bolt)
 
+        self.run = False
+
     def start_all(self):
         for manager in self.all_managers:
             manager.start()
 
+    def start(self):
+        self.run = True
+
+    def stop(self):
+        self.run = False
+
     def input(self, msg: list):
+        if not msg:
+            self.stop()
+            return
+
         if msg[0] == 'tonal':
             pass
         elif msg[0] == "atonal":
@@ -42,12 +77,14 @@ class GfxZone:
             self.smoke.stop()
 
     def draw(self, surf: pg.Surface):
-        for manager in self.all_managers:
-            manager.draw(surf)
+        if self.run:
+            for manager in self.all_managers:
+                manager.draw(surf)
 
 
 if __name__ == "__main__":
     import gfx_tester
     gz = GfxZone(0, 200, 300, 350)
     gz.input([None, 'quiet', 'high'])
+    gz.start()
     gfx_tester.main(gz)

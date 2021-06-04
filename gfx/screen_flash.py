@@ -11,10 +11,10 @@ class ScreenFlasher:
         self.overlaid_surf.fill(color)
 
     def draw(self, surf: pg.Surface):
-        if self.alpha > 1:
-            self.alpha -= 2
-        self.overlaid_surf.set_alpha(self.alpha)
-        surf.blit(self.overlaid_surf, (0, 0))
+        if self.alpha > 2:
+            self.alpha -= 3
+            self.overlaid_surf.set_alpha(self.alpha)
+            surf.blit(self.overlaid_surf, (0, 0))
 
 
 if __name__ == "__main__":

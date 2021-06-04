@@ -37,4 +37,10 @@ EXPENSIVE ACTIONS:
 
     maybe limit the number of random calls?
 
-    you need to call convert on ALL the images!!!
+    maybe call moon card before other cards
+
+    217929   25.788    0.000   25.788    0.000 {built-in method pygame.draw.rect}
+
+    ^^ maybe cards have built in rects?
+
+    need transposition elements in the piece

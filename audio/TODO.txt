@@ -1,14 +1,20 @@
- - Add more cards
- - experiment ALOT more
- - make piece end when cards run out
- - more animations
- - improve performance
-
-
     217929   25.788    0.000   25.788    0.000 {built-in method pygame.draw.rect}
 
     ^^ maybe cards have built in rects?
 
     need transposition elements in the piece
 
-    test it out on real people!  Build it!
+
+    !!!!create GUI menus, then build then test on real people!!!!
+
+    try non esoteric cards
+
+    try version where more cards stay functional
+
+    cards can be reapplied more easily?
+
+    admin should be informed when new users register
+
+    piece should end when cards run out
+
+    a couple more animations?  make them have low cpu requirements

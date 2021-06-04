@@ -24,7 +24,7 @@ class BoltManager:
     def __init__(self, bounds: pg.rect):
         self.bounds = bounds
         self.bolts = []
-        for _ in range(5):
+        for _ in range(4):
             self.new_bolt()
 
     def reprocess(self):
@@ -81,7 +81,7 @@ class Bolt:
         self.combine_points()
 
     def build_points(self):
-        self.segment_num = randrange(3, 10)
+        self.segment_num = randrange(3, 7)
         self.prim_points = self.return_points(list(self.start), list(self.finish))
         self.sec_points = self.get_sec_points(list(self.start), list(self.finish))
 

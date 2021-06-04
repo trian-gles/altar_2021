@@ -247,7 +247,8 @@ class Card20(AudioCard):
         self.cb = self.callback
 
     def callback(self, dx7: DX7Poly, pat: Pattern):
-        dx7.randomize_all()
+        if getrandbits(1):
+            dx7.randomize_all()
 
 
 class Card21(AudioCard):

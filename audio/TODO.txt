@@ -1,7 +1,40 @@
  - Add more cards
- - Add more images to cards
- - Center items on GUI
- - write markdown score
- - set up remote server
  - experiment ALOT more
  - make piece end when cards run out
+ - more animations
+ - improve performance
+
+
+EXPENSIVE ACTIONS:
+    21    0.000    0.000    0.419    0.020 audio.py:21(input)
+    10    0.000    0.000    0.374    0.037 audio.py:39(randomize_all)
+
+    12168    0.010    0.000   10.755    0.001 cardspace.py:143(draw) maybe recreate cards less frequently????
+    936    0.004    0.000    0.417    0.000 cardspace.py:156(draw)
+    936    0.010    0.000    0.268    0.000 cardspace.py:203(draw)
+    7994    6.727    0.001   11.102    0.001 cardspace.py:264(draw)
+    3744    0.008    0.000   10.763    0.003 cardspace.py:37(draw)
+    3744    0.008    0.000   10.763    0.003 cardspace.py:37(draw)
+    30    0.000    0.000    0.373    0.012 dx7.py:185(randomize_all)
+       30    0.000    0.000    0.317    0.011 dx7.py:191(randomize_algo)
+      936    5.814    0.006   37.764    0.040 eye_anim.py:40(draw)
+     9942    5.867    0.001   10.388    0.001 eye_part.py:35(draw)
+     936    3.310    0.004    6.597    0.007 screen_flash.py:13(draw)
+     3133    1.817    0.001    3.324    0.001 smoke.py:38(draw)
+     14309    0.164    0.000    0.185    0.000 static.py:110(combine_points)
+     40190    0.641    0.000    1.918    0.000 static.py:116(animate)
+     40190    0.253    0.000    2.382    0.000 static.py:132(draw)
+     2808    0.004    0.000    2.536    0.001 static.py:17(draw)
+     2511    0.058    0.000    2.527    0.001 static.py:59(draw)
+     13554    0.138    0.000    0.727    0.000 static.py:83(build_points)
+    14309    0.082    0.000    0.251    0.000 static.py:90(get_sec_points)
+    28618    0.121    0.000    0.212    0.000 static.py:97(return_points)
+
+    21276    1.574    0.000    1.574    0.000 {built-in method pygame.draw.rect}
+    25749   45.688    0.002   45.688    0.002 {method 'blit' of 'pygame.Surface' objects}
+
+    check if need to do so much drawing!
+
+    maybe limit the number of random calls?
+
+    you need to call convert on ALL the images!!!

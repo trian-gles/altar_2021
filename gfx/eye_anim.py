@@ -33,7 +33,9 @@ class EyeAnimation:
                 self.alpha -= 5
             else:
                 self.alpha = 0
+                self.run = False
             self.frame.set_alpha(self.alpha)
+
 
         self.framenum += 1
 

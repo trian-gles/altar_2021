@@ -97,7 +97,7 @@ else:
 
 
 FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 12)
-BACKGROUND = pg.image.load(load_resource("gameboard.jpg"))
+BACKGROUND = pg.image.load(load_resource("gameboard.jpg")).convert()
 pg.display.set_caption(f"ALTAR CLIENT username = {USERNAME}")
 
 if AUDIO:
@@ -222,6 +222,9 @@ def main():
 
 if __name__ == "__main__":
     profile.run('main()')
+
+
+# 1641    6.295    0.004   15.555    0.009 screen_flash.py:13(draw) WTFFFFFF
 
 
 

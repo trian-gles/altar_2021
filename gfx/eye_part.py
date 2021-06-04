@@ -1,4 +1,4 @@
-from gfx_base import GfxBase
+from .gfx_base import GfxBase
 import pygame as pg
 from random import randrange
 

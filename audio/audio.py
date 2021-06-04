@@ -12,41 +12,56 @@ class AudioManager:
         self.server = Server().boot()
         self.server.start()
         self.zones = (ZoneOne(), ZoneTwo(), ZoneThree())
+
+        # prevent global colored cards from reapplying every turn
         self.added_gaps = False
+        self.randomized_all = False
+        self.all_tonal = False
+
         for zone in self.zones:
             #zone.dx7.randomize_all()
             for i in range(6):
                 zone.dx7.set_level(i, uniform(0, .4))
 
     def input(self, msg):
-        # Messages should be a tuple of three tuples, each inner tuple providing three elements of instructions ((1, 2, 3), (None, 5, 8), (2, 5, 8))
-        for i, zone in enumerate(self.zones):
-            zone.input(msg[i])
-
-        # special cards affecting all zones
+        # special cards affecting all zones, checked before normal card applications
         full_msg = msg[0] + msg[1] + msg[2]
         if 21 in full_msg:
             self.randomize_all()
-        elif 22 in full_msg:
+        else:
+            self.randomized_all = False
+        if 22 in full_msg:
             self.make_tonal_all()
+        else:
+            self.all_tonal = False
         if 26 in full_msg:
             self.add_gaps()
         else:
             self.remove_gaps()
 
+        # Messages should be a tuple of three tuples, each inner tuple providing three elements of instructions ((1, 2, 3), (None, 5, 8), (2, 5, 8))
+        for i, zone in enumerate(self.zones):
+            zone.input(msg[i])
+
+
+
         self.check_status()
 
     def randomize_all(self):
-        for zone in self.zones:
-            zone.dx7.randomize_all()
-            zone.pattern.time = uniform(.2, 1.5)
+        if not self.randomized_all:
+            for zone in self.zones:
+                zone.dx7.randomize_all()
+                zone.pattern.time = uniform(.2, 1.5)
+            self.randomized_all = True
 
     def make_tonal_all(self):
-        for zone in self.zones:
-            orig_ratios = [zone.dx7.get_ratio(i) for i in range(6)]
-            for i, ratio in enumerate(orig_ratios):
-                new_rat = int(ratio)
-                zone.dx7.set_ratio(i, new_rat)
+        if not self.all_tonal:
+            for zone in self.zones:
+                orig_ratios = [zone.dx7.get_ratio(i) for i in range(6)]
+                for i, ratio in enumerate(orig_ratios):
+                    new_rat = int(ratio)
+                    zone.dx7.set_ratio(i, new_rat)
+            self.all_tonal = True
 
     def add_gaps(self):
         if not self.added_gaps:

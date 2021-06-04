@@ -187,12 +187,13 @@ def main():
                             # check if the card was successfully dropped
                             if result:
                                 # for certain cards, fill the screen
-                                if held_card.id_num == 26:
-                                    screen_flasher.init_color((11, 82, 3))
-                                elif held_card.id_num == 22:
-                                    screen_flasher.init_color((141, 252, 243))
-                                elif held_card.id_num == 21:
-                                    screen_flasher.init_color((166, 0, 0))
+                                if type(item) == DropZone:
+                                    if held_card.id_num == 26:
+                                        screen_flasher.init_color((11, 82, 3))
+                                    elif held_card.id_num == 22:
+                                        screen_flasher.init_color((141, 252, 243))
+                                    elif held_card.id_num == 21:
+                                        screen_flasher.init_color((166, 0, 0))
                                 held_card = None
                                 end_turn(getset_items, gfx_man)
                                 break

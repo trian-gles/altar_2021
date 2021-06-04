@@ -9,10 +9,11 @@ if sys.platform == 'win32':
     except AttributeError:
         pass # Windows XP doesn't support monitor scaling, so just do nothing.
 
+pg.init()
+screen = pg.display.set_mode((1920, 1080))
+
 
 def main(tested_item):
-    pg.init()
-    screen = pg.display.set_mode((1920, 1080))
     step = 0
     while step < 200:
         clock = pg.time.Clock()

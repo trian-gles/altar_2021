@@ -7,6 +7,7 @@ from random import randrange, choice
 class SmokeManager(GfxBase):
     def __init__(self, x_min, x_max, y_min, y_max):
         super().__init__(x_min, x_max, y_min, y_max)
+        SmokePart.convert_imgs()
 
     def update(self):
         # check to see if to add a new particle or to remove an old one
@@ -29,6 +30,10 @@ class SmokePart:
         self.img = choice(self.file_obs)
         self.alpha = 255
 
+    @classmethod
+    def convert_imgs(cls):
+        cls.file_obs = [img.convert_alpha() for img in cls.file_obs]
+
     def update(self):
         self.coor += self.vel
         self.alpha -= 2
@@ -44,6 +49,10 @@ class SmokePart:
 
 if __name__ == "__main__":
     import gfx_tester
+    import cProfile
     dm = SmokeManager(0, 200, 300, 350)
     dm.start()
-    gfx_tester.main(dm)
+    cProfile.run("gfx_tester.main(dm)")
+
+# without : 2654    2.389    0.001    2.389    0.001 {method 'blit' of 'pygame.Surface' objects}
+# with      2654    0.788    0.000    0.788    0.000 {method 'blit' of 'pygame.Surface' objects}

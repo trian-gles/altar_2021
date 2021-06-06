@@ -5,6 +5,7 @@ from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
                        MessageButton, CenterText)
 from gfx import ScreenFlasher, GfxManager, EyeAnimation
 import argparse
+import menu
 from random import randrange
 from socks import Client
 import cProfile as profile
@@ -18,6 +19,7 @@ parser.add_argument('--fullscreen', action='store_true', help='run the gui in a 
 parser.add_argument('--audio', action='store_true', help='connect the audio engine to this client instance')
 parser.add_argument('--admin', action='store_true',
                     help="When the player designated as 'ADMIN' exits, the server will restart")
+parser.add_argument('--nogui', action='store_true')
 
 args = parser.parse_args()
 
@@ -26,6 +28,15 @@ AUDIO = args.audio
 LOCAL = args.local
 ADMIN = args.admin
 FULLSCREEN = args.fullscreen
+
+if not args.nogui:
+    menu_opts = menu.menu()
+
+    USERNAME = menu_opts["username"]
+    AUDIO = menu_opts["audio"]
+    LOCAL = menu_opts["local"]
+    ADMIN = menu_opts["admin"]
+    FULLSCREEN = menu_opts["fullscreen"]
 
 if sys.platform == 'win32':
     # On Windows, the monitor scaling can be set to something besides normal 100%.
@@ -137,7 +148,7 @@ def main():
     # GFX generators
     screen_flasher = ScreenFlasher(screen)
     eye_anim = EyeAnimation()
-    eye_anim.play()
+
     gfx_man = GfxManager(zone_coors)
     gfx_gens = (gfx_man, screen_flasher, eye_anim)
 
@@ -200,7 +211,7 @@ def main():
 
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
-                    run = False
+                    eye_anim.play()
 
         if not LOCAL:
             client_msg = client.listen()

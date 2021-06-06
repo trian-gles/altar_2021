@@ -21,7 +21,7 @@ pg.init()
 s.boot()
 
 screen = pg.display.set_mode((WIDTH, HEIGHT))
-FONT = pg.font.Font('../resources/JetBrainsMono-Medium.ttf', 12)
+FONT = pg.font.Font('JetBrainsMono-Medium.ttf', 12)
 pg.display.set_caption("DX7 testing GUI")
 
 

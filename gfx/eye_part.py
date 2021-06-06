@@ -19,7 +19,7 @@ class EyeManager(GfxBase):
 
 
 class EyePart:
-    img = pg.image.load("particles/eye_part.png")
+    img = pg.image.load("resources/particles/eye_part.png")
 
     def __init__(self, coor):
         self.vel = pg.math.Vector2((0, -1))

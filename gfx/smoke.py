@@ -21,7 +21,7 @@ class SmokeManager(GfxBase):
 
 class SmokePart:
     filenames = ["smoke_" + str(i + 1) + ".PNG" for i in range(4)]
-    file_obs = [pg.image.load(os.path.join('particles/smoke_img', filename)) for filename in filenames]
+    file_obs = [pg.image.load(os.path.join('resources/particles/smoke_img', filename)) for filename in filenames]
 
     def __init__(self, coor):
         self.vel = pg.math.Vector2((0, -1))

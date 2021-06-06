@@ -148,7 +148,7 @@ def main():
     # GFX generators
     screen_flasher = ScreenFlasher(screen)
     eye_anim = EyeAnimation()
-
+    eye_anim.play()
     gfx_man = GfxManager(zone_coors)
     gfx_gens = (gfx_man, screen_flasher, eye_anim)
 
@@ -211,7 +211,7 @@ def main():
 
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
-                    eye_anim.play()
+                    pass
 
         if not LOCAL:
             client_msg = client.listen()

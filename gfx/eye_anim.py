@@ -4,7 +4,7 @@ import os
 
 class EyeAnimation:
     filenames = ["eye_" + str(i + 1) + ".png" for i in range(4)]
-    frames = [pg.image.load(os.path.join('eye_anims', filename)) for filename in filenames]
+    frames = [pg.image.load(os.path.join('resources/eye_anims', filename)) for filename in filenames]
 
     def __init__(self):
         self.alpha = 255

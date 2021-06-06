@@ -79,7 +79,7 @@ class BasicCard:
     def __init__(self, coor):
         self.rect = pg.Rect(coor[0], coor[1], self.CARD_WIDTH, self.CARD_HEIGHT)
         self.hover = False
-        self.graphic = pg.image.load(os.path.join('cards', 'test_card.jpg'))
+        self.graphic = None
 
     def check_mouse(self, mouse_coor):
         if self.rect.collidepoint(mouse_coor):
@@ -151,7 +151,7 @@ class CardSpace(BasicCard):
 class DiscardSpace(CardSpace):
     def __init__(self, coor):
         super(DiscardSpace, self).__init__(coor)
-        self.graphic = pg.image.load(os.path.join('cards', 'discard.png')).convert_alpha()
+        self.graphic = pg.image.load(os.path.join('resources/cards', 'discard.png')).convert_alpha()
 
     def draw(self, surf: pg.Surface):
         surf.blit(self.graphic, self.rect)
@@ -229,8 +229,8 @@ image_list = ["half_speed", "double_speed", "random_speeds", "long_sustain", "sh
 
 
 class MoveableCard(BasicCard):
-    flip_graphic = pg.image.load(os.path.join('cards', 'flip_card.jpg'))
-    imgs = [pg.image.load(os.path.join('cards', image_list[id_num] + '.PNG')) for id_num in range(27)]
+    flip_graphic = pg.image.load(os.path.join('resources/cards', 'flip_card.jpg'))
+    imgs = [pg.image.load(os.path.join('resources/cards', image_list[id_num] + '.PNG')) for id_num in range(27)]
 
     bkg_color = (0, 0, 0)
     border_color = (55, 55, 55)

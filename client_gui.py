@@ -44,7 +44,7 @@ if sys.platform == 'win32':
     try:
         ctypes.windll.user32.SetProcessDPIAware()
     except AttributeError:
-        pass # Windows XP doesn't support monitor scaling, so just do nothing.
+        pass  # Windows XP doesn't support monitor scaling, so just do nothing.
 
 if not LOCAL:
 #    client = Client(USERNAME, ip="172.104.21.51")
@@ -83,7 +83,7 @@ def get_content(items):
 def set_content(items, content: tuple, gfxman: GfxManager):
     if AUDIO:
         audio.input(content[0:3])
-        gfxman.input(audio.check_status()) # will this be called twice for the user who sends a card?
+        gfxman.input(audio.check_status())  # will this be called twice for the user who sends a card?
     for i, item in enumerate(items):
         item.set_content(content[i])
 
@@ -199,7 +199,7 @@ def main():
             if event.type == pg.QUIT:
                 quit_all()
             elif event.type == pg.MOUSEBUTTONDOWN:
-                if event.button == 1: # left click
+                if event.button == 1:  # left click
                     if ADMIN:
                         for btn in admin_btns:
                             btn.try_click()
@@ -232,7 +232,6 @@ def main():
                         active_card = item.try_right_click()
                         if active_card:
                             end_turn_reactivate(active_card, i, gfx_man)
-
 
         # check for input from the server
         if not LOCAL:
@@ -268,9 +267,3 @@ def main():
 
 if __name__ == "__main__":
     profile.run('main()')
-
-
-
-
-
-

@@ -43,9 +43,11 @@ class AudioManager:
         for i, zone in enumerate(self.zones):
             zone.input(msg[i])
 
-
-
         self.check_status()
+
+    def force_input(self, card_num: int, zone_num: int):
+        # forces the selected card to have it's effect on the indicated zone
+        self.zones[zone_num].force_apply(card_num)
 
     def randomize_all(self):
         if not self.randomized_all:
@@ -81,13 +83,11 @@ class AudioManager:
             full_msg += (zone.check_status(),)
         return full_msg
 
-
     def test_lag(self):
         pass
 
     def close(self):
         self.server.stop()
-
 
 
 class Zone:
@@ -111,7 +111,7 @@ class Zone:
     def input(self, msg):
         for card_num in msg:
             if card_num or card_num == 0:
-                self.apply_card(card_num)
+                self.try_apply(card_num)
         for card in self.applied_cards:
             if card.index not in msg:
                 self.remove_card(card)
@@ -120,7 +120,7 @@ class Zone:
         elif not self.applied_cards and self.pattern.isPlaying():
             self.pattern.stop()
 
-    def apply_card(self, card_num):
+    def try_apply(self, card_num):
         # check if the card is not yet accounted for in the hand and then apply it
         if ALL_CARDS[card_num] not in self.applied_cards:
             new_card = ALL_CARDS[card_num]
@@ -129,6 +129,13 @@ class Zone:
 
             if new_card.cb:
                 self.callbacks.append(new_card.cb)
+
+    def force_apply(self, card_num):
+        card = ALL_CARDS[card_num]
+        card.apply(self.dx7, self.pattern)
+
+        if card.cb:
+            self.callbacks.append(card.cb)
 
     def remove_card(self, card: AudioCard):
         card.remove(self.dx7, self.pattern)

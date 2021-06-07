@@ -26,6 +26,13 @@ class CardZone:
             if result:
                 return result
 
+    def try_right_click(self):
+        for space in self.card_spaces:
+            # check if the selected space is highlighted and has a card, then return it
+            result = space.try_right_click()
+            if result:
+                return result
+
     def drop_card(self, card):
         for space in self.card_spaces:
             # check if the drop was successful
@@ -57,10 +64,14 @@ class HandZone(CardZone):
     def __init__(self, coor):
         super(HandZone, self).__init__(coor, num_cards=4)
 
+    # all these methods should have no effect
     def return_content(self):
         pass
 
     def set_content(self, card_nums):
+        pass
+
+    def try_right_click(self):
         pass
     
     def draw(self, surf):
@@ -128,6 +139,10 @@ class CardSpace(BasicCard):
             elif not self.card.clicked:
                 self.card.clicked = False
 
+    def try_right_click(self):
+        if self.hover:
+            return self.return_content()
+
     def return_content(self):
         if self.card:
             return self.card.id_num
@@ -166,6 +181,9 @@ class DiscardSpace(CardSpace):
     def try_click(self):
         pass
 
+    def try_right_click(self):
+        pass
+
     def drop_card(self, card):
         if self.hover:
             self.card = card
@@ -199,6 +217,9 @@ class DrawSpace(BasicCard):
                 return picked_card
             elif not self.cards[0].clicked:
                 self.cards[0].clicked = False
+
+    def try_right_click(self):
+        pass
 
     def draw(self, surf: pg.Surface):
         if self.cards:

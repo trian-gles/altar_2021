@@ -80,14 +80,15 @@ def get_content(items):
     return content
 
 
-def set_content(items, content: tuple):
+def set_content(items, content: tuple, gfxman: GfxManager):
     if AUDIO:
         audio.input(content[0:3])
+        gfxman.input(audio.check_status()) # will this be called twice for the user who sends a card?
     for i, item in enumerate(items):
         item.set_content(content[i])
 
 
-def end_turn(gui_items, gfxman: GfxManager):
+def end_turn_update(gui_items, gfxman: GfxManager):
     # updates the audio manager when cards are dropped
     content = get_content(gui_items)
     if AUDIO:
@@ -95,6 +96,15 @@ def end_turn(gui_items, gfxman: GfxManager):
         gfxman.input(audio.check_status())
     if not LOCAL:
         client.end_turn(content)
+
+
+def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):
+    # reactivate the selected card
+    if AUDIO:
+        audio.force_input(reac_card, zone_num)
+        gfxman.input(audio.check_status())
+    if not LOCAL:
+        client.end_turn_reactivate(reac_card, zone_num)
 
 
 def quit_all():
@@ -171,7 +181,9 @@ def main():
         debug_text.change_msg("RUNNING IN LOCAL MODE")
         piece_started = True
 
+    # MAIN GAMELOOP
     while run:
+
         # check the mouse position for all hoverable items
         mouse_pos = pg.mouse.get_pos()
         for item in hover_items:
@@ -179,46 +191,50 @@ def main():
             if ADMIN:
                 for btn in admin_btns:
                     btn.check_mouse(mouse_pos)
-
         if held_card:
             held_card.check_mouse(mouse_pos)
 
+        # check for key inputs
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 quit_all()
             elif event.type == pg.MOUSEBUTTONDOWN:
-                if ADMIN:
-                    for btn in admin_btns:
-                        btn.try_click()
-                if piece_started:
-                    # try to pick up a card
-                    if not held_card:
-                        for item in hover_items:
-                            new_card = item.try_click()
-                            if new_card:
-                                held_card = new_card
-                    # try to drop a card
-                    else:
-                        for item in hover_items:
-                            result = item.drop_card(held_card)
-                            # check if the card was successfully dropped
-                            if result:
-                                # for certain cards, fill the screen
-                                if type(item) == DropZone:
-                                    if held_card.id_num == 26:
-                                        screen_flasher.init_color((11, 82, 3))
-                                    elif held_card.id_num == 22:
-                                        screen_flasher.init_color((141, 252, 243))
-                                    elif held_card.id_num == 21:
-                                        screen_flasher.init_color((166, 0, 0))
-                                held_card = None
-                                end_turn(getset_items, gfx_man)
-                                break
+                if event.button == 1: # left click
+                    if ADMIN:
+                        for btn in admin_btns:
+                            btn.try_click()
+                    if piece_started:
+                        # try to pick up a card
+                        if not held_card:
+                            for item in hover_items:
+                                new_card = item.try_click()
+                                if new_card:
+                                    held_card = new_card
+                        # try to drop a card
+                        else:
+                            for item in hover_items:
+                                result = item.drop_card(held_card)
+                                # check if the card was successfully dropped
+                                if result:
+                                    # for certain cards, fill the screen
+                                    if type(item) == DropZone:
+                                        if held_card.id_num == 26:
+                                            screen_flasher.init_color((11, 82, 3))
+                                        elif held_card.id_num == 22:
+                                            screen_flasher.init_color((141, 252, 243))
+                                        elif held_card.id_num == 21:
+                                            screen_flasher.init_color((166, 0, 0))
+                                    held_card = None
+                                    end_turn_update(getset_items, gfx_man)
+                                    break
+                elif (event.button == 3) and not held_card:  # right click
+                    for i, item in enumerate(getset_items):
+                        active_card = item.try_right_click()
+                        if active_card:
+                            end_turn_reactivate(active_card, i, gfx_man)
 
-            elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
-                    pass
 
+        # check for input from the server
         if not LOCAL:
             client_msg = client.listen()
             if client_msg:
@@ -227,12 +243,20 @@ def main():
                         piece_started = True
                         eye_anim.play()
                     debug_text.change_msg(client_msg['current_player'] + "'s turn")
-                    set_content(getset_items, client_msg["content"])
+                    set_content(getset_items, client_msg["content"], gfx_man)
+                elif client_msg["method"] == "reactivate":
+                    debug_text.change_msg(client_msg['current_player'] + "'s turn")
+                    card_num = client_msg["content"][0]
+                    zone_num = client_msg['content'][1]
+                    if AUDIO:
+                        audio.force_input(card_num, zone_num)
+                        gfx_man.input(audio.check_status())
                 elif (client_msg["method"] == "new_user") and ADMIN:
                     debug_text.append(f"  New user {client_msg['name']}")
                 elif client_msg["method"] == 'quit':
                     quit_all()
 
+        # draw everything and finish the loop
         screen.blit(BACKGROUND, (0, 0))
         for item in gui_items:
             item.draw(screen)
@@ -245,8 +269,6 @@ def main():
 if __name__ == "__main__":
     profile.run('main()')
 
-
-# 1641    6.295    0.004   15.555    0.009 screen_flash.py:13(draw) WTFFFFFF
 
 
 

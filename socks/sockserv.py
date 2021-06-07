@@ -116,6 +116,13 @@ class Server:
                         "current_player": current_name}
         self.send_all(content_dict)
 
+    def new_turn_reactivate(self, reac_content: tuple):
+        current_sock = next(self.turn_iter)
+        current_name = self.clients[current_sock]['data'].decode('utf-8')
+        content_dict = {"method": "reactivate", "content": reac_content,
+                        "current_player": current_name}
+        self.send_all(content_dict)
+
     def quit(self):
         self.mode = "quit"
         content_dict = {"method": "quit"}
@@ -149,6 +156,8 @@ class Server:
                         self.print_log(f"User {username} has initiated the piece")
                 elif msg_dict["method"] == "end_turn":
                     self.new_turn_update(msg_dict["content"])
+                elif msg_dict["method"] == "end_turn_reactivate":
+                    self.new_turn_reactivate(msg_dict["content"])
 
 
 if __name__ == "__main__":

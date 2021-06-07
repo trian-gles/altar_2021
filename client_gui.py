@@ -147,6 +147,8 @@ def main():
         admin_btns = (quit_btn, start_btn)
         gui_items += admin_btns
 
+        debug_text.change_msg("Press START when all users have joined.")
+
     # GFX generators
     screen_flasher = ScreenFlasher(screen)
     eye_anim = EyeAnimation()
@@ -227,7 +229,7 @@ def main():
                     debug_text.change_msg(client_msg['current_player'] + "'s turn")
                     set_content(getset_items, client_msg["content"])
                 elif (client_msg["method"] == "new_user") and ADMIN:
-                    debug_text.change_msg(f"New user {client_msg['name']}")
+                    debug_text.append(f"  New user {client_msg['name']}")
                 elif client_msg["method"] == 'quit':
                     quit_all()
 

@@ -1,15 +1,15 @@
-    217929   25.788    0.000   25.788    0.000 {built-in method pygame.draw.rect}
-
-    ^^ maybe cards have built in rects?
-
     need transposition elements in the piece
 
-    try non esoteric cards
+    redo card drawings
 
     try version where more cards stay functional
-
-    !!!cards can be reapplied with right click!!!
 
     figure out how the piece should end
 
     a couple more animations?  make them have low cpu requirements
+
+    eventually audio needs to affect GFX managers of other users
+
+    eventually need a GUI designed specifically for the audience
+
+    !!! I think reactivate will be called twice for the user that sends it !!!

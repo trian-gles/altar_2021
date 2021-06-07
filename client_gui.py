@@ -47,7 +47,9 @@ if sys.platform == 'win32':
         pass # Windows XP doesn't support monitor scaling, so just do nothing.
 
 if not LOCAL:
-    client = Client(USERNAME, ip="172.104.21.51")
+#    client = Client(USERNAME, ip="172.104.21.51")
+    client = Client(USERNAME, ip="127.0.0.1")
+
 else:
     AUDIO = True
 
@@ -148,7 +150,9 @@ def main():
     # GFX generators
     screen_flasher = ScreenFlasher(screen)
     eye_anim = EyeAnimation()
-    eye_anim.play()
+    if LOCAL:
+        eye_anim.play()
+
     gfx_man = GfxManager(zone_coors)
     gfx_gens = (gfx_man, screen_flasher, eye_anim)
 
@@ -217,9 +221,13 @@ def main():
             client_msg = client.listen()
             if client_msg:
                 if client_msg["method"] == 'update':
-                    piece_started = True
+                    if not piece_started:
+                        piece_started = True
+                        eye_anim.play()
                     debug_text.change_msg(client_msg['current_player'] + "'s turn")
                     set_content(getset_items, client_msg["content"])
+                elif (client_msg["method"] == "new_user") and ADMIN:
+                    debug_text.change_msg(f"New user {client_msg['name']}")
                 elif client_msg["method"] == 'quit':
                     quit_all()
 

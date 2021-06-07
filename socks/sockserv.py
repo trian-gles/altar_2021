@@ -11,7 +11,7 @@ import datetime
 class Server:
     HEADER_LENGTH = 10
 
-    def __init__(self, ip="127.0.0.1", port=8000, deal_time=1, pass_time=1):
+    def __init__(self, ip="127.0.0.1", port=8000):
         logging.basicConfig(filename="server.log", level=logging.DEBUG, filemode='w')
         self.print_log(f"Building server on IP {ip}, PORT {port}")
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,13 +41,18 @@ class Server:
         print(msg)
         logging.debug(str(datetime.datetime.now()) + " : " + msg)
 
-    def send_pickle(self, content_dict, send_sock):
+    def send_pickle(self, content_dict: dict, send_sock: socket.socket):
         print(f"sending message {content_dict}")
         dict_pick = pickle.dumps(content_dict)
         pick_mess = bytes(f"{len(dict_pick):<{Server.HEADER_LENGTH}}", "utf-8") + dict_pick
         send_sock.send(pick_mess)
 
-    def receive_message(self, client_socket):
+    def send_all(self, content_dict: dict):
+        for sock in self.sockets_list:
+            if sock != self.server_socket:
+                self.send_pickle(content_dict, sock)
+
+    def receive_message(self, client_socket: socket.socket):
         try:
             message_header = client_socket.recv(Server.HEADER_LENGTH)
 
@@ -60,6 +65,12 @@ class Server:
         except:
             return False
 
+    def new_user(self, username: str):
+        # sends a message informing all of the new user
+        msg_dict = {"method": "new_user",
+                    "name": username}
+        self.send_all(msg_dict)
+
     def register_client(self):
         # add the client to the list of sockets and dictionary of clients
         client_socket, client_addr = self.server_socket.accept()
@@ -71,8 +82,12 @@ class Server:
         self.sockets_list.append(client_socket)
         self.clients[client_socket] = user
 
+        username = user['data'].decode('utf-8')
+
         self.print_log(f"accepted new connection from \
-        {client_addr[0]}: {client_addr[1]} username = {user['data'].decode('utf-8')}")
+        {client_addr[0]}: {client_addr[1]} username = {username}")
+
+        self.new_user(username)
 
     def remove_client(self, notified_socket):
         # disconnect from the indicated socket
@@ -87,6 +102,7 @@ class Server:
             del self.clients[notified_socket]
 
     def start_piece(self):
+        # message allowing gui to function
         self.mode = "play"
         self.turn_iter = cycle(self.sockets_list[1:])
         deck = tuple(range(27, 0))
@@ -98,16 +114,12 @@ class Server:
         current_name = self.clients[current_sock]['data'].decode('utf-8')
         content_dict = {"method": "update", "content": gui_content,
                         "current_player": current_name}
-        for sock in self.sockets_list:
-            if sock != self.server_socket:
-                self.send_pickle(content_dict, sock)
+        self.send_all(content_dict)
 
     def quit(self):
         self.mode = "quit"
         content_dict = {"method": "quit"}
-        for sock in self.sockets_list:
-            if sock != self.server_socket:
-                self.send_pickle(content_dict, sock)
+        self.send_all(content_dict)
 
     def listen(self):
         read_sockets, _, exception_sockets = select.select(self.sockets_list, [], self.sockets_list)

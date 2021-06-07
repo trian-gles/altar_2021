@@ -4,9 +4,6 @@
 
     need transposition elements in the piece
 
-
-    !!!!create GUI menus, then build then test on real people!!!!
-
     try non esoteric cards
 
     try version where more cards stay functional

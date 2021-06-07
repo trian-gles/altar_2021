@@ -8,10 +8,8 @@
 
     try version where more cards stay functional
 
-    cards can be reapplied more easily?
+    !!!cards can be reapplied with right click!!!
 
-    admin should be informed when new users register
-
-    piece should end when cards run out
+    figure out how the piece should end
 
     a couple more animations?  make them have low cpu requirements

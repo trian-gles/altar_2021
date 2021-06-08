@@ -49,6 +49,19 @@ class AudioManager:
         # forces the selected card to have it's effect on the indicated zone
         self.zones[zone_num].force_apply(card_num)
 
+        if card_num == 21:
+            self.randomize_all()
+        else:
+            self.randomized_all = False
+        if card_num == 22:
+            self.make_tonal_all()
+        else:
+            self.all_tonal = False
+        if card_num == 26:
+            self.add_gaps()
+        else:
+            self.remove_gaps()
+
     def randomize_all(self):
         if not self.randomized_all:
             for zone in self.zones:

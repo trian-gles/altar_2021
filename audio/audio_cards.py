@@ -1,6 +1,7 @@
 from pyo import *
 from .dx7 import DX7Poly
 from random import uniform, choice, getrandbits
+from itertools import cycle
 
 ALL_CARDS = []
 
@@ -10,9 +11,10 @@ class AudioCard:
         ALL_CARDS.append(self)
         self.index = ALL_CARDS.index(self)
         self.orig_param = None
-        self.levels = None
+        self.levels = None # use these, they are useful!!!
         self.ratios = None
         self.algo = None
+        self.trans_cb = None
 
     def apply(self, dx7: DX7Poly, pat: Pattern):
         pass
@@ -289,12 +291,21 @@ class Card26(AudioCard):
     # tree card
     pass
 
+
 class Card27(AudioCard):
     # transposition card
     def __init__(self):
-        super().__init__()
+        super(Card27, self).__init__()
+        self.trans_vals = cycle((12, 0, -12, 0))
+        self.trans_cb = self.cb
+        self.trans_return = 0
 
+    def cb(self):
+        if getrandbits(1):
+            self.trans_return = next(self.trans_vals)
+
+        return self.trans_return
 
 audio_cards = [Card0(), Card1(), Card2(), Card3(), Card4(), Card5(), Card6(), Card7(), Card8(), Card9(), Card10(),
                Card11(), Card12(), Card13(), Card14(), Card15(), Card16(), Card17(), Card18(), Card19(), Card20(),
-               Card21(), Card22(), Card23(), Card24(), Card25(), Card26()]
+               Card21(), Card22(), Card23(), Card24(), Card25(), Card26(), Card27()]

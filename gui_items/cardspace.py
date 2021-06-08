@@ -195,7 +195,7 @@ class DiscardSpace(CardSpace):
 class DrawSpace(BasicCard):
     def __init__(self, coor):
         super(DrawSpace, self).__init__(coor)
-        self.cards = [MoveableCard(coor, i, True) for i in range(27)]
+        self.cards = [MoveableCard(coor, i, True) for i in range(28)]
         shuffle(self.cards)
 
     def check_mouse(self, mouse_coor):
@@ -246,12 +246,12 @@ image_list = ["half_speed", "double_speed", "random_speeds", "long_sustain", "sh
                   "some_int_ratios", "5_ratios", "some_5_ratios", "rand_ratios", "some_rand_ratios", "white_noise_card",
                   "random", "octave_down", "normal_speed", "many_octaves_up", "many_octaves_down", "quiet", "silence",
                   "random_every_cycle", "moon_card", "sunrise_card", "change_algo", "algo_every_cycle", "sharp_attacks",
-                  "tree_card"]
+                  "tree_card", "transp_changes"]
 
 
 class MoveableCard(BasicCard):
     flip_graphic = pg.image.load(os.path.join('resources/cards', 'flip_card.jpg'))
-    imgs = [pg.image.load(os.path.join('resources/cards', image_list[id_num] + '.PNG')) for id_num in range(27)]
+    imgs = [pg.image.load(os.path.join('resources/cards', image_list[id_num] + '.PNG')) for id_num in range(28)]
 
     bkg_color = (0, 0, 0)
     border_color = (55, 55, 55)

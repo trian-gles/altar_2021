@@ -105,7 +105,7 @@ class Server:
         # message allowing gui to function
         self.mode = "play"
         self.turn_iter = cycle(self.sockets_list[1:])
-        deck = tuple(range(27, 0))
+        deck = tuple(range(28, 0))
         init_content = ((None, None, None), (None, None, None), (None, None, None), deck)
         self.new_turn_update(init_content)
 

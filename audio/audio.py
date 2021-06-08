@@ -114,6 +114,7 @@ class Zone:
         self.last_time = time()
         self.card_callback = None
         self.callbacks = []
+        self.trans_cb = None
 
     def input(self, msg):
         for card_num in msg:
@@ -134,6 +135,8 @@ class Zone:
             self.applied_cards.append(new_card)
             new_card.apply(self.dx7, self.pattern)
             self.callbacks.append(new_card.callback)
+            if new_card.trans_cb:
+                self.trans_cb = new_card.trans_cb
 
     def force_apply(self, card_num):
         card = ALL_CARDS[card_num]
@@ -144,14 +147,18 @@ class Zone:
         if card.callback in self.callbacks:
             self.callbacks.remove(card.callback)
 
+        if card.trans_cb and (card.trans_cb == self.trans_cb):
+            self.trans_cb = None
+
         self.applied_cards.remove(card)
 
     def play(self):
-        # print(self.last_time - time())
         if self.callbacks:
             for cb in self.callbacks:
                 cb(self.dx7, self.pattern)
-        self.last_time = time()
+
+        if self.trans_cb:
+            self.trans = self.trans_cb()
 
         if Zone.glob_pat_count >= len(Zone.glob_pattern):
             Zone.glob_pat_count = 0

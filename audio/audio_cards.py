@@ -10,7 +10,6 @@ class AudioCard:
         ALL_CARDS.append(self)
         self.index = ALL_CARDS.index(self)
         self.orig_param = None
-        self.cb = self.callback
         self.levels = None
         self.ratios = None
         self.algo = None
@@ -62,7 +61,6 @@ class Card2(AudioCard):
     # stuttering times
     def __init__(self):
         super(Card2, self).__init__()
-        self.cb = self.callback
 
     def callback(self, dx7: DX7Poly, pat: Pattern):
         pat.time = uniform(0, 1)
@@ -244,7 +242,6 @@ class Card20(AudioCard):
     # randomizes every note
     def __init__(self):
         super().__init__()
-        self.cb = self.callback
 
     def callback(self, dx7: DX7Poly, pat: Pattern):
         if getrandbits(1):
@@ -271,10 +268,8 @@ class Card23(AudioCard):
 
 class Card24(AudioCard):
     # algo every cycle
-    # still need to make this
     def __init__(self):
         super().__init__()
-        self.cb = self.callback
         self.count = 0
 
     def callback(self, dx7: DX7Poly, pat: Pattern):
@@ -293,6 +288,11 @@ class Card25(AudioCard):
 class Card26(AudioCard):
     # tree card
     pass
+
+class Card27(AudioCard):
+    # transposition card
+    def __init__(self):
+        super().__init__()
 
 
 audio_cards = [Card0(), Card1(), Card2(), Card3(), Card4(), Card5(), Card6(), Card7(), Card8(), Card9(), Card10(),

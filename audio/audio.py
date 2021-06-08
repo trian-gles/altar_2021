@@ -133,9 +133,7 @@ class Zone:
             new_card = ALL_CARDS[card_num]
             self.applied_cards.append(new_card)
             new_card.apply(self.dx7, self.pattern)
-
-            if new_card.cb:
-                self.callbacks.append(new_card.cb)
+            self.callbacks.append(new_card.callback)
 
     def force_apply(self, card_num):
         card = ALL_CARDS[card_num]
@@ -143,8 +141,8 @@ class Zone:
 
     def remove_card(self, card: AudioCard):
         card.remove(self.dx7, self.pattern)
-        if card.cb in self.callbacks:
-            self.callbacks.remove(card.cb)
+        if card.callback in self.callbacks:
+            self.callbacks.remove(card.callback)
 
         self.applied_cards.remove(card)
 
@@ -158,7 +156,7 @@ class Zone:
         if Zone.glob_pat_count >= len(Zone.glob_pattern):
             Zone.glob_pat_count = 0
         if self.glob_pattern[Zone.glob_pat_count]:
-            freq = note_to_freq(self.glob_pattern[Zone.glob_pat_count])
+            freq = note_to_freq(self.glob_pattern[Zone.glob_pat_count] + self.trans)
             self.dx7.noteon(freq, 1)
         Zone.glob_pat_count += 1
 

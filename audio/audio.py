@@ -134,9 +134,6 @@ class Zone:
         card = ALL_CARDS[card_num]
         card.apply(self.dx7, self.pattern)
 
-        if card.cb:
-            self.callbacks.append(card.cb)
-
     def remove_card(self, card: AudioCard):
         card.remove(self.dx7, self.pattern)
         if card.cb in self.callbacks:

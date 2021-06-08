@@ -107,6 +107,15 @@ def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):
         client.end_turn_reactivate(reac_card, zone_num)
 
 
+def check_screen_flash(card_num: int, sf: ScreenFlasher):
+    if card_num == 26:
+        sf.init_color((11, 82, 3))
+    elif card_num == 22:
+        sf.init_color((141, 252, 243))
+    elif card_num == 21:
+        sf.init_color((166, 0, 0))
+
+
 def quit_all():
     if AUDIO:
         audio.close()
@@ -218,12 +227,7 @@ def main():
                                 if result:
                                     # for certain cards, fill the screen
                                     if type(item) == DropZone:
-                                        if held_card.id_num == 26:
-                                            screen_flasher.init_color((11, 82, 3))
-                                        elif held_card.id_num == 22:
-                                            screen_flasher.init_color((141, 252, 243))
-                                        elif held_card.id_num == 21:
-                                            screen_flasher.init_color((166, 0, 0))
+                                        check_screen_flash(held_card.id_num, screen_flasher)
                                     held_card = None
                                     end_turn_update(getset_items, gfx_man)
                                     break
@@ -231,6 +235,7 @@ def main():
                     for i, item in enumerate(getset_items):
                         active_card = item.try_right_click()
                         if active_card:
+                            check_screen_flash(active_card, screen_flasher)
                             end_turn_reactivate(active_card, i, gfx_man)
 
         # check for input from the server

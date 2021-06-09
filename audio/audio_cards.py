@@ -1,6 +1,6 @@
 from pyo import *
 from .dx7 import DX7Poly
-from random import uniform, choice, getrandbits
+from random import uniform, choice, getrandbits, randrange
 from itertools import cycle
 
 ALL_CARDS = []
@@ -129,7 +129,7 @@ class Card8(AudioCard):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
 
         for i, ratio in enumerate(self.orig_ratios):
-            new_rat = int(ratio * 2) / 2
+            new_rat = (int(ratio * 2) + randrange(-1, 1)) / 2
             dx7.set_ratio(i, new_rat)
 
 
@@ -140,7 +140,7 @@ class Card9(AudioCard):
         print(self.orig_ratios)
 
         for i, ratio in enumerate(self.orig_ratios):
-            new_rat = int(ratio * 2) / 2
+            new_rat = (int(ratio * 2) + randrange(-1, 1)) / 2
             if getrandbits(1):
                 dx7.set_ratio(i, new_rat)
 

@@ -4,7 +4,7 @@
 
     try version where more cards stay functional
 
-    figure out how the piece should end
+    piece should end when all cards have been drawn and all zones are empty
 
     a couple more animations?  make them have low cpu requirements
 

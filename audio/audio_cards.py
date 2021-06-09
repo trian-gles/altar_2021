@@ -235,9 +235,9 @@ class Card19(AudioCard):
             new_lev = lev / 10
             dx7.set_level(i, new_lev)
 
-    def remove(self, dx7: DX7Poly, pat: Pattern):
-        for i, lev in enumerate(self.orig_levs):
-            dx7.set_level(i, lev)
+#    def remove(self, dx7: DX7Poly, pat: Pattern):
+#        for i, lev in enumerate(self.orig_levs):
+#            dx7.set_level(i, lev)
 
 
 class Card20(AudioCard):
@@ -293,7 +293,7 @@ class Card26(AudioCard):
 
 
 class Card27(AudioCard):
-    # transposition card
+    # moderate transposition card
     def __init__(self):
         super(Card27, self).__init__()
         self.trans_vals = cycle((12, 0, -12, 0))
@@ -306,6 +306,14 @@ class Card27(AudioCard):
 
         return self.trans_return
 
+
+class Card28(Card27):
+    # crazy transposition card
+    def __init__(self):
+        super().__init__()
+        self.trans_vals = cycle((12, 0, 7, 24, -12, 0, -7, 7))
+
+
 audio_cards = [Card0(), Card1(), Card2(), Card3(), Card4(), Card5(), Card6(), Card7(), Card8(), Card9(), Card10(),
                Card11(), Card12(), Card13(), Card14(), Card15(), Card16(), Card17(), Card18(), Card19(), Card20(),
-               Card21(), Card22(), Card23(), Card24(), Card25(), Card26(), Card27()]
+               Card21(), Card22(), Card23(), Card24(), Card25(), Card26(), Card27(), Card28()]

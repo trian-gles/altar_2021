@@ -204,7 +204,7 @@ class Card16(AudioCard):
         self.orig_ratios = [dx7.get_ratio(i) for i in range(6)]
 
         for i, ratio in enumerate(self.orig_ratios):
-            dx7.set_ratio(i, ratio * 20)
+            dx7.set_ratio(i, ratio * 8)
 
 
 class Card17(AudioCard):

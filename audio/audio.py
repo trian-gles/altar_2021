@@ -102,8 +102,8 @@ class Zone:
     glob_pat_count = 0
     # shared global pattern that the three zones will loop through together
 
-    def __init__(self):
-        self.dx7 = DX7Poly(4)
+    def __init__(self, pan: float):
+        self.dx7 = DX7Poly(4, pan=pan)
         self.trans = 0
         self.count = 0
         self.pattern_count = 0
@@ -208,21 +208,21 @@ class Zone:
 
 class ZoneOne(Zone):
     def __init__(self):
-        super().__init__()
+        super().__init__(0.5)
         self.load("soft_steel_perc.json")
 
 
 
 class ZoneTwo(Zone):
     def __init__(self):
-        super().__init__()
+        super().__init__(0.3)
         self.load("organ_bell.json")
         self.pattern.time = .75
 
 
 class ZoneThree(Zone):
     def __init__(self):
-        super().__init__()
+        super().__init__(0.8)
         self.load("harmonica.json")
         self.pattern.time = 1.5
 

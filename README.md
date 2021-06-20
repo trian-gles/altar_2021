@@ -1,4 +1,4 @@
-# ALTAR DRAFT 6-1-21
+# ALTAR DRAFT 6-20-21
 ![Image](resources/ALTAR%20new%20logo.jpg)
 ## About
 Altar is a musical piece for 1+ laptop performers.
@@ -33,50 +33,26 @@ pip install -r requirements.txt
 
 ## Single Player Launch
 Altar can be performed or practiced in a single player mode, or in a multiplayer mode of any number of performers.
-For single player, simply enter:
-```
-python client_gui.py --local
-```
-
-and the piece will begin.
+For single player check the "local" option in the start menu and the piece will begin.
 
 ## Multiplayer Launch
 
-Leaving out the `--local` flag will connect to an already configured external server.
+Leaving out the "local" will connect to an already configured external server.
 
-In this mode, one performer should be designated as the ADMIN by adding the `--admin` flag.  This player will be
+In this mode, one performer should be designated as the ADMIN by selecting the "admin" option.  This player will be
 given special START and QUIT controls to start the piece after all performers have joined, and to end the program for all
 performers.
 
 Performers can chose whether they want their machine to run the audio engine by adding the
-`--audio` flag.
+selecting the "audio" option.
 In a performance with all performers in the same location, one performer should hook up their machine to speakers and 
-use the AUDIO flag, while all others can leave out this flag.
+use the "audio" option, while all others can leave this out.
 
-The optional NAME flag `-name YOUR-USERNAME-HERE` can inform other players of each other's names during turn rotations.
+The optional "username" field can inform other players of each other's names during turn rotations.
 If this is left out, the performer will be provided with a username of a random string of digits.
 
-EXAMPLE:
-
-Tristan, Isolde, Brangane and Marke want to perform ALTAR aboard Tristan's ship.
-
-Tristan acts as the ADMIN:
-```
-python client_gui.py --admin -name tristan
-```
-
-Isolde's hooks her laptop up to the ship's sound system for all to hear:
-```
-python client_gui.py --audio -name isolde
-```
-Brangane plays as well:
-```
-python client_gui.py -name brangane
-```
-Marke participates remotely from his castle, and must use the audio callback to hear the piece:
-```
-python client_gui.py --audio -name marke
-```
+A machine can be used to run a projector for the audience to view by checking the "Projector view" option.
+This view cannot move cards, and shows no draw/discard piles or hand.
 
 ## Inside the game
 On their turn players can click on any card to move it elsewhere.
@@ -108,13 +84,9 @@ Text appearing only in multiplayer mode annoucing whose turn is up:
 ![Image](resources/debug_txt.jpg)
 
 ## Coming soon:
-- A nice UI for configuring the piece
-
-- Visuals designed specifically for audience viewing
-
-- Animations that respond to the musical content of the zones
-
 - Many more cards
+
+- More melodic variety
 
 ## !!SPOILERS!!
 

@@ -28,6 +28,8 @@ class Server:
         self.turn_iter = None
         # The mode will go from "sleep" to "play" to "finish" to "quit"
 
+        self.current_gfx_content = ()
+
         self.mode = "sleep"
 
     def reset(self):
@@ -123,6 +125,15 @@ class Server:
                         "current_player": current_name}
         self.send_all(content_dict)
 
+    def gui_update_msg(self, gfx_content: tuple):
+        if gfx_content != self.current_gfx_content:
+            self.current_gfx_content = gfx_content
+
+            content_dict = {"method": "gfx_update",
+                            "content": gfx_content}
+            self.send_all(content_dict)
+            print(f"New gfx content : {gfx_content}")
+
     def quit(self):
         self.mode = "quit"
         content_dict = {"method": "quit"}
@@ -158,6 +169,10 @@ class Server:
                     self.new_turn_update(msg_dict["content"])
                 elif msg_dict["method"] == "end_turn_reactivate":
                     self.new_turn_reactivate(msg_dict["content"])
+                elif msg_dict["method"] == "gfx_update":
+                    self.gui_update_msg(msg_dict["content"])
+
+
 
 
 if __name__ == "__main__":

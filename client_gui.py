@@ -83,7 +83,10 @@ def get_content(items):
 def set_content(items, content: tuple, gfxman: GfxManager):
     if AUDIO:
         audio.input(content[0:3])
-        gfxman.input(audio.check_status())  # will this be called twice for the user who sends a card?
+        audio_status = audio.check_status()  # will this be called twice for the user who sends a card?
+        gfxman.input(audio_status)
+        if not LOCAL:
+            client.gfx_update(audio_status)
     for i, item in enumerate(items):
         item.set_content(content[i])
 
@@ -93,9 +96,11 @@ def end_turn_update(gui_items, gfxman: GfxManager):
     content = get_content(gui_items)
     if AUDIO:
         audio.input(content[0:3])
-        gfxman.input(audio.check_status())
+        audio_status = audio.check_status()
+        gfxman.input(audio_status)
     if not LOCAL:
         client.end_turn(content)
+
 
 
 def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):
@@ -257,6 +262,9 @@ def main():
                         gfx_man.input(audio.check_status())
                 elif (client_msg["method"] == "new_user") and ADMIN:
                     debug_text.append(f"  New user {client_msg['name']}")
+                elif (client_msg["method"] == "gfx_update") and not AUDIO:
+                    gfx_man.input(client_msg["content"])
+
                 elif client_msg["method"] == 'quit':
                     quit_all()
 

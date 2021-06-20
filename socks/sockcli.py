@@ -38,6 +38,10 @@ class Client:
         msg_dict = {"method": "end_turn", "content": content}
         self.send_pickle(msg_dict)
 
+    def gfx_update(self, content: tuple):
+        msg_dict = {"method": "gfx_update", "content": content}
+        self.send_pickle(msg_dict)
+
     def end_turn_reactivate(self, reac_card: int, zone_num: int):
         msg_dict = {"method": "end_turn_reactivate", "content": (reac_card, zone_num)}
         self.send_pickle(msg_dict)

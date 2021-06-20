@@ -19,6 +19,7 @@ class Server:
         self.server_socket.bind((ip, port))
         self.server_socket.listen()
 
+        # all connected sockets
         self.sockets_list = [self.server_socket]
 
         # dictionary containing socket objects that point to usernames
@@ -74,22 +75,31 @@ class Server:
         self.send_all(msg_dict)
 
     def register_client(self):
-        # add the client to the list of sockets and dictionary of clients
         client_socket, client_addr = self.server_socket.accept()
 
-        user = self.receive_message(client_socket)
-        if user is False:
+        # add the new socket to the list of clients
+        self.sockets_list.append(client_socket)
+
+        message = self.receive_message(client_socket)
+        if message is False:
             return
 
-        self.sockets_list.append(client_socket)
-        self.clients[client_socket] = user
+        msg_dict = pickle.loads(message['data'])
 
-        username = user['data'].decode('utf-8')
+        if msg_dict["method"] == "new_player":
+            client_type = "performer"
+        else:
+            client_type = "projector"
+
+        client_dict = {"type" : client_type,
+                       "username" : msg_dict["username"]}
+
+        self.clients[client_socket] = client_dict
 
         self.print_log(f"accepted new connection from \
-        {client_addr[0]}: {client_addr[1]} username = {username}")
+        {client_addr[0]}: {client_addr[1]} username = {client_dict['username']}")
 
-        self.new_user(username)
+        self.new_user(client_dict['username'])
 
     def remove_client(self, notified_socket):
         # disconnect from the indicated socket
@@ -113,7 +123,7 @@ class Server:
 
     def new_turn_update(self, gui_content: tuple):
         current_sock = next(self.turn_iter)
-        current_name = self.clients[current_sock]['data'].decode('utf-8')
+        current_name = self.clients[current_sock]["username"]
         content_dict = {"method": "update", "content": gui_content,
                         "current_player": current_name}
         self.send_all(content_dict)
@@ -154,10 +164,10 @@ class Server:
                     continue
 
                 user = self.clients[notified_socket]
-                username = user['data'].decode('utf-8')
+                username = user["username"]
                 msg_dict = pickle.loads(message['data'])
 
-                self.print_log(f"received message from {user['data'].decode('utf-8')}: {msg_dict}")
+                self.print_log(f"received message from {username}: {msg_dict}")
 
                 if msg_dict["method"] == "quit":
                     self.quit()

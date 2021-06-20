@@ -36,6 +36,7 @@ if not args.nogui:
     AUDIO = menu_opts["audio"]
     LOCAL = menu_opts["local"]
     ADMIN = menu_opts["admin"]
+    PROJECT = menu_opts["project"]
     FULLSCREEN = menu_opts["fullscreen"]
 
 if sys.platform == 'win32':

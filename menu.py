@@ -22,6 +22,10 @@ def menu():
     localb = tk.Checkbutton(text="Single player", variable=localvar)
     localb.pack()
 
+    projectvar = tk.BooleanVar()
+    projectb = tk.Checkbutton(text="Projector view", variable=projectvar)
+    projectb.pack()
+
     fullscreenvar = tk.BooleanVar()
     fullscreenb = tk.Checkbutton(text="Fullscreen", variable=fullscreenvar)
     fullscreenb.pack()
@@ -39,6 +43,7 @@ def menu():
         results["audio"] = audiovar.get()
         results["local"] = localvar.get()
         results["admin"] = adminvar.get()
+        results["project"] = projectvar.get()
         results["fullscreen"] = fullscreenvar.get()
         window.destroy()
 

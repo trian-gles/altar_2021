@@ -116,10 +116,18 @@ class Server:
     def start_piece(self):
         # message allowing gui to function
         self.mode = "play"
-        self.turn_iter = cycle(self.sockets_list[1:])
+        self.build_turn_order()
         deck = tuple(range(29, 0))
         init_content = ((None, None, None), (None, None, None), (None, None, None), deck)
         self.new_turn_update(init_content)
+
+    def build_turn_order(self):
+        # sets up a rotating cycle of performers
+        self.turn_iter = []
+        for sock in self.sockets_list[1:]:
+            if self.clients[sock]["type"] != "projector":
+                self.turn_iter.append(sock)
+        self.turn_iter = cycle(self.turn_iter)
 
     def new_turn_update(self, gui_content: tuple):
         current_sock = next(self.turn_iter)
@@ -130,7 +138,7 @@ class Server:
 
     def new_turn_reactivate(self, reac_content: tuple):
         current_sock = next(self.turn_iter)
-        current_name = self.clients[current_sock]['data'].decode('utf-8')
+        current_name = self.clients[current_sock]["username"]
         content_dict = {"method": "reactivate", "content": reac_content,
                         "current_player": current_name}
         self.send_all(content_dict)

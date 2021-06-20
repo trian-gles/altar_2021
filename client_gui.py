@@ -7,7 +7,7 @@ from gfx import ScreenFlasher, GfxManager, EyeAnimation
 import argparse
 import menu
 from random import randrange
-from socks import Client
+from socks import Client, ProjectClient
 import cProfile as profile
 
 
@@ -19,6 +19,7 @@ parser.add_argument('--fullscreen', action='store_true', help='run the gui in a 
 parser.add_argument('--audio', action='store_true', help='connect the audio engine to this client instance')
 parser.add_argument('--admin', action='store_true',
                     help="When the player designated as 'ADMIN' exits, the server will restart")
+parser.add_argument('--project', help="Run a projector for the audience", action='store_true')
 parser.add_argument('--nogui', action='store_true')
 
 args = parser.parse_args()
@@ -27,6 +28,7 @@ USERNAME = args.name
 AUDIO = args.audio
 LOCAL = args.local
 ADMIN = args.admin
+PROJECT = args.project
 FULLSCREEN = args.fullscreen
 
 if not args.nogui:
@@ -48,8 +50,12 @@ if sys.platform == 'win32':
         pass  # Windows XP doesn't support monitor scaling, so just do nothing.
 
 if not LOCAL:
-#    client = Client(USERNAME, ip="172.104.21.51")
-    client = Client(USERNAME, ip="127.0.0.1")
+    ip = "127.0.0.1"
+    # ip = "172.104.21.51"
+    if PROJECT:
+        client = ProjectClient(USERNAME, ip=ip)
+    else:
+        client = Client(USERNAME, ip=ip)
 
 else:
     AUDIO = True
@@ -161,7 +167,10 @@ def main():
     # All items that track mouse movement
     hover_items = (discard, hand) + getset_items
     # All GUI items
-    gui_items = hover_items + (debug_text,)
+    if PROJECT:
+        gui_items = (drop_c, drop_r, drop_l)
+    else:
+        gui_items = hover_items + (debug_text,)
 
     admin_btns = None
 
@@ -213,36 +222,38 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 quit_all()
-            elif event.type == pg.MOUSEBUTTONDOWN:
-                if event.button == 1:  # left click
-                    if ADMIN:
-                        for btn in admin_btns:
-                            btn.try_click()
-                    if piece_started:
-                        # try to pick up a card
-                        if not held_card:
-                            for item in hover_items:
-                                new_card = item.try_click()
-                                if new_card:
-                                    held_card = new_card
-                        # try to drop a card
-                        else:
-                            for item in hover_items:
-                                result = item.drop_card(held_card)
-                                # check if the card was successfully dropped
-                                if result:
-                                    # for certain cards, fill the screen
-                                    if type(item) == DropZone:
-                                        check_screen_flash(held_card.id_num, screen_flasher)
-                                    held_card = None
-                                    end_turn_update(getset_items, gfx_man)
-                                    break
-                elif (event.button == 3) and not held_card:  # right click
-                    for i, item in enumerate(getset_items):
-                        active_card = item.try_right_click()
-                        if active_card:
-                            check_screen_flash(active_card, screen_flasher)
-                            end_turn_reactivate(active_card, i, gfx_man)
+            if not PROJECT:
+                # the projector can't move cards
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # left click
+                        if ADMIN:
+                            for btn in admin_btns:
+                                btn.try_click()
+                        if piece_started:
+                            # try to pick up a card
+                            if not held_card:
+                                for item in hover_items:
+                                    new_card = item.try_click()
+                                    if new_card:
+                                        held_card = new_card
+                            # try to drop a card
+                            else:
+                                for item in hover_items:
+                                    result = item.drop_card(held_card)
+                                    # check if the card was successfully dropped
+                                    if result:
+                                        # for certain cards, fill the screen
+                                        if type(item) == DropZone:
+                                            check_screen_flash(held_card.id_num, screen_flasher)
+                                        held_card = None
+                                        end_turn_update(getset_items, gfx_man)
+                                        break
+                    elif (event.button == 3) and not held_card:  # right click
+                        for i, item in enumerate(getset_items):
+                            active_card = item.try_right_click()
+                            if active_card:
+                                check_screen_flash(active_card, screen_flasher)
+                                end_turn_reactivate(active_card, i, gfx_man)
 
         # check for input from the server
         if not LOCAL:

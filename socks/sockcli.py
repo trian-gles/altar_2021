@@ -78,6 +78,7 @@ class Client:
 
 
 class ProjectClient(Client):
+    # Special Client that sends no end turn messages
     def send_register(self, username: str):
         msg_dict = {"method": "new_projector",
                     "username": username}

@@ -10,7 +10,7 @@ s = Server()
 
 
 class DXSineModule:
-    def __init__(self, name: str, ratio: float = 1.0, level: float = 1.0):
+    def __init__(self, name: int, ratio: float = 1.0, level: float = 1.0, pan: float = 0.5):
         self.env = Adsr(dur=2)
 
         self.name = name
@@ -21,7 +21,7 @@ class DXSineModule:
         # self.level.ctrl([SLMapMul(init=level)], title=f"{name} level")
         self.cos = Cos(input=self.phasor, mul=self.env)
         self.output = self.level * self.cos
-        self.mixed = None
+        self.pan = Pan(self.output, pan=pan, mul=.3)
         self.inputs = [self.phasor]
 
     def patch(self, modding):
@@ -33,15 +33,14 @@ class DXSineModule:
     def reset(self):
         self.inputs = [self.phasor]
         self.cos.input = self.phasor
-        self.mixed = None
+        self.pan.stop()
 
     def change_pitch(self, freq):
         self.phasor.freq = freq * self.ratio
         self.env.play()
 
     def out(self):
-        self.mixed = self.output.mix(2) * 0.3
-        self.mixed.out()
+        self.pan.out()
 
 
 class DX7Mono:
@@ -60,11 +59,11 @@ class DX7Mono:
         ((1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (6, 6))
     )
 
-    def __init__(self):
+    def __init__(self, pan: float = 0.5):
         self.vel = Sig(0)
         self.mod_dict = {}
         for mod_num in range(6):
-            self.mod_dict[mod_num + 1] = DXSineModule(mod_num + 1)
+            self.mod_dict[mod_num + 1] = DXSineModule(mod_num + 1, pan=pan)
         self.master_feedback = Sig(1.0)
         # self.master_feedback.ctrl([SLMap(0, 8.0, 'lin', 'value', 1)], title="Master Feedback")
         self.set_algo(0)
@@ -98,9 +97,9 @@ class DX7Mono:
 
 
 class DX7Poly:
-    def __init__(self, voices, rand_seed: int = 10):
+    def __init__(self, voices, rand_seed: int = 10, pan: float = 0.5):
         #random.seed(rand_seed)
-        self.voices = [DX7Mono() for _ in range(voices)]
+        self.voices = [DX7Mono(pan) for _ in range(voices)]
         self.voice_num = voices
         self.active_voice_num = 0
         self.active_voice = self.voices[0]
@@ -225,7 +224,7 @@ class DX7Poly:
 
 if __name__ == "__main__":
     s.boot()
-    synth = DX7Poly(8)
+    synth = DX7Poly(4, pan=0.5)
     synth.randomize_all()
     #synth.load()
 

@@ -13,6 +13,9 @@ class Text:
         self.msg = new_msg
         self.image = self.font.render(self.msg, 0, self.color)
 
+    def append(self, new_msg):
+        self.change_msg(self.msg + new_msg)
+
     def draw(self, surf):
         surf.blit(self.image, self.loc)
 

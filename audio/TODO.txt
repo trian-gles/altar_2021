@@ -1,7 +1,11 @@
- - Add more cards
- - Add more images to cards
- - Center items on GUI
- - write markdown score
- - set up remote server
- - experiment ALOT more
- - make piece end when cards run out
+    try version where more cards stay functional
+
+    piece should end when all cards have been drawn and all zones are empty
+
+    a couple more animations?  make them have low cpu requirements
+
+    set the same random seed for all clients
+
+    screen flash should work for all
+
+    !!! I think reactivate will be called twice for the user that sends it !!!

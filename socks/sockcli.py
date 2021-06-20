@@ -13,7 +13,7 @@ class Client:
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket.connect((self.IP, self.PORT))
         self.client_socket.setblocking(False)
-        self.send_message(username)
+        self.send_register(username)
         print(f"User {username} listening on IP {self.IP}, PORT {self.PORT}")
 
     def send_message(self, message):
@@ -26,6 +26,11 @@ class Client:
         pick_mess = bytes(f"{len(dict_pick):<{self.HEADER_LENGTH}}", "utf-8") + dict_pick
         self.client_socket.send(pick_mess)
 
+    def send_register(self, username: str):
+        msg_dict = {"method": "new_player",
+                    "username": username}
+        self.send_pickle(msg_dict)
+
     def send_start(self):
         msg_dict = {"method": "start"}
         self.send_pickle(msg_dict)
@@ -36,6 +41,14 @@ class Client:
 
     def end_turn(self, content: tuple):
         msg_dict = {"method": "end_turn", "content": content}
+        self.send_pickle(msg_dict)
+
+    def gfx_update(self, content: tuple):
+        msg_dict = {"method": "gfx_update", "content": content}
+        self.send_pickle(msg_dict)
+
+    def end_turn_reactivate(self, reac_card: int, zone_num: int):
+        msg_dict = {"method": "end_turn_reactivate", "content": (reac_card, zone_num)}
         self.send_pickle(msg_dict)
 
     def listen(self):
@@ -63,6 +76,13 @@ class Client:
             print("General error : " + str(e))
             sys.exit()
 
+
+class ProjectClient(Client):
+    # Special Client that sends no end turn messages
+    def send_register(self, username: str):
+        msg_dict = {"method": "new_projector",
+                    "username": username}
+        self.send_pickle(msg_dict)
 
 if __name__ == "__main__":
     username = "TEST USERNAME"

@@ -1,2 +1,2 @@
-from .sockcli import Client
+from .sockcli import Client, ProjectClient
 from .sockserv import Server

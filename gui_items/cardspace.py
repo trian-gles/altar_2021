@@ -40,7 +40,7 @@ class CardZone:
             if result:
                 return result
 
-    def drop_card(self, card):
+    def drop_card(self, card: MoveableCard):
         for space in self.card_spaces:
             # check if the drop was successful
             result = space.drop_card(card)
@@ -81,13 +81,10 @@ class HandZone(CardZone):
     def try_right_click(self):
         pass
     
-    def draw(self, surf):
+    def draw(self, surf: pg.Surface):
         for card_space in self.card_spaces:
             pg.draw.rect(surf, (60, 60, 60), card_space.rect, width=3, border_radius=5)
         super(HandZone, self).draw(surf)
-
-
-
 
 
 class CardSpace(BasicCard):
@@ -134,7 +131,7 @@ class CardSpace(BasicCard):
         else:
             return None
 
-    def set_content(self, card_num):
+    def set_content(self, card_num: int):
         if card_num or card_num == 0:
             self.card = MoveableCard(self.rect.topleft, card_num)
         else:
@@ -169,7 +166,7 @@ class DiscardSpace(CardSpace):
     def try_right_click(self):
         pass
 
-    def drop_card(self, card):
+    def drop_card(self, card: MoveableCard):
         if self.hover:
             self.card = card
             card.drop(self.rect.topleft)
@@ -213,7 +210,7 @@ class DrawSpace(BasicCard):
         if self.hover:
             pg.draw.rect(surf, (255, 255, 255), self.rect, width=3, border_radius=5)
 
-    def drop_card(self, card):
+    def drop_card(self, card: MoveableCard):
         pass
 
     def return_content(self):
@@ -222,7 +219,7 @@ class DrawSpace(BasicCard):
         else:
             return None
 
-    def set_content(self, card_nums):
+    def set_content(self, card_nums: Tuple[int]):
         if card_nums:
             self.cards = [MoveableCard(self.rect.topleft, card_num, True) for card_num in card_nums]
 

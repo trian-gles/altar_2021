@@ -1,6 +1,8 @@
 import unittest
+
+
 from pyo import *
-from dx7 import DX7Poly, DX7Mono, DXSineModule
+from audio.dx7 import DX7Poly, DX7Mono, DXSineModule
 
 s = Server().boot()
 

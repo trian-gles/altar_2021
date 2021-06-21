@@ -1,15 +1,19 @@
-import pygame as pg
 import sys
 import os
+from typing import Tuple, Optional, cast
+import argparse
+from random import randrange
+
+import pygame as pg
+import cProfile as profile
+
 from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
                        MessageButton, CenterText)
 from gfx import ScreenFlasher, GfxManager, EyeAnimation
-import argparse
 import menu
-from random import randrange
 from socks import Client, ProjectClient
-import cProfile as profile
-from typing import Tuple, Optional, cast
+
+
 
 # set up some type aliases
 GuiItems = Tuple[DropZone, DropZone, DropZone, DrawSpace]
@@ -95,7 +99,7 @@ def get_content(items: GuiItems) -> GuiContent:
 
 def set_content(items: GuiItems, content: GuiContent, gfxman: GfxManager):
     if AUDIO:
-        audio.input(content)
+        audio.input(content[0:2])
         audio_status = audio.check_status()  # will this be called twice for the user who sends a card?
         gfxman.input(audio_status)
         if not LOCAL:
@@ -108,7 +112,7 @@ def end_turn_update(items: GuiItems, gfxman: GfxManager):
     # updates the audio manager when cards are dropped
     content = get_content(items)
     if AUDIO:
-        audio.input(content)
+        audio.input(content[0:2])
         audio_status = audio.check_status()
         gfxman.input(audio_status)
     if not LOCAL:

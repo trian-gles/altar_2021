@@ -9,6 +9,12 @@ import menu
 from random import randrange
 from socks import Client, ProjectClient
 import cProfile as profile
+from typing import Tuple
+
+# set up some type aliases
+GuiItems = Tuple[DropZone, DropZone, DropZone, DrawSpace]
+DropZoneContent = Tuple[int, int, int]
+GuiContent = Tuple[DropZoneContent, DropZoneContent, DropZoneContent, Tuple[int]]
 
 
 parser = argparse.ArgumentParser(description='Main script for piece')
@@ -74,40 +80,39 @@ RED = (255, 0, 0)
 pg.init()
 
 
-def load_resource(filename):
+def load_resource(filename: str) -> str:
     return os.path.join('resources', filename)
 
 
-def load_image(filename):
+def load_image(filename: str) -> pg.image:
     return pg.image.load(load_resource(filename))
 
 
-def get_content(items):
+def get_content(items: GuiItems) -> GuiContent:
     content = tuple(map(lambda item: item.return_content(), items))
-    return content
+    return content[0:3]
 
 
-def set_content(items, content: tuple, gfxman: GfxManager):
+def set_content(items: GuiItems, content: GuiContent, gfxman: GfxManager):
     if AUDIO:
-        audio.input(content[0:3])
+        audio.input(content)
         audio_status = audio.check_status()  # will this be called twice for the user who sends a card?
         gfxman.input(audio_status)
         if not LOCAL:
             client.gfx_update(audio_status)
-    for i, item in enumerate(items):
+    for i, item in enumerate(items[0:3]):
         item.set_content(content[i])
 
 
-def end_turn_update(gui_items, gfxman: GfxManager):
+def end_turn_update(items: GuiItems, gfxman: GfxManager):
     # updates the audio manager when cards are dropped
-    content = get_content(gui_items)
+    content = get_content(items)
     if AUDIO:
-        audio.input(content[0:3])
+        audio.input(content)
         audio_status = audio.check_status()
         gfxman.input(audio_status)
     if not LOCAL:
         client.end_turn(content)
-
 
 
 def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):

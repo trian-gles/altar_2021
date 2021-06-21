@@ -3,6 +3,8 @@ import unittest
 
 from pyo import *
 from audio.dx7 import DX7Poly, DX7Mono, DXSineModule
+from audio.audiomanager import AudioManager, Zone
+from audio.audio_cards import ALL_CARDS
 
 s = Server().boot()
 
@@ -40,6 +42,31 @@ class TestDX7Mono(unittest.TestCase):
 class TestDX7Sine(unittest.TestCase):
     def setUp(self):
         self.synth = DXSineModule(0)
+
+
+class TestZone(unittest.TestCase):
+    def setUp(self):
+        self.zone = Zone(0)
+
+    def test_input(self):
+        self.zone.input((0, 1, 2))
+        self.assertTrue(self.zone.pattern.isPlaying())
+        self.assertEqual(self.zone.applied_cards, [ALL_CARDS[i] for i in range(3)])
+        self.zone.input((0, 1, 2))
+        self.assertEqual(self.zone.applied_cards, [ALL_CARDS[i] for i in range(3)])
+
+    def test_remove(self):
+        self.zone.input((0, 1, None))
+        self.assertEqual(self.zone.applied_cards, [ALL_CARDS[i] for i in range(2)])
+        self.zone.input((None, None, None))
+        self.assertEqual(self.zone.applied_cards, [])
+        self.assertFalse(self.zone.pattern.isPlaying())
+
+    def test_status(self):
+        self.zone.input((12, None, None))
+        self.assertEqual(self.zone.check_status()[0:2], ('atonal', 'static'))
+        self.zone.input((19, None, None))
+        self.assertEqual(self.zone.check_status()[1], 'quiet')
 
 
 if __name__ == "__main__":

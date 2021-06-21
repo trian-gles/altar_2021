@@ -119,13 +119,16 @@ class Zone:
         self.callbacks = []
         self.trans_cb = None
 
-    def input(self, msg: Tuple[int, int, int]):
-        for card_num in msg:
-            if card_num or card_num == 0:
-                self.try_apply(card_num)
-        for card in self.applied_cards:
-            if card.index not in msg:
-                self.remove_card(card)
+    def input(self, msg: Tuple[Optional[int], Optional[int], Optional[int]]):
+
+        active_nums = [card_num for card_num in msg if card_num is not None]
+        for card_num in active_nums:
+            self.try_apply(card_num)
+
+        remove_cards = list(filter(lambda card: card.index not in msg, self.applied_cards))
+        for card in remove_cards:
+            self.remove_card(card)
+
         if self.applied_cards and not self.pattern.isPlaying():
             self.pattern.play()
         elif not self.applied_cards and self.pattern.isPlaying():
@@ -226,10 +229,6 @@ class ZoneThree(Zone):
         super().__init__(0.8)
         self.load("harmonica.json")
         self.pattern.time = 1.5
-
-
-class Node:
-    pass
 
 
 def note_to_freq(pitch: float) -> float:

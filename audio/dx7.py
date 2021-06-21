@@ -2,8 +2,6 @@ from pyo import *
 import random
 import math
 import json
-from tkinter import filedialog as fd
-from tkinter import Tk
 
 
 s = Server()
@@ -24,7 +22,7 @@ class DXSineModule:
         self.pan = Pan(self.output, pan=pan, mul=.3)
         self.inputs = [self.phasor]
 
-    def patch(self, modding):
+    def patch(self, modding: PyoObject):
         self.inputs += modding
 
     def configure_input(self):
@@ -35,7 +33,7 @@ class DXSineModule:
         self.cos.input = self.phasor
         self.pan.stop()
 
-    def change_pitch(self, freq):
+    def change_pitch(self, freq: float):
         self.phasor.freq = freq * self.ratio
         self.env.play()
 
@@ -68,7 +66,7 @@ class DX7Mono:
         # self.master_feedback.ctrl([SLMap(0, 8.0, 'lin', 'value', 1)], title="Master Feedback")
         self.set_algo(0)
 
-    def set_algo(self, algo_num):
+    def set_algo(self, algo_num: int):
         self.reset_routes()
         self.algo_num = algo_num
         for route in self.ALGORITHMS[algo_num]:
@@ -97,7 +95,7 @@ class DX7Mono:
 
 
 class DX7Poly:
-    def __init__(self, voices, rand_seed: int = 10, pan: float = 0.5):
+    def __init__(self, voices: int, rand_seed: int = 10, pan: float = 0.5):
         #random.seed(rand_seed)
         self.voices = [DX7Mono(pan) for _ in range(voices)]
         self.voice_num = voices
@@ -226,7 +224,7 @@ if __name__ == "__main__":
     s.boot()
     synth = DX7Poly(4, pan=0.5)
     synth.randomize_all()
-    #synth.load()
+    # synth.load()
 
     pattern = (48, 51, 55, 56, 51, 58)
     pattern_count = 0

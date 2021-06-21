@@ -1,6 +1,6 @@
 from pyo import *
 from .dx7 import DX7Poly
-from random import uniform, choice, getrandbits, randrange
+from random import uniform, getrandbits, randrange
 from itertools import cycle
 
 ALL_CARDS = []

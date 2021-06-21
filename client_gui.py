@@ -9,11 +9,11 @@ import menu
 from random import randrange
 from socks import Client, ProjectClient
 import cProfile as profile
-from typing import Tuple
+from typing import Tuple, Optional, cast
 
 # set up some type aliases
 GuiItems = Tuple[DropZone, DropZone, DropZone, DrawSpace]
-DropZoneContent = Tuple[int, int, int]
+DropZoneContent = Tuple[Optional[int], Optional[int], Optional[int]]
 GuiContent = Tuple[DropZoneContent, DropZoneContent, DropZoneContent, Tuple[int]]
 
 
@@ -89,8 +89,8 @@ def load_image(filename: str) -> pg.image:
 
 
 def get_content(items: GuiItems) -> GuiContent:
-    content = tuple(map(lambda item: item.return_content(), items))
-    return content[0:3]
+    content = cast(GuiContent, tuple([item.return_content() for item in items]))
+    return content
 
 
 def set_content(items: GuiItems, content: GuiContent, gfxman: GfxManager):

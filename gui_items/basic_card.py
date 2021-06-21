@@ -1,13 +1,13 @@
 import pygame as pg
 import os
-from random import shuffle
 from typing import Tuple
 
 # type aliases
 Vector2 = Tuple[int, int]
 
-# Smaller card units
-TOTAL_CARDS = 29 # Consider not placing this in both files
+TOTAL_CARDS = 29
+# Consider not placing this in both files
+
 
 class BasicCard:
     CARD_WIDTH = 130
@@ -31,7 +31,6 @@ class BasicCard:
             pg.draw.rect(surf, (255, 255, 255), self.rect, width=3, border_radius=5)
 
 
-
 image_list = ["half_speed", "double_speed", "random_speeds", "long_sustain", "short_attacks", "octave_up", "int_ratios",
                   "some_int_ratios", "5_ratios", "some_5_ratios", "rand_ratios", "some_rand_ratios", "white_noise_card",
                   "random", "octave_down", "normal_speed", "many_octaves_up", "many_octaves_down", "quiet", "silence",
@@ -49,7 +48,7 @@ class MoveableCard(BasicCard):
     def __init__(self, coor: Vector2, id_num: int = 0, flip=False):
         super(MoveableCard, self).__init__(coor)
         self.graphic = self.imgs[id_num]
-        self.id_num = id_num
+        self._id_num = id_num
         self.clicked = False
         self.flipped = flip
         if image_list[id_num] == "moon_card":
@@ -58,6 +57,10 @@ class MoveableCard(BasicCard):
             self.bkg_color = (105, 233, 240)
         elif image_list[id_num] == "tree_card":
             self.bkg_color = (0, 74, 35)
+
+    @property
+    def id_num(self) -> int:
+        return self._id_num
 
     @classmethod
     def convert_imgs(cls):

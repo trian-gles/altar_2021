@@ -1,7 +1,7 @@
 import pygame as pg
 import os
 from random import shuffle
-from typing import Tuple
+from typing import Tuple, Optional, List
 from .basic_card import MoveableCard, BasicCard
 
 # type aliases
@@ -10,6 +10,7 @@ Vector2 = Tuple[int, int]
 # Spaces containing multiple cards
 
 TOTAL_CARDS = 29
+
 
 class CardZone:
     SPACE_MARGIN = 15
@@ -26,26 +27,28 @@ class CardZone:
         for card in self.card_spaces:
             card.check_mouse(mouse_coor)
 
-    def try_click(self):
+    def try_click(self) -> Optional[MoveableCard]:
         for space in self.card_spaces:
             # check if the selected space is highlighted and has a card, then return it
             result = space.try_click()
             if result:
                 return result
 
-    def try_right_click(self):
+    def try_right_click(self) -> Optional[int]:
         for space in self.card_spaces:
             # check if the selected space is highlighted and has a card, then return it
             result = space.try_right_click()
             if result:
                 return result
 
-    def drop_card(self, card: MoveableCard):
+    def drop_card(self, card: MoveableCard) -> bool:
         for space in self.card_spaces:
             # check if the drop was successful
             result = space.drop_card(card)
             if result:
                 return True
+        else:
+            return False
 
     def draw(self, surf: pg.Surface):
         for card in self.card_spaces:
@@ -55,12 +58,9 @@ class CardZone:
 class DropZone(CardZone):
     def __init__(self, coor: Vector2):
         super(DropZone, self).__init__(coor, num_cards=3)
-        print(self.card_spaces[0].rect.topleft)
-        print(self.card_spaces[2].rect.bottomright)
 
-    def return_content(self) -> tuple:
-        map_obj = map(lambda space: space.return_content(), self.card_spaces)
-        return tuple(map_obj)
+    def return_content(self) -> Tuple[Optional[int]]:
+        return tuple([space.return_content() for space in self.card_spaces])
 
     def set_content(self, card_nums):
         for i, card_num in enumerate(card_nums):
@@ -72,13 +72,13 @@ class HandZone(CardZone):
         super(HandZone, self).__init__(coor, num_cards=4)
 
     # all these methods should have no effect
-    def return_content(self):
+    def return_content(self) -> None:
         pass
 
     def set_content(self, card_nums):
         pass
 
-    def try_right_click(self):
+    def try_right_click(self) -> None:
         pass
     
     def draw(self, surf: pg.Surface):
@@ -90,7 +90,7 @@ class HandZone(CardZone):
 class CardSpace(BasicCard):
     def __init__(self, coor: Vector2):
         super().__init__(coor)
-        self.card = None
+        self.card: Optional[MoveableCard] = None
         MoveableCard.convert_imgs()
 
     def check_mouse(self, mouse_coor: Vector2):
@@ -98,20 +98,22 @@ class CardSpace(BasicCard):
         if self.card:
             self.card.check_mouse(mouse_coor)
 
-    def drop_card(self, card):
+    def drop_card(self, card) -> bool:
         if self.hover:
             self.card = card
             card.drop(self.rect.topleft)
             return True
+        else:
+            return False
 
-    def pickup_card(self):
+    def pickup_card(self) -> Optional[MoveableCard]:
         if self.hover:
             picked_card = self.card
             self.card = None
             print("Calling pickup card")
             return picked_card
 
-    def try_click(self):
+    def try_click(self) -> Optional[MoveableCard]:
         if self.card:
             if self.hover and not self.card.clicked:
                 self.card.clicked = True
@@ -125,7 +127,7 @@ class CardSpace(BasicCard):
         if self.hover:
             return self.return_content()
 
-    def return_content(self):
+    def return_content(self) -> Optional[int]:
         if self.card:
             return self.card.id_num
         else:
@@ -166,18 +168,20 @@ class DiscardSpace(CardSpace):
     def try_right_click(self):
         pass
 
-    def drop_card(self, card: MoveableCard):
+    def drop_card(self, card: MoveableCard) -> bool:
         if self.hover:
             self.card = card
             card.drop(self.rect.topleft)
             card.flip()
             return True
+        else:
+            return False
 
 
 class DrawSpace(BasicCard):
     def __init__(self, coor: Vector2):
         super(DrawSpace, self).__init__(coor)
-        self.cards = [MoveableCard(coor, i, True) for i in range(TOTAL_CARDS)]
+        self.cards: List[MoveableCard] = [MoveableCard(coor, i, True) for i in range(TOTAL_CARDS)]
         shuffle(self.cards)
 
     def check_mouse(self, mouse_coor: Vector2):
@@ -185,13 +189,13 @@ class DrawSpace(BasicCard):
         if self.cards:
             self.cards[0].check_mouse(mouse_coor)
 
-    def pickup_card(self):
+    def pickup_card(self) -> Optional[MoveableCard]:
         if self.hover and self.cards:
             picked_card = self.cards.pop()
             print(self.cards)
             return picked_card
 
-    def try_click(self):
+    def try_click(self) -> Optional[MoveableCard]:
         if self.cards:
             if self.hover and not self.cards[0].clicked:
                 self.cards[0].clicked = True
@@ -200,7 +204,7 @@ class DrawSpace(BasicCard):
             elif not self.cards[0].clicked:
                 self.cards[0].clicked = False
 
-    def try_right_click(self):
+    def try_right_click(self) -> None:
         pass
 
     def draw(self, surf: pg.Surface):
@@ -213,21 +217,13 @@ class DrawSpace(BasicCard):
     def drop_card(self, card: MoveableCard):
         pass
 
-    def return_content(self):
+    def return_content(self) -> Optional[Tuple[int]]:
         if self.cards:
-            return tuple(map(lambda card: card.id_num, self.cards))
+
+            return tuple([card.id_num for card in self.cards])
         else:
             return None
 
     def set_content(self, card_nums: Tuple[int]):
         if card_nums:
             self.cards = [MoveableCard(self.rect.topleft, card_num, True) for card_num in card_nums]
-
-
-
-
-
-
-
-#    3744    0.008    0.000   10.763    0.003 cardspace.py:37(draw) # maybe the hand should only appear on mouseover?
-

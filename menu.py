@@ -1,7 +1,8 @@
 import tkinter as tk
 from random import randrange
 
-def menu():
+
+def menu() -> dict:
     results = {}
     window = tk.Tk()
 
@@ -33,7 +34,6 @@ def menu():
     adminvar = tk.BooleanVar()
     adminb = tk.Checkbutton(text="Admin", variable=adminvar)
     adminb.pack()
-
 
     def action():
         results["username"] = usernamee.get()

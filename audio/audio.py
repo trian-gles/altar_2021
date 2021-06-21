@@ -5,6 +5,10 @@ from time import time
 from random import uniform
 import os
 from numpy import mean
+from typing import Tuple, Optional, List
+
+# type aliases
+DropZoneContent = Tuple[Optional[int], Optional[int], Optional[int]]
 
 
 class AudioManager:
@@ -19,11 +23,11 @@ class AudioManager:
         self.all_tonal = False
 
         for zone in self.zones:
-            #zone.dx7.randomize_all()
+            # zone.dx7.randomize_all()
             for i in range(6):
                 zone.dx7.set_level(i, uniform(0, .4))
 
-    def input(self, msg):
+    def input(self, msg: DropZoneContent):
         # special cards affecting all zones, checked before normal card applications
         full_msg = msg[0] + msg[1] + msg[2]
         if 21 in full_msg:
@@ -42,7 +46,6 @@ class AudioManager:
         else:
             self.remove_gaps()
 
-        # Messages should be a tuple of three tuples, each inner tuple providing three elements of instructions ((1, 2, 3), (None, 5, 8), (2, 5, 8))
         for i, zone in enumerate(self.zones):
             zone.input(msg[i])
 
@@ -98,7 +101,7 @@ class AudioManager:
 
 
 class Zone:
-    glob_pattern = [48, 51, 55, 56, 51, 58]
+    glob_pattern: List[Optional[int]] = [48, 51, 55, 56, 51, 58]
     glob_pat_count = 0
     # shared global pattern that the three zones will loop through together
 
@@ -116,7 +119,7 @@ class Zone:
         self.callbacks = []
         self.trans_cb = None
 
-    def input(self, msg):
+    def input(self, msg: Tuple[int, int, int]):
         for card_num in msg:
             if card_num or card_num == 0:
                 self.try_apply(card_num)
@@ -128,7 +131,7 @@ class Zone:
         elif not self.applied_cards and self.pattern.isPlaying():
             self.pattern.stop()
 
-    def try_apply(self, card_num):
+    def try_apply(self, card_num: int):
         # check if the card is not yet accounted for in the hand and then apply it
         if ALL_CARDS[card_num] not in self.applied_cards:
             new_card = ALL_CARDS[card_num]
@@ -138,7 +141,7 @@ class Zone:
             if new_card.trans_cb:
                 self.trans_cb = new_card.trans_cb
 
-    def force_apply(self, card_num):
+    def force_apply(self, card_num: int):
         card = ALL_CARDS[card_num]
         card.apply(self.dx7, self.pattern)
 
@@ -167,17 +170,17 @@ class Zone:
             self.dx7.noteon(freq, 1)
         Zone.glob_pat_count += 1
 
-    def load(self, filename):
+    def load(self, filename: str):
         path = os.path.join("audio/settings", filename)
         file = open(path)
         self.dx7.load(file)
 
-    def check_status(self):
+    def check_status(self) -> Optional[Tuple[Optional[str], Optional[str], Optional[str]]]:
         if self.pattern.isPlaying():
             msg = (self.check_atonal(), self.check_levels(), self.check_register())
             return msg
 
-    def check_atonal(self):
+    def check_atonal(self) -> Optional[str]:
         ratios = [self.dx7.get_ratio(i) for i in range(6)]
         total_offset = 0
         for r in ratios:
@@ -189,7 +192,7 @@ class Zone:
         if total_offset == 0:
             return "tonal"
 
-    def check_register(self):
+    def check_register(self) -> Optional[str]:
         ratios = [self.dx7.get_ratio(i) for i in range(6)]
         avg_rat = mean(ratios)
         if avg_rat > 10:
@@ -197,7 +200,7 @@ class Zone:
         elif avg_rat < 1:
             return "low"
 
-    def check_levels(self):
+    def check_levels(self) -> Optional[str]:
         levels = [self.dx7.get_level(i) for i in range(6)]
         if mean(levels) > 0.6:
             return "static"
@@ -205,12 +208,10 @@ class Zone:
             return "quiet"
 
 
-
 class ZoneOne(Zone):
     def __init__(self):
         super().__init__(0.5)
         self.load("soft_steel_perc.json")
-
 
 
 class ZoneTwo(Zone):
@@ -231,6 +232,6 @@ class Node:
     pass
 
 
-def note_to_freq(pitch):
+def note_to_freq(pitch: float) -> float:
     a = 440
     return (a / 32) * (2 ** ((pitch - 9) / 12))

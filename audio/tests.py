@@ -34,9 +34,11 @@ class TestDX7Mono(unittest.TestCase):
         self.synth.set_algo(5)
         self.assertEqual(self.synth.algo_num, 5)
 
+
 class TestDX7Sine(unittest.TestCase):
     def setUp(self):
-        self.synth = DXSineModule()
+        self.synth = DXSineModule(0)
+
 
 if __name__ == "__main__":
     unittest.main()

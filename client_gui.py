@@ -112,7 +112,7 @@ def end_turn_update(items: GuiItems, gfxman: GfxManager):
     # updates the audio manager when cards are dropped
     content = get_content(items)
     if AUDIO:
-        audio.input(content[0:2])
+        audio.input(content[0:3])
         audio_status = audio.check_status()
         gfxman.input(audio_status)
     if not LOCAL:

@@ -9,6 +9,7 @@ from typing import Tuple, Optional, List
 
 # type aliases
 DropZoneContent = Tuple[Optional[int], Optional[int], Optional[int]]
+AudioZoneStatus = Tuple[Optional[str], Optional[str], Optional[str]]
 
 
 class AudioManager:
@@ -85,7 +86,7 @@ class AudioManager:
             Zone.glob_pattern = [48, 51, 55, 56, 51, 58]
             self.added_gaps = False
 
-    def check_status(self) -> Tuple[tuple, tuple, tuple]:
+    def check_status(self) -> Tuple[AudioZoneStatus, AudioZoneStatus, AudioZoneStatus]:
         return tuple([zone.check_status() for zone in self.zones])
 
     def test_lag(self):

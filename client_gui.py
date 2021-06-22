@@ -6,6 +6,7 @@ from random import randrange
 
 import pygame as pg
 import cProfile as profile
+from pyo import Server
 
 from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
                        MessageButton, CenterText)
@@ -72,6 +73,8 @@ else:
 
 if AUDIO:
     from audio import AudioManager
+    s = Server().boot()
+    s.start()
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -139,7 +142,7 @@ def check_screen_flash(card_num: int, sf: ScreenFlasher):
 
 def quit_all():
     if AUDIO:
-        audio.close()
+        s.shutdown()
     quit()
 
 

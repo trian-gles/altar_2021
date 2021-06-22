@@ -13,8 +13,6 @@ DropZoneContent = Tuple[Optional[int], Optional[int], Optional[int]]
 
 class AudioManager:
     def __init__(self):
-        self.server = Server().boot()
-        self.server.start()
         self.zones = (ZoneOne(), ZoneTwo(), ZoneThree())
 
         # prevent global colored cards from reapplying every turn
@@ -27,7 +25,7 @@ class AudioManager:
             for i in range(6):
                 zone.dx7.set_level(i, uniform(0, .4))
 
-    def input(self, msg: DropZoneContent):
+    def input(self, msg: Tuple[DropZoneContent, DropZoneContent, DropZoneContent]):
         # special cards affecting all zones, checked before normal card applications
         full_msg = msg[0] + msg[1] + msg[2]
         if 21 in full_msg:
@@ -87,17 +85,11 @@ class AudioManager:
             Zone.glob_pattern = [48, 51, 55, 56, 51, 58]
             self.added_gaps = False
 
-    def check_status(self):
-        full_msg = ()
-        for zone in self.zones:
-            full_msg += (zone.check_status(),)
-        return full_msg
+    def check_status(self) -> Tuple[tuple, tuple, tuple]:
+        return tuple([zone.check_status() for zone in self.zones])
 
     def test_lag(self):
         pass
-
-    def close(self):
-        self.server.stop()
 
 
 class Zone:
@@ -178,10 +170,12 @@ class Zone:
         file = open(path)
         self.dx7.load(file)
 
-    def check_status(self) -> Optional[Tuple[Optional[str], Optional[str], Optional[str]]]:
+    def check_status(self) -> Tuple[Optional[str], Optional[str], Optional[str]]:
         if self.pattern.isPlaying():
             msg = (self.check_atonal(), self.check_levels(), self.check_register())
             return msg
+        else:
+            return tuple((None, None, None))
 
     def check_atonal(self) -> Optional[str]:
         ratios = [self.dx7.get_ratio(i) for i in range(6)]

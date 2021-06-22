@@ -2,7 +2,7 @@ import sys
 import os
 from typing import Tuple, Optional, cast
 import argparse
-from random import randrange
+from random import randrange, seed
 
 import pygame as pg
 import cProfile as profile
@@ -287,7 +287,9 @@ def main():
                     debug_text.append(f"  New user {client_msg['name']}")
                 elif (client_msg["method"] == "gfx_update") and not AUDIO:
                     gfx_man.input(client_msg["content"])
-
+                elif client_msg["method"] == "seed":
+                    seed(client_msg["seed"])
+                    print(f"Setting seed to {client_msg['seed']}")
                 elif client_msg["method"] == 'quit':
                     quit_all()
 

@@ -95,7 +95,3 @@ class TestAM(AudioTest):
         self.am.input(((26, None, None), self.basic_hand, self.basic_hand))
         desired_pat = [48, None, None, None, 51, None, None, 55, None, None, None, 56, None, None, None, 51, None, 58]
         self.assertEqual(self.am.zones[0].glob_pattern, desired_pat)
-
-
-if __name__ == "__main__":
-    unittest.main()

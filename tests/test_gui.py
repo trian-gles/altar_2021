@@ -45,7 +45,3 @@ class TestCardSpace(unittest.TestCase):
         self.assertTrue(self.card_space.hover)
         drop_result = self.card_space.drop_card(MoveableCard((0, 0)))
         self.assertTrue(drop_result)
-
-
-if __name__ == '__main__':
-    unittest.main()

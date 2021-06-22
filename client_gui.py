@@ -15,7 +15,6 @@ import menu
 from socks import Client, ProjectClient
 
 
-
 # set up some type aliases
 GuiItems = Tuple[DropZone, DropZone, DropZone, DrawSpace]
 DropZoneContent = Tuple[Optional[int], Optional[int], Optional[int]]

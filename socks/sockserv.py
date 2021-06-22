@@ -55,6 +55,11 @@ class Server:
             if sock != self.server_socket:
                 self.send_pickle(content_dict, sock)
 
+    def send_all_except_sender(self, content_dict: dict, sender: socket.socket):
+        for sock in self.sockets_list:
+            if sock not in (self.server_socket, sender):
+                self.send_pickle(content_dict, sock)
+
     def receive_message(self, client_socket: socket.socket):
         try:
             message_header = client_socket.recv(Server.HEADER_LENGTH)
@@ -196,6 +201,8 @@ class Server:
                     self.new_turn_reactivate(msg_dict["content"])
                 elif msg_dict["method"] == "gfx_update":
                     self.gui_update_msg(msg_dict["content"])
+                elif msg_dict["method"] == "screen_flash":
+                    self.send_all_except_sender(msg_dict, notified_socket)
 
 
 

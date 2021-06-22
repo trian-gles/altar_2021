@@ -130,13 +130,17 @@ def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):
         client.end_turn_reactivate(reac_card, zone_num)
 
 
-def check_screen_flash(card_num: int, sf: ScreenFlasher):
+def check_screen_flash(card_num: int, sf: ScreenFlasher, sender=True):
     if card_num == 26:
         sf.init_color((11, 82, 3))
     elif card_num == 22:
         sf.init_color((141, 252, 243))
     elif card_num == 21:
         sf.init_color((166, 0, 0))
+    else:
+        return
+    if sender and not LOCAL:
+        client.send_screen_flash(card_num)
 
 
 def quit_all():
@@ -216,10 +220,14 @@ def main():
         debug_text.change_msg("RUNNING IN LOCAL MODE")
         piece_started = True
 
-    # MAIN GAMELOOP
+    ###############
+    # MAIN GAME LOOP
+    ###############
     while run:
 
-        # check the mouse position for all hoverable items
+        #################
+        # MOUSE POSITION CHECKS
+        #################
         mouse_pos = pg.mouse.get_pos()
         for item in hover_items:
             item.check_mouse(mouse_pos)
@@ -229,7 +237,9 @@ def main():
         if held_card:
             held_card.check_mouse(mouse_pos)
 
-        # check for key inputs
+        #############
+        # KEY INPUTS
+        #############
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 quit_all()
@@ -266,7 +276,9 @@ def main():
                                 check_screen_flash(active_card, screen_flasher)
                                 end_turn_reactivate(active_card, i, gfx_man)
 
-        # check for input from the server
+        #################
+        # SERVER MESSAGES
+        #################
         if not LOCAL:
             client_msg = client.listen()
             if client_msg:
@@ -289,11 +301,14 @@ def main():
                     gfx_man.input(client_msg["content"])
                 elif client_msg["method"] == "seed":
                     seed(client_msg["seed"])
-                    print(f"Setting seed to {client_msg['seed']}")
+                elif client_msg["method"] == "screen_flash":
+                    check_screen_flash(client_msg["card_num"], screen_flasher, sender=False)
                 elif client_msg["method"] == 'quit':
                     quit_all()
 
-        # draw everything and finish the loop
+        #################
+        # DRAW AND FINISH
+        #################
         screen.blit(BACKGROUND, (0, 0))
         for item in gui_items:
             item.draw(screen)

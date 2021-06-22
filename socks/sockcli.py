@@ -5,7 +5,7 @@ import pickle
 
 
 class Client:
-    def __init__(self, username, ip="127.0.0.1"):
+    def __init__(self, username: str, ip="127.0.0.1"):
         self.HEADER_LENGTH = 10
         self.IP = ip
         self.PORT = 8000
@@ -16,12 +16,12 @@ class Client:
         self.send_register(username)
         print(f"User {username} listening on IP {self.IP}, PORT {self.PORT}")
 
-    def send_message(self, message):
+    def send_message(self, message: str):
         enc_message = message.encode('utf-8')
         message_header = f"{len(enc_message):<{self.HEADER_LENGTH}}".encode('utf-8')
         self.client_socket.send(message_header + enc_message)
 
-    def send_pickle(self, msg_dict):
+    def send_pickle(self, msg_dict: dict):
         dict_pick = pickle.dumps(msg_dict)
         pick_mess = bytes(f"{len(dict_pick):<{self.HEADER_LENGTH}}", "utf-8") + dict_pick
         self.client_socket.send(pick_mess)
@@ -51,6 +51,10 @@ class Client:
         msg_dict = {"method": "end_turn_reactivate", "content": (reac_card, zone_num)}
         self.send_pickle(msg_dict)
 
+    def send_screen_flash(self, card_num: int):
+        msg_dict = {"method": "screen_flash", "card_num": card_num}
+        self.send_pickle(msg_dict)
+
     def listen(self):
         try:
             while True:
@@ -78,11 +82,12 @@ class Client:
 
 
 class ProjectClient(Client):
-    # Special Client that sends no end turn messages
+    """Special Client that sends no end turn messages"""
     def send_register(self, username: str):
         msg_dict = {"method": "new_projector",
                     "username": username}
         self.send_pickle(msg_dict)
+
 
 if __name__ == "__main__":
     username = "TEST USERNAME"

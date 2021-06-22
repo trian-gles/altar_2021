@@ -1,14 +1,24 @@
-import pygame as pg
 import sys
 import os
+from typing import Tuple, Optional, cast
+import argparse
+from random import randrange, seed
+
+import pygame as pg
+import cProfile as profile
+from pyo import Server
+
 from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
                        MessageButton, CenterText)
 from gfx import ScreenFlasher, GfxManager, EyeAnimation
-import argparse
 import menu
-from random import randrange
 from socks import Client, ProjectClient
-import cProfile as profile
+
+
+# set up some type aliases
+GuiItems = Tuple[DropZone, DropZone, DropZone, DrawSpace]
+DropZoneContent = Tuple[Optional[int], Optional[int], Optional[int]]
+GuiContent = Tuple[DropZoneContent, DropZoneContent, DropZoneContent, Tuple[int]]
 
 
 parser = argparse.ArgumentParser(description='Main script for piece')
@@ -62,6 +72,8 @@ else:
 
 if AUDIO:
     from audio import AudioManager
+    s = Server().boot()
+    s.start()
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -74,40 +86,39 @@ RED = (255, 0, 0)
 pg.init()
 
 
-def load_resource(filename):
+def load_resource(filename: str) -> str:
     return os.path.join('resources', filename)
 
 
-def load_image(filename):
+def load_image(filename: str) -> pg.image:
     return pg.image.load(load_resource(filename))
 
 
-def get_content(items):
-    content = tuple(map(lambda item: item.return_content(), items))
+def get_content(items: GuiItems) -> GuiContent:
+    content = cast(GuiContent, tuple([item.return_content() for item in items]))
     return content
 
 
-def set_content(items, content: tuple, gfxman: GfxManager):
+def set_content(items: GuiItems, content: GuiContent, gfxman: GfxManager):
     if AUDIO:
-        audio.input(content[0:3])
+        audio.input(content[0:2])
         audio_status = audio.check_status()  # will this be called twice for the user who sends a card?
         gfxman.input(audio_status)
         if not LOCAL:
             client.gfx_update(audio_status)
-    for i, item in enumerate(items):
+    for i, item in enumerate(items[0:3]):
         item.set_content(content[i])
 
 
-def end_turn_update(gui_items, gfxman: GfxManager):
+def end_turn_update(items: GuiItems, gfxman: GfxManager):
     # updates the audio manager when cards are dropped
-    content = get_content(gui_items)
+    content = get_content(items)
     if AUDIO:
         audio.input(content[0:3])
         audio_status = audio.check_status()
         gfxman.input(audio_status)
     if not LOCAL:
         client.end_turn(content)
-
 
 
 def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):
@@ -119,18 +130,22 @@ def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):
         client.end_turn_reactivate(reac_card, zone_num)
 
 
-def check_screen_flash(card_num: int, sf: ScreenFlasher):
+def check_screen_flash(card_num: int, sf: ScreenFlasher, sender=True):
     if card_num == 26:
         sf.init_color((11, 82, 3))
     elif card_num == 22:
         sf.init_color((141, 252, 243))
     elif card_num == 21:
         sf.init_color((166, 0, 0))
+    else:
+        return
+    if sender and not LOCAL:
+        client.send_screen_flash(card_num)
 
 
 def quit_all():
     if AUDIO:
-        audio.close()
+        s.shutdown()
     quit()
 
 
@@ -205,10 +220,14 @@ def main():
         debug_text.change_msg("RUNNING IN LOCAL MODE")
         piece_started = True
 
-    # MAIN GAMELOOP
+    ###############
+    # MAIN GAME LOOP
+    ###############
     while run:
 
-        # check the mouse position for all hoverable items
+        #################
+        # MOUSE POSITION CHECKS
+        #################
         mouse_pos = pg.mouse.get_pos()
         for item in hover_items:
             item.check_mouse(mouse_pos)
@@ -218,7 +237,9 @@ def main():
         if held_card:
             held_card.check_mouse(mouse_pos)
 
-        # check for key inputs
+        #############
+        # KEY INPUTS
+        #############
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 quit_all()
@@ -255,7 +276,9 @@ def main():
                                 check_screen_flash(active_card, screen_flasher)
                                 end_turn_reactivate(active_card, i, gfx_man)
 
-        # check for input from the server
+        #################
+        # SERVER MESSAGES
+        #################
         if not LOCAL:
             client_msg = client.listen()
             if client_msg:
@@ -276,11 +299,16 @@ def main():
                     debug_text.append(f"  New user {client_msg['name']}")
                 elif (client_msg["method"] == "gfx_update") and not AUDIO:
                     gfx_man.input(client_msg["content"])
-
+                elif client_msg["method"] == "seed":
+                    seed(client_msg["seed"])
+                elif client_msg["method"] == "screen_flash":
+                    check_screen_flash(client_msg["card_num"], screen_flasher, sender=False)
                 elif client_msg["method"] == 'quit':
                     quit_all()
 
-        # draw everything and finish the loop
+        #################
+        # DRAW AND FINISH
+        #################
         screen.blit(BACKGROUND, (0, 0))
         for item in gui_items:
             item.draw(screen)

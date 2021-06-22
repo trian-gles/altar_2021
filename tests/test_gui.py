@@ -1,5 +1,18 @@
 import unittest
-from cardspace import MoveableCard, CardSpace
+from gui_items.basic_card import BasicCard, MoveableCard
+from gui_items.cardspace import CardSpace
+import pygame as pg
+
+
+class TestBasicCard(unittest.TestCase):
+    def setUp(self):
+        self.card = BasicCard((0, 0))
+
+    def test_hover(self):
+        self.card.check_mouse((50, 50))
+        self.assertTrue(self.card.hover)
+        self.card.check_mouse((300, 300))
+        self.assertFalse(self.card.hover)
 
 
 class TestMoveCard(unittest.TestCase):
@@ -19,6 +32,11 @@ class TestMoveCard(unittest.TestCase):
 
 
 class TestCardSpace(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        pg.init()
+        cls.screen = pg.display.set_mode((1, 1))
+
     def setUp(self):
         self.card_space = CardSpace((0, 0))
 
@@ -27,7 +45,3 @@ class TestCardSpace(unittest.TestCase):
         self.assertTrue(self.card_space.hover)
         drop_result = self.card_space.drop_card(MoveableCard((0, 0)))
         self.assertTrue(drop_result)
-
-
-if __name__ == '__main__':
-    unittest.main()

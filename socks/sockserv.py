@@ -2,7 +2,7 @@ import socket
 import select
 import pickle
 import os
-from random import choice, shuffle
+from random import randrange
 from itertools import cycle
 import logging
 import datetime
@@ -53,6 +53,11 @@ class Server:
     def send_all(self, content_dict: dict):
         for sock in self.sockets_list:
             if sock != self.server_socket:
+                self.send_pickle(content_dict, sock)
+
+    def send_all_except_sender(self, content_dict: dict, sender: socket.socket):
+        for sock in self.sockets_list:
+            if sock not in (self.server_socket, sender):
                 self.send_pickle(content_dict, sock)
 
     def receive_message(self, client_socket: socket.socket):
@@ -114,15 +119,15 @@ class Server:
             del self.clients[notified_socket]
 
     def start_piece(self):
-        # message allowing gui to function
         self.mode = "play"
         self.build_turn_order()
+        self.seed()
         deck = tuple(range(29, 0))
         init_content = ((None, None, None), (None, None, None), (None, None, None), deck)
         self.new_turn_update(init_content)
 
     def build_turn_order(self):
-        # sets up a rotating cycle of performers
+        """Sets up a rotating cycle of users"""
         self.turn_iter = []
         for sock in self.sockets_list[1:]:
             if self.clients[sock]["type"] != "projector":
@@ -151,6 +156,13 @@ class Server:
                             "content": gfx_content}
             self.send_all(content_dict)
             print(f"New gfx content : {gfx_content}")
+
+    def seed(self):
+        """Sets a random seed and sends it to all clients"""
+        seed = randrange(10000)
+        content_dict = {"method": "seed",
+                        "seed": seed}
+        self.send_all(content_dict)
 
     def quit(self):
         self.mode = "quit"
@@ -189,6 +201,8 @@ class Server:
                     self.new_turn_reactivate(msg_dict["content"])
                 elif msg_dict["method"] == "gfx_update":
                     self.gui_update_msg(msg_dict["content"])
+                elif msg_dict["method"] == "screen_flash":
+                    self.send_all_except_sender(msg_dict, notified_socket)
 
 
 

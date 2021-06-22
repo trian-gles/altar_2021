@@ -46,13 +46,14 @@ class MessageBox(Text):
         self._build_rect()
 
     def draw(self, surf):
-        #draw the background rectangle
+        # draw the background rectangle
         pg.draw.rect(surf, self.bkg_color, self.rect)
-        #draw the overlaid text
+        # draw the overlaid text
         super().draw(surf)
 
 
 class MessageButton(MessageBox):
+    """Clickable button with text"""
     def __init__(self, msg: str, loc: tuple, callback: callable, font: pg.font.Font,
      bkg_color=(0, 0, 0), text_color=(255, 255, 255)):
         super().__init__(msg, loc, font, bkg_color, text_color)

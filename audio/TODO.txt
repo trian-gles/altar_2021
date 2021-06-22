@@ -4,8 +4,4 @@
 
     a couple more animations?  make them have low cpu requirements
 
-    set the same random seed for all clients
-
-    screen flash should work for all
-
     !!! I think reactivate will be called twice for the user that sends it !!!

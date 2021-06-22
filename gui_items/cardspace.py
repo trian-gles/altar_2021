@@ -1,15 +1,22 @@
 import pygame as pg
 import os
 from random import shuffle
+from typing import Tuple, Optional, List
+from .basic_card import MoveableCard, BasicCard
+
+# type aliases
+Vector2 = Tuple[int, int]
 
 # Spaces containing multiple cards
 
 TOTAL_CARDS = 29
 
+
 class CardZone:
+    """Base class for an area with multiple card spaces"""
     SPACE_MARGIN = 15
 
-    def __init__(self, coor, num_cards):
+    def __init__(self, coor: Vector2, num_cards: int):
         self.origin = coor
         self.card_spaces = []
         for i in range(num_cards):
@@ -17,45 +24,45 @@ class CardZone:
             new_card = CardSpace((card_x, coor[1]))
             self.card_spaces.append(new_card)
 
-    def check_mouse(self, mouse_coor):
+    def check_mouse(self, mouse_coor: Vector2):
         for card in self.card_spaces:
             card.check_mouse(mouse_coor)
 
-    def try_click(self):
+    def try_click(self) -> Optional[MoveableCard]:
         for space in self.card_spaces:
             # check if the selected space is highlighted and has a card, then return it
             result = space.try_click()
             if result:
                 return result
 
-    def try_right_click(self):
+    def try_right_click(self) -> Optional[int]:
+        """Check if any of the contained spaces are highlighted and contain a card"""
         for space in self.card_spaces:
-            # check if the selected space is highlighted and has a card, then return it
             result = space.try_right_click()
             if result:
                 return result
 
-    def drop_card(self, card):
+    def drop_card(self, card: MoveableCard) -> bool:
+        """Try to move the held card to all contained spaces, return results"""
         for space in self.card_spaces:
-            # check if the drop was successful
             result = space.drop_card(card)
             if result:
                 return True
+        else:
+            return False
 
-    def draw(self, surf):
+    def draw(self, surf: pg.Surface):
         for card in self.card_spaces:
             card.draw(surf)
 
 
 class DropZone(CardZone):
-    def __init__(self, coor):
+    """Three card area of the main game board"""
+    def __init__(self, coor: Vector2):
         super(DropZone, self).__init__(coor, num_cards=3)
-        print(self.card_spaces[0].rect.topleft)
-        print(self.card_spaces[2].rect.bottomright)
 
-    def return_content(self):
-        map_obj = map(lambda space: space.return_content(), self.card_spaces)
-        return tuple(map_obj)
+    def return_content(self) -> Tuple[Optional[int]]:
+        return tuple([space.return_content() for space in self.card_spaces])
 
     def set_content(self, card_nums):
         for i, card_num in enumerate(card_nums):
@@ -63,75 +70,54 @@ class DropZone(CardZone):
 
 
 class HandZone(CardZone):
-    def __init__(self, coor):
+    """Four card area for the player's hand"""
+    def __init__(self, coor: Vector2):
         super(HandZone, self).__init__(coor, num_cards=4)
 
     # all these methods should have no effect
-    def return_content(self):
+    def return_content(self) -> None:
         pass
 
     def set_content(self, card_nums):
         pass
 
-    def try_right_click(self):
+    def try_right_click(self) -> None:
         pass
     
-    def draw(self, surf):
+    def draw(self, surf: pg.Surface):
         for card_space in self.card_spaces:
             pg.draw.rect(surf, (60, 60, 60), card_space.rect, width=3, border_radius=5)
         super(HandZone, self).draw(surf)
 
 
-# Smaller card units
-
-
-class BasicCard:
-    CARD_WIDTH = 130
-    CARD_HEIGHT = 200
-
-    def __init__(self, coor):
-        self.rect = pg.Rect(coor[0], coor[1], self.CARD_WIDTH, self.CARD_HEIGHT)
-        self.hover = False
-        self.graphic = None
-
-    def check_mouse(self, mouse_coor):
-        if self.rect.collidepoint(mouse_coor):
-            self.hover = True
-        else:
-            self.hover = False
-
-    def draw(self, surf: pg.Surface):
-        if self.hover:
-            pg.draw.rect(surf, (0, 0, 0), self.rect, width=0, border_radius=5)
-            surf.blit(self.graphic, self.rect)
-            pg.draw.rect(surf, (255, 255, 255), self.rect, width=3, border_radius=5)
-
-
 class CardSpace(BasicCard):
-    def __init__(self, coor):
+    """Space that may contain a MoveableCard"""
+    def __init__(self, coor: Vector2):
         super().__init__(coor)
-        self.card = None
+        self.card: Optional[MoveableCard] = None
         MoveableCard.convert_imgs()
 
-    def check_mouse(self, mouse_coor):
+    def check_mouse(self, mouse_coor: Vector2):
         super().check_mouse(mouse_coor)
         if self.card:
             self.card.check_mouse(mouse_coor)
 
-    def drop_card(self, card):
+    def drop_card(self, card) -> bool:
         if self.hover:
             self.card = card
             card.drop(self.rect.topleft)
             return True
+        else:
+            return False
 
-    def pickup_card(self):
+    def pickup_card(self) -> Optional[MoveableCard]:
         if self.hover:
             picked_card = self.card
             self.card = None
             print("Calling pickup card")
             return picked_card
 
-    def try_click(self):
+    def try_click(self) -> Optional[MoveableCard]:
         if self.card:
             if self.hover and not self.card.clicked:
                 self.card.clicked = True
@@ -145,13 +131,13 @@ class CardSpace(BasicCard):
         if self.hover:
             return self.return_content()
 
-    def return_content(self):
+    def return_content(self) -> Optional[int]:
         if self.card:
             return self.card.id_num
         else:
             return None
 
-    def set_content(self, card_num):
+    def set_content(self, card_num: int):
         if card_num or card_num == 0:
             self.card = MoveableCard(self.rect.topleft, card_num)
         else:
@@ -166,7 +152,7 @@ class CardSpace(BasicCard):
 
 
 class DiscardSpace(CardSpace):
-    def __init__(self, coor):
+    def __init__(self, coor: Vector2):
         super(DiscardSpace, self).__init__(coor)
         self.graphic = pg.image.load(os.path.join('resources/cards', 'discard.png')).convert_alpha()
 
@@ -186,32 +172,34 @@ class DiscardSpace(CardSpace):
     def try_right_click(self):
         pass
 
-    def drop_card(self, card):
+    def drop_card(self, card: MoveableCard) -> bool:
         if self.hover:
             self.card = card
             card.drop(self.rect.topleft)
             card.flip()
             return True
+        else:
+            return False
 
 
 class DrawSpace(BasicCard):
-    def __init__(self, coor):
+    def __init__(self, coor: Vector2):
         super(DrawSpace, self).__init__(coor)
-        self.cards = [MoveableCard(coor, i, True) for i in range(TOTAL_CARDS)]
+        self.cards: List[MoveableCard] = [MoveableCard(coor, i, True) for i in range(TOTAL_CARDS)]
         shuffle(self.cards)
 
-    def check_mouse(self, mouse_coor):
+    def check_mouse(self, mouse_coor: Vector2):
         super().check_mouse(mouse_coor)
         if self.cards:
             self.cards[0].check_mouse(mouse_coor)
 
-    def pickup_card(self):
+    def pickup_card(self) -> Optional[MoveableCard]:
         if self.hover and self.cards:
             picked_card = self.cards.pop()
             print(self.cards)
             return picked_card
 
-    def try_click(self):
+    def try_click(self) -> Optional[MoveableCard]:
         if self.cards:
             if self.hover and not self.cards[0].clicked:
                 self.cards[0].clicked = True
@@ -220,7 +208,7 @@ class DrawSpace(BasicCard):
             elif not self.cards[0].clicked:
                 self.cards[0].clicked = False
 
-    def try_right_click(self):
+    def try_right_click(self) -> None:
         pass
 
     def draw(self, surf: pg.Surface):
@@ -230,76 +218,16 @@ class DrawSpace(BasicCard):
         if self.hover:
             pg.draw.rect(surf, (255, 255, 255), self.rect, width=3, border_radius=5)
 
-    def drop_card(self, card):
+    def drop_card(self, card: MoveableCard):
         pass
 
-    def return_content(self):
+    def return_content(self) -> Optional[Tuple[int]]:
         if self.cards:
-            return tuple(map(lambda card: card.id_num, self.cards))
+
+            return tuple([card.id_num for card in self.cards])
         else:
             return None
 
-    def set_content(self, card_nums):
+    def set_content(self, card_nums: Tuple[int]):
         if card_nums:
             self.cards = [MoveableCard(self.rect.topleft, card_num, True) for card_num in card_nums]
-
-
-image_list = ["half_speed", "double_speed", "random_speeds", "long_sustain", "short_attacks", "octave_up", "int_ratios",
-                  "some_int_ratios", "5_ratios", "some_5_ratios", "rand_ratios", "some_rand_ratios", "white_noise_card",
-                  "random", "octave_down", "normal_speed", "many_octaves_up", "many_octaves_down", "quiet", "silence",
-                  "random_every_cycle", "moon_card", "sunrise_card", "change_algo", "algo_every_cycle", "sharp_attacks",
-                  "tree_card", "transp_changes", "transp_changes_many"]
-
-
-class MoveableCard(BasicCard):
-    flip_graphic = pg.image.load(os.path.join('resources/cards', 'flip_card.jpg'))
-    imgs = [pg.image.load(os.path.join('resources/cards', image_list[id_num] + '.PNG')) for id_num in range(TOTAL_CARDS)]
-
-    bkg_color = (0, 0, 0)
-    border_color = (55, 55, 55)
-
-    def __init__(self, coor, id_num=0, flip=False):
-        super(MoveableCard, self).__init__(coor)
-        self.graphic = self.imgs[id_num]
-        self.id_num = id_num
-        self.clicked = False
-        self.flipped = flip
-        if image_list[id_num] == "moon_card":
-            self.bkg_color = (173, 35, 0)
-        elif image_list[id_num] == "sunrise_card":
-            self.bkg_color = (105, 233, 240)
-        elif image_list[id_num] == "tree_card":
-            self.bkg_color = (0, 74, 35)
-
-    @classmethod
-    def convert_imgs(cls):
-        cls.imgs = [img.convert_alpha() for img in cls.imgs]
-        cls.flip_graphic = cls.flip_graphic.convert_alpha()
-
-    def check_mouse(self, mouse_coor):
-        if not self.clicked:
-            super().check_mouse(mouse_coor)
-        else:
-            self.rect.center = mouse_coor
-
-    def drop(self, coor):
-        self.rect.topleft = coor
-        self.clicked = False
-        if self.flipped:
-            self.flip()
-
-    def flip(self):
-        self.flipped = not self.flipped
-
-    def draw(self, surf: pg.Surface):
-
-        if self.flipped:
-            pg.draw.rect(surf, (0, 0, 0), self.rect, width=0, border_radius=5)
-            surf.blit(self.flip_graphic, self.rect)
-        else:
-            pg.draw.rect(surf, self.bkg_color, self.rect, width=0, border_radius=5)
-            surf.blit(self.graphic, self.rect)
-        pg.draw.rect(surf, (55, 55, 55), self.rect, width=3, border_radius=5)
-
-#    3744    0.008    0.000   10.763    0.003 cardspace.py:37(draw) # maybe the hand should only appear on mouseover?
-

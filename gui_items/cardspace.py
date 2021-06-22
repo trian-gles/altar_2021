@@ -13,6 +13,7 @@ TOTAL_CARDS = 29
 
 
 class CardZone:
+    """Base class for an area with multiple card spaces"""
     SPACE_MARGIN = 15
 
     def __init__(self, coor: Vector2, num_cards: int):
@@ -35,15 +36,15 @@ class CardZone:
                 return result
 
     def try_right_click(self) -> Optional[int]:
+        """Check if any of the contained spaces are highlighted and contain a card"""
         for space in self.card_spaces:
-            # check if the selected space is highlighted and has a card, then return it
             result = space.try_right_click()
             if result:
                 return result
 
     def drop_card(self, card: MoveableCard) -> bool:
+        """Try to move the held card to all contained spaces, return results"""
         for space in self.card_spaces:
-            # check if the drop was successful
             result = space.drop_card(card)
             if result:
                 return True
@@ -56,6 +57,7 @@ class CardZone:
 
 
 class DropZone(CardZone):
+    """Three card area of the main game board"""
     def __init__(self, coor: Vector2):
         super(DropZone, self).__init__(coor, num_cards=3)
 
@@ -68,6 +70,7 @@ class DropZone(CardZone):
 
 
 class HandZone(CardZone):
+    """Four card area for the player's hand"""
     def __init__(self, coor: Vector2):
         super(HandZone, self).__init__(coor, num_cards=4)
 
@@ -88,6 +91,7 @@ class HandZone(CardZone):
 
 
 class CardSpace(BasicCard):
+    """Space that may contain a MoveableCard"""
     def __init__(self, coor: Vector2):
         super().__init__(coor)
         self.card: Optional[MoveableCard] = None

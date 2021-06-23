@@ -58,12 +58,24 @@ class EndAnimation(BaseEye):
     def __init__(self, callback):
         super().__init__()
         self.callback = callback
+        self.fill_alpha = 0
+        self.fill_img = self.frame.copy()
+        self.fill_img.fill((0, 0, 0))
 
     def update(self):
+        if self.framenum > 20:
+            if self.fill_alpha < 255:
+                self.fill_alpha += 5
+                self.fill_img.set_alpha(self.fill_alpha)
         if self.framenum == 120:
             self.callback()
             self.run = False
         super().update()
+
+    def draw(self, surf: pg.Surface):
+        super(EndAnimation, self).draw(surf)
+        if self.run and self.fill_alpha > 0:
+            surf.blit(self.fill_img, (0, 0))
 
 
 if __name__ == "__main__":

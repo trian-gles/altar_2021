@@ -1,4 +1,4 @@
-# ALTAR DRAFT 6-20-21
+# ALTAR DRAFT 6-23-21
 ![Image](resources/ALTAR%20new%20logo.jpg)
 ## About
 Altar is a musical piece for 1+ laptop performers.
@@ -60,17 +60,19 @@ Shown here is the full board:
 
 ![Image](resources/full_board.jpg)
 
-The draw pile. Click on a card to pick it up and drag it to your hand or a musical zone:
+The draw pile. Click on a card to pick it up and move it to your hand or a musical zone:
 
 ![Image](resources/draw_pile.jpg)
 
-Your hand, of cards only you can see or use.  Putting cards here will (usually) not affect the audio engine.
+Your hand, of cards only you can see or use.  Putting cards here will not affect the audio engine.
 Click one to pick it up and move it elsewhere: 
 
 ![Image](resources/hand.jpg)
 
-One of three musical zones.  Dropping cards in here will modify its sound.  A zone with no cards will (usually) stop 
-playing.  Click on a card to move it:
+One of three musical zones.  Dropping cards in here will modify its sound.  
+Alternatively, you can right click a card on your turn to reactivate its effects.  
+A zone with no cards will (usually) stop 
+playing.
 
 ![Image](resources/zone.jpg)
 
@@ -85,11 +87,9 @@ Text appearing only in multiplayer mode annoucing whose turn is up:
 
 ## Coming soon:
 - Many more cards
-
 - More melodic variety
+- More mysteries
 
 ## !!SPOILERS!!
-
-- Cards can be applied multiple times on the same zone by removing them and putting them back
 - Not all zones have to be active simultaneously.  Sometimes the engine will make noise with completely empty zones!
 - Colored cards affect all zones

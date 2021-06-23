@@ -10,15 +10,17 @@ from pyo import Server
 
 from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
                        MessageButton, CenterText)
-from gfx import ScreenFlasher, GfxManager, EyeAnimation
+from gfx import ScreenFlasher, GfxManager, EyeAnimation, EndAnimation
 import menu
 from socks import Client, ProjectClient
 
 
 # set up some type aliases
-GuiItems = Tuple[DropZone, DropZone, DropZone, DrawSpace]
+GetsetItems = Tuple[DropZone, DropZone, DropZone, DrawSpace]
 DropZoneContent = Tuple[Optional[int], Optional[int], Optional[int]]
 GuiContent = Tuple[DropZoneContent, DropZoneContent, DropZoneContent, Tuple[int]]
+EMPTY_TUP = (None, None, None)
+EMPTY_CONTENT = (EMPTY_TUP, EMPTY_TUP, EMPTY_TUP, None)
 
 
 parser = argparse.ArgumentParser(description='Main script for piece')
@@ -66,7 +68,6 @@ if not LOCAL:
         client = ProjectClient(USERNAME, ip=ip)
     else:
         client = Client(USERNAME, ip=ip)
-
 else:
     AUDIO = True
 
@@ -94,23 +95,23 @@ def load_image(filename: str) -> pg.image:
     return pg.image.load(load_resource(filename))
 
 
-def get_content(items: GuiItems) -> GuiContent:
+def get_content(items: GetsetItems) -> GuiContent:
     content = cast(GuiContent, tuple([item.return_content() for item in items]))
     return content
 
 
-def set_content(items: GuiItems, content: GuiContent, gfxman: GfxManager):
+def set_content(items: GetsetItems, content: GuiContent, gfxman: GfxManager):
     if AUDIO:
-        audio.input(content[0:2])
+        audio.input(content[0:3])
         audio_status = audio.check_status()  # will this be called twice for the user who sends a card?
         gfxman.input(audio_status)
         if not LOCAL:
             client.gfx_update(audio_status)
-    for i, item in enumerate(items[0:3]):
+    for i, item in enumerate(items):
         item.set_content(content[i])
 
 
-def end_turn_update(items: GuiItems, gfxman: GfxManager):
+def end_turn_update(items: GetsetItems, gfxman: GfxManager):
     # updates the audio manager when cards are dropped
     content = get_content(items)
     if AUDIO:
@@ -166,8 +167,11 @@ if AUDIO:
 def main():
     clock = pg.time.Clock()
 
-    zone_coors = ((750, 245), (175, 665), (1330, 665))
+    ###########
+    # GUI ITEMS
+    ###########
 
+    zone_coors = ((750, 245), (175, 665), (1330, 665))
     drop_c = DropZone(zone_coors[0])
     drop_r = DropZone(zone_coors[1])
     drop_l = DropZone(zone_coors[2])
@@ -183,7 +187,7 @@ def main():
     hover_items = (discard, hand) + getset_items
     # All GUI items
     if PROJECT:
-        gui_items = (drop_c, drop_r, drop_l)
+        gui_items = getset_items[0:2]
     else:
         gui_items = hover_items + (debug_text,)
 
@@ -201,11 +205,10 @@ def main():
     # GFX generators
     screen_flasher = ScreenFlasher(screen)
     eye_anim = EyeAnimation()
-    if LOCAL:
-        eye_anim.play()
+    end_anim = EndAnimation(quit_all)
 
     gfx_man = GfxManager(zone_coors)
-    gfx_gens = (gfx_man, screen_flasher, eye_anim)
+    gfx_gens = (gfx_man, screen_flasher, eye_anim, end_anim)
 
     gui_items += gfx_gens
 
@@ -219,15 +222,18 @@ def main():
     if LOCAL:
         debug_text.change_msg("RUNNING IN LOCAL MODE")
         piece_started = True
+        eye_anim.play()
 
     ###############
     # MAIN GAME LOOP
     ###############
+
     while run:
 
         #################
         # MOUSE POSITION CHECKS
         #################
+
         mouse_pos = pg.mouse.get_pos()
         for item in hover_items:
             item.check_mouse(mouse_pos)
@@ -240,6 +246,7 @@ def main():
         #############
         # KEY INPUTS
         #############
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 quit_all()
@@ -268,6 +275,9 @@ def main():
                                             check_screen_flash(held_card.id_num, screen_flasher)
                                         held_card = None
                                         end_turn_update(getset_items, gfx_man)
+
+                                        if get_content(getset_items) == EMPTY_CONTENT:
+                                            end_anim.play()
                                         break
                     elif (event.button == 3) and not held_card:  # right click
                         for i, item in enumerate(getset_items):
@@ -279,6 +289,7 @@ def main():
         #################
         # SERVER MESSAGES
         #################
+
         if not LOCAL:
             client_msg = client.listen()
             if client_msg:
@@ -288,6 +299,11 @@ def main():
                         eye_anim.play()
                     debug_text.change_msg(client_msg['current_player'] + "'s turn")
                     set_content(getset_items, client_msg["content"], gfx_man)
+                    print(f"Server message content: {client_msg['content']}")
+                    print(f"Current get content : {get_content(getset_items)}")
+                    if get_content(getset_items) == EMPTY_CONTENT:
+                        end_anim.play()
+
                 elif client_msg["method"] == "reactivate":
                     debug_text.change_msg(client_msg['current_player'] + "'s turn")
                     card_num = client_msg["content"][0]

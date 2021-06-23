@@ -1,11 +1,12 @@
 import socket
 import select
 import pickle
-import os
-from random import randrange
+from random import randrange, shuffle
 from itertools import cycle
 import logging
 import datetime
+
+TOTAL_CARDS = 29
 
 
 class Server:
@@ -108,7 +109,7 @@ class Server:
 
     def remove_client(self, notified_socket):
         # disconnect from the indicated socket
-        self.print_log(f"Closed connection from {self.clients[notified_socket]['data'].decode('utf-8')}")
+        self.print_log(f"Closed connection from {self.clients[notified_socket]['username']}")
         self.sockets_list.remove(notified_socket)
         del self.clients[notified_socket]
 
@@ -122,8 +123,9 @@ class Server:
         self.mode = "play"
         self.build_turn_order()
         self.seed()
-        deck = tuple(range(29, 0))
-        init_content = ((None, None, None), (None, None, None), (None, None, None), deck)
+        deck = list(range(29))
+        shuffle(deck)
+        init_content = ((None, None, None), (None, None, None), (None, None, None), tuple(deck))
         self.new_turn_update(init_content)
 
     def build_turn_order(self):

@@ -2,19 +2,17 @@ import pygame as pg
 import os
 
 
-class EyeAnimation:
+class BaseEye:
     filenames = ["eye_" + str(i + 1) + ".png" for i in range(4)]
     frames = [pg.image.load(os.path.join('resources/eye_anims', filename)) for filename in filenames]
 
     def __init__(self):
-        self.alpha = 255
         self.run = False
         self.framenum = 0
         self.frame = self.frames[0]
 
     def play(self):
         self.run = True
-        self.alpha = 255
         self.framenum = 0
         self.frame = self.frames[0]
 
@@ -25,17 +23,8 @@ class EyeAnimation:
         elif self.framenum == 11:
             self.frame = self.frames[2]
 
-        elif self.framenum == 17:
+        elif self.framenum >= 17:
             self.frame = self.frames[3]
-
-        elif self.framenum > 20:
-            if self.alpha > 2:
-                self.alpha -= 5
-            else:
-                self.alpha = 0
-                self.run = False
-            self.frame.set_alpha(self.alpha)
-
 
         self.framenum += 1
 
@@ -43,6 +32,50 @@ class EyeAnimation:
         if self.run:
             self.update()
             surf.blit(self.frame, (0, 0))
+
+
+class EyeAnimation(BaseEye):
+    def __init__(self):
+        super().__init__()
+        self.alpha = 255
+
+    def play(self):
+        super().play()
+        self.alpha = 255
+
+    def update(self):
+        if self.framenum > 20:
+            if self.alpha > 2:
+                self.alpha -= 5
+            else:
+                self.alpha = 255
+                self.run = False
+            self.frame.set_alpha(self.alpha)
+        super().update()
+
+
+class EndAnimation(BaseEye):
+    def __init__(self, callback):
+        super().__init__()
+        self.callback = callback
+        self.fill_alpha = 0
+        self.fill_img = self.frame.copy()
+        self.fill_img.fill((0, 0, 0))
+
+    def update(self):
+        if self.framenum > 20:
+            if self.fill_alpha < 255:
+                self.fill_alpha += 5
+                self.fill_img.set_alpha(self.fill_alpha)
+        if self.framenum == 120:
+            self.callback()
+            self.run = False
+        super().update()
+
+    def draw(self, surf: pg.Surface):
+        super(EndAnimation, self).draw(surf)
+        if self.run and self.fill_alpha > 0:
+            surf.blit(self.fill_img, (0, 0))
 
 
 if __name__ == "__main__":

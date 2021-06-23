@@ -1,4 +1,4 @@
-# ALTAR DRAFT 6-22-21
+# ALTAR DRAFT 6-23-21
 ![Image](resources/ALTAR%20new%20logo.jpg)
 ## About
 Altar is a musical piece for 1+ laptop performers.
@@ -87,12 +87,9 @@ Text appearing only in multiplayer mode annoucing whose turn is up:
 
 ## Coming soon:
 - Many more cards
-- An ending!
 - More melodic variety
 - More mysteries
 
 ## !!SPOILERS!!
-
-- Cards can be applied multiple times on the same zone by removing them and putting them back
 - Not all zones have to be active simultaneously.  Sometimes the engine will make noise with completely empty zones!
 - Colored cards affect all zones

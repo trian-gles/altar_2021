@@ -107,7 +107,7 @@ def set_content(items: GetsetItems, content: GuiContent, gfxman: GfxManager):
         gfxman.input(audio_status)
         if not LOCAL:
             client.gfx_update(audio_status)
-    for i, item in enumerate(items[0:3]):
+    for i, item in enumerate(items):
         item.set_content(content[i])
 
 
@@ -187,7 +187,7 @@ def main():
     hover_items = (discard, hand) + getset_items
     # All GUI items
     if PROJECT:
-        gui_items = (drop_c, drop_r, drop_l)
+        gui_items = getset_items[0:2]
     else:
         gui_items = hover_items + (debug_text,)
 
@@ -299,7 +299,8 @@ def main():
                         eye_anim.play()
                     debug_text.change_msg(client_msg['current_player'] + "'s turn")
                     set_content(getset_items, client_msg["content"], gfx_man)
-
+                    print(f"Server message content: {client_msg['content']}")
+                    print(f"Current get content : {get_content(getset_items)}")
                     if get_content(getset_items) == EMPTY_CONTENT:
                         end_anim.play()
 

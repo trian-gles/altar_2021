@@ -231,3 +231,5 @@ class DrawSpace(BasicCard):
     def set_content(self, card_nums: Tuple[int]):
         if card_nums:
             self.cards = [MoveableCard(self.rect.topleft, card_num, True) for card_num in card_nums]
+        else:
+            self.cards = []

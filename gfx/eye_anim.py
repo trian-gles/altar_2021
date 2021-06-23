@@ -30,7 +30,6 @@ class BaseEye:
 
     def draw(self, surf: pg.Surface):
         if self.run:
-            print(f"Drawing eye at frame {self.framenum}")
             self.update()
             surf.blit(self.frame, (0, 0))
 

@@ -4,4 +4,4 @@
 
     !!! I think reactivate will be called twice for the user that sends it !!!
 
-    SERVER NEEDS TO SEE ENDING ANIMATION
+    server needs to quit on proper end of piece

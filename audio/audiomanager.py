@@ -2,7 +2,7 @@ from pyo import *
 from .dx7 import DX7Poly
 from .audio_cards import ALL_CARDS, AudioCard
 from time import time
-from random import uniform
+from random import uniform, choice
 import os
 from numpy import mean
 from typing import Tuple, Optional, List
@@ -10,6 +10,10 @@ from typing import Tuple, Optional, List
 # type aliases
 DropZoneContent = Tuple[Optional[int], Optional[int], Optional[int]]
 AudioZoneStatus = Tuple[Optional[str], Optional[str], Optional[str]]
+
+GLOB_PATTERNS = ([48, 51, 55, 56, 51, 58],
+                 [48, 51, 55, 56, 51, 59],
+                 [49, 51, 55, 56, 51, 58])
 
 
 class AudioManager:
@@ -27,6 +31,7 @@ class AudioManager:
                 zone.dx7.set_level(i, uniform(0, .4))
 
     def input(self, msg: Tuple[DropZoneContent, DropZoneContent, DropZoneContent]):
+
         # special cards affecting all zones, checked before normal card applications
         full_msg = msg[0] + msg[1] + msg[2]
         if 21 in full_msg:
@@ -83,7 +88,7 @@ class AudioManager:
 
     def remove_gaps(self):
         if self.added_gaps:
-            Zone.glob_pattern = [48, 51, 55, 56, 51, 58]
+            Zone.glob_pattern = (choice(GLOB_PATTERNS)) # make this so it just removes instances of None
             self.added_gaps = False
 
     def check_status(self) -> Tuple[AudioZoneStatus, AudioZoneStatus, AudioZoneStatus]:
@@ -98,7 +103,7 @@ class Zone:
     glob_pat_count = 0
     # shared global pattern that the three zones will loop through together
 
-    def __init__(self, pan: float):
+    def __init__(self, pan: float, zone_num: int):
         self.dx7 = DX7Poly(4, pan=pan)
         self.trans = 0
         self.count = 0
@@ -111,6 +116,7 @@ class Zone:
         self.card_callback = None
         self.callbacks = []
         self.trans_cb = None
+        self.zone_num = zone_num
 
     def input(self, msg: Tuple[Optional[int], Optional[int], Optional[int]]):
 
@@ -137,9 +143,15 @@ class Zone:
             if new_card.trans_cb:
                 self.trans_cb = new_card.trans_cb
 
+            # change the global pattern to the appropriate number
+            Zone.glob_pattern = GLOB_PATTERNS[self.zone_num]
+
     def force_apply(self, card_num: int):
         card = ALL_CARDS[card_num]
         card.apply(self.dx7, self.pattern)
+
+        # change the global pattern to the appropriate number
+        Zone.glob_pattern = GLOB_PATTERNS[self.zone_num]
 
     def remove_card(self, card: AudioCard):
         card.remove(self.dx7, self.pattern)
@@ -208,20 +220,20 @@ class Zone:
 
 class ZoneOne(Zone):
     def __init__(self):
-        super().__init__(0.5)
+        super().__init__(0.5, 0)
         self.load("soft_steel_perc.json")
 
 
 class ZoneTwo(Zone):
     def __init__(self):
-        super().__init__(0.3)
+        super().__init__(0.3, 1)
         self.load("organ_bell.json")
         self.pattern.time = .75
 
 
 class ZoneThree(Zone):
     def __init__(self):
-        super().__init__(0.8)
+        super().__init__(0.8, 2)
         self.load("harmonica.json")
         self.pattern.time = 1.5
 

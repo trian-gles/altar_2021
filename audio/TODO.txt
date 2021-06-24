@@ -5,3 +5,5 @@
     !!! I think reactivate will be called twice for the user that sends it !!!
 
     server needs to quit on proper end of piece
+
+    add visual representation of melodic pattern changing

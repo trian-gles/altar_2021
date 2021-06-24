@@ -56,7 +56,7 @@ class TestDX7Sine(AudioTest):
 
 class TestZone(AudioTest):
     def setUp(self):
-        self.zone = Zone(0)
+        self.zone = Zone(0, 0)
 
     def test_input(self):
         self.zone.input((0, 1, 2))
@@ -91,7 +91,14 @@ class TestAM(AudioTest):
         for tup in self.am.check_status():
             self.assertEqual(tup[0], "tonal")
 
+    def test_new_melody(self):
+        # Test if updating each zone results in the second melodic pattern
+        card_tup = (0, None, None)
+        self.am.input((card_tup, card_tup, card_tup))
+        desired_pat = [48, 51, 55, 56, 51, 59]
+        self.assertEqual(self.am.zones[0].glob_pattern, desired_pat)
+
     def test_tree_card(self):
         self.am.input(((26, None, None), self.basic_hand, self.basic_hand))
-        desired_pat = [48, None, None, None, 51, None, None, 55, None, None, None, 56, None, None, None, 51, None, 58]
+        desired_pat = [48, None, None, None, 51, None, None, 55, None, None, None, 56, None, None, None, 51, None, 59]
         self.assertEqual(self.am.zones[0].glob_pattern, desired_pat)

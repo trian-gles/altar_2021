@@ -6,14 +6,11 @@ from random import uniform, choice
 import os
 from numpy import mean
 from typing import Tuple, Optional, List
+from itertools import cycle
 
 # type aliases
 DropZoneContent = Tuple[Optional[int], Optional[int], Optional[int]]
 AudioZoneStatus = Tuple[Optional[str], Optional[str], Optional[str]]
-
-GLOB_PATTERNS = ([48, 51, 55, 56, 51, 58],
-                 [48, 51, 55, 56, 51, 59],
-                 [49, 51, 55, 56, 51, 58])
 
 
 class AudioManager:
@@ -24,6 +21,11 @@ class AudioManager:
         self.added_gaps = False
         self.randomized_all = False
         self.all_tonal = False
+        self.GLOB_PATTERNS = cycle(([48, 51, 55, 56, 51, 58],
+                                    [48, 51, 55, 56, 51, 59],
+                                    [49, 51, 55, 56, 51, 58]))
+        Zone.glob_pattern = next(self.GLOB_PATTERNS)
+        print(Zone.glob_pattern)
 
         for zone in self.zones:
             # zone.dx7.randomize_all()
@@ -44,14 +46,17 @@ class AudioManager:
                 self.make_tonal_all()
         else:
             self.all_tonal = False
+
+        # this needs work
         if 26 in full_msg:
             if not self.added_gaps:
-                self.add_gaps()
+                self.added_gaps = True
         else:
-            self.remove_gaps()
+            self.remove_pat_gaps()
 
         for i, zone in enumerate(self.zones):
             zone.input(msg[i])
+        self.check_all_acted_on()
 
         self.check_status()
 
@@ -80,19 +85,33 @@ class AudioManager:
                 zone.dx7.set_ratio(i, new_rat)
         self.all_tonal = True
 
-    def add_gaps(self):
+    @staticmethod
+    def add_gaps(p: list):
         for _ in range(3):
             for loc in (1, 5, 6, 8):
-                Zone.glob_pattern.insert(loc, None)
-        self.added_gaps = True
+                p.insert(loc, None)
 
-    def remove_gaps(self):
+    def remove_pat_gaps(self):
         if self.added_gaps:
-            Zone.glob_pattern = (choice(GLOB_PATTERNS)) # make this so it just removes instances of None
+            Zone.glob_pattern = list(filter(lambda note: note, Zone.glob_pattern))
             self.added_gaps = False
 
     def check_status(self) -> Tuple[AudioZoneStatus, AudioZoneStatus, AudioZoneStatus]:
+        """Get info on each zone for the GFX manager"""
         return tuple([zone.check_status() for zone in self.zones])
+
+    def check_all_acted_on(self):
+        """Go to the next melodic pattern if all zones have been acted on"""
+
+        acted_tups = map(lambda zone: zone.acted_on, self.zones)
+        if all(acted_tups):
+            Zone.glob_pattern = next(self.GLOB_PATTERNS)
+            for z in self.zones:
+                z.acted_on = False
+
+            # space out the notes if the tree card is still active
+            if self.added_gaps:
+                self.add_gaps(Zone.glob_pattern)
 
     def test_lag(self):
         pass
@@ -117,6 +136,7 @@ class Zone:
         self.callbacks = []
         self.trans_cb = None
         self.zone_num = zone_num
+        self.acted_on = False
 
     def input(self, msg: Tuple[Optional[int], Optional[int], Optional[int]]):
 
@@ -143,15 +163,16 @@ class Zone:
             if new_card.trans_cb:
                 self.trans_cb = new_card.trans_cb
 
-            # change the global pattern to the appropriate number
-            Zone.glob_pattern = GLOB_PATTERNS[self.zone_num]
+            # mark this zone as recently updated
+            print(f"Applying card {card_num} to zone {self.zone_num}")
+            self.acted_on = True
 
     def force_apply(self, card_num: int):
         card = ALL_CARDS[card_num]
         card.apply(self.dx7, self.pattern)
 
-        # change the global pattern to the appropriate number
-        Zone.glob_pattern = GLOB_PATTERNS[self.zone_num]
+        # mark this zone as recently updated
+        self.acted_on = True
 
     def remove_card(self, card: AudioCard):
         card.remove(self.dx7, self.pattern)

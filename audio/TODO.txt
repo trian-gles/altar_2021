@@ -6,4 +6,4 @@
 
     server needs to quit on proper end of piece
 
-    add visual representation of melodic pattern changing
+    TwinkleStar needs to update for non-audio clients

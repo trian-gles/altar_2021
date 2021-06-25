@@ -222,7 +222,7 @@ class Card18(AudioCard):
         self.orig_levs = [dx7.get_level(i) for i in range(6)]
 
         for i, lev in enumerate(self.orig_levs):
-            new_lev = lev / 10
+            new_lev = lev / 4
             dx7.set_level(i, new_lev)
 
 

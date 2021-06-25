@@ -77,6 +77,7 @@ class AudioManager:
             zone.dx7.randomize_all()
             zone.pattern.time = uniform(.2, 1.5)
         self.randomized_all = True
+        self.advance_pattern()
 
     def make_tonal_all(self):
         for zone in self.zones:
@@ -86,8 +87,9 @@ class AudioManager:
                 zone.dx7.set_ratio(i, new_rat)
         self.all_tonal = True
 
-    @staticmethod
-    def add_gaps(p: list):
+        self.advance_pattern()
+
+    def add_gaps(self, p: list):
         for _ in range(3):
             for loc in (1, 5, 6, 8):
                 p.insert(loc, None)
@@ -101,18 +103,22 @@ class AudioManager:
         """Get info on each zone for the GFX manager"""
         return tuple([zone.check_status() for zone in self.zones])
 
+    def advance_pattern(self):
+        """Next melodic pattern"""
+        Zone.glob_pattern = next(self.GLOB_PATTERNS)
+        for z in self.zones:
+            z.acted_on = False
+
+        # space out the notes if the tree card is still active
+        if self.added_gaps:
+            self.add_gaps(Zone.glob_pattern)
+
     def check_all_acted_on(self):
         """Go to the next melodic pattern if all zones have been acted on"""
-
         acted_tups = map(lambda zone: zone.acted_on, self.zones)
         if all(acted_tups):
-            Zone.glob_pattern = next(self.GLOB_PATTERNS)
-            for z in self.zones:
-                z.acted_on = False
+            self.advance_pattern()
 
-            # space out the notes if the tree card is still active
-            if self.added_gaps:
-                self.add_gaps(Zone.glob_pattern)
 
     def test_lag(self):
         pass

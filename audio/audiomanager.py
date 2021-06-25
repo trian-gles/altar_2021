@@ -51,6 +51,7 @@ class AudioManager:
         if 26 in full_msg:
             if not self.added_gaps:
                 self.added_gaps = True
+                self.add_gaps(Zone.glob_pattern)
         else:
             self.remove_pat_gaps()
 

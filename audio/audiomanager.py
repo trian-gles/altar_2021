@@ -25,6 +25,7 @@ class AudioManager:
                                     [48, 51, 55, 56, 51, 59],
                                     [49, 51, 55, 56, 51, 58]))
         Zone.glob_pattern = next(self.GLOB_PATTERNS)
+        self.current_pat_num = 0
         print(Zone.glob_pattern)
 
         for zone in self.zones:
@@ -59,8 +60,6 @@ class AudioManager:
             zone.input(msg[i])
         self.check_all_acted_on()
 
-        self.check_status()
-
     def force_input(self, card_num: int, zone_num: int):
         # forces the selected card to have its effect on the indicated zone
         self.zones[zone_num].force_apply(card_num)
@@ -71,6 +70,8 @@ class AudioManager:
             self.make_tonal_all()
         elif card_num == 26:
             self.add_gaps(Zone.glob_pattern)
+
+        self.check_all_acted_on()
 
     def randomize_all(self):
         for zone in self.zones:
@@ -112,6 +113,8 @@ class AudioManager:
         # space out the notes if the tree card is still active
         if self.added_gaps:
             self.add_gaps(Zone.glob_pattern)
+
+        self.current_pat_num = (self.current_pat_num + 1) % 3
 
     def check_all_acted_on(self):
         """Go to the next melodic pattern if all zones have been acted on"""
@@ -179,6 +182,7 @@ class Zone:
         card.apply(self.dx7, self.pattern)
 
         # mark this zone as recently updated
+        print(f"Reactivating {card_num} on zone {self.zone_num}")
         self.acted_on = True
 
     def remove_card(self, card: AudioCard):

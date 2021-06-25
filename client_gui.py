@@ -79,6 +79,10 @@ if AUDIO:
 WIDTH = 1920
 HEIGHT = 1080
 
+ZONE_COORS = ((750, 245), (175, 665), (1330, 665))
+
+TWINK_LOCS = ((380, 120), (380, 450), (961, 630), (961, 960), (1537, 450), (1537, 120))
+
 BLACK = (55, 55, 55)
 WHITE = (255, 255, 255)
 LIGHT_GREY = (191, 191, 191)
@@ -105,6 +109,7 @@ def set_content(items: GetsetItems, content: GuiContent, gfxman: GfxManager):
         audio.input(content[0:3])
         audio_status = audio.check_status()  # will this be called twice for the user who sends a card?
         gfxman.input(audio_status)
+        gfxman.set_pattern_num(audio.current_pat_num)
         if not LOCAL:
             client.gfx_update(audio_status)
     for i, item in enumerate(items):
@@ -118,6 +123,7 @@ def end_turn_update(items: GetsetItems, gfxman: GfxManager):
         audio.input(content[0:3])
         audio_status = audio.check_status()
         gfxman.input(audio_status)
+        gfxman.set_pattern_num(audio.current_pat_num)
     if not LOCAL:
         client.end_turn(content)
 
@@ -127,6 +133,7 @@ def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):
     if AUDIO:
         audio.force_input(reac_card, zone_num)
         gfxman.input(audio.check_status())
+        gfxman.set_pattern_num(audio.current_pat_num)
     if not LOCAL:
         client.end_turn_reactivate(reac_card, zone_num)
 
@@ -171,10 +178,10 @@ def main():
     # GUI ITEMS
     ###########
 
-    zone_coors = ((750, 245), (175, 665), (1330, 665))
-    drop_c = DropZone(zone_coors[0])
-    drop_r = DropZone(zone_coors[1])
-    drop_l = DropZone(zone_coors[2])
+
+    drop_c = DropZone(ZONE_COORS[0])
+    drop_r = DropZone(ZONE_COORS[1])
+    drop_l = DropZone(ZONE_COORS[2])
     hand = HandZone((685, 850))
     discard = DiscardSpace((50, 50))
     draw = DrawSpace((WIDTH - 150, 50))
@@ -207,7 +214,7 @@ def main():
     eye_anim = EyeAnimation()
     end_anim = EndAnimation(quit_all)
 
-    gfx_man = GfxManager(zone_coors)
+    gfx_man = GfxManager(ZONE_COORS, TWINK_LOCS)
     gfx_gens = (gfx_man, screen_flasher, eye_anim, end_anim)
 
     gui_items += gfx_gens

@@ -69,7 +69,7 @@ class AudioManager:
         elif card_num == 22:
             self.make_tonal_all()
         elif card_num == 26:
-            self.add_gaps()
+            self.add_gaps(Zone.glob_pattern)
 
     def randomize_all(self):
         for zone in self.zones:

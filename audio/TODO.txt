@@ -6,4 +6,4 @@
 
     server needs to quit on proper end of piece
 
-    TwinkleStar needs to update for non-audio clients
+    TwinkleStar still doesn't properly update on reactivation

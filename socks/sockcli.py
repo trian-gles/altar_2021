@@ -55,6 +55,10 @@ class Client:
         msg_dict = {"method": "screen_flash", "card_num": card_num}
         self.send_pickle(msg_dict)
 
+    def send_pattern_num(self, pat_num: int):
+        msg_dict = {"method": "pattern_num", "pat_num": pat_num}
+        self.send_pickle(msg_dict)
+
     def listen(self):
         try:
             while True:

@@ -205,6 +205,8 @@ class Server:
                     self.gui_update_msg(msg_dict["content"])
                 elif msg_dict["method"] == "screen_flash":
                     self.send_all_except_sender(msg_dict, notified_socket)
+                elif msg_dict["method"] == "pattern_num":
+                    self.send_all_except_sender(msg_dict, notified_socket)
 
 
 

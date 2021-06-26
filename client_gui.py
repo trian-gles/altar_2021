@@ -112,6 +112,8 @@ def set_content(items: GetsetItems, content: GuiContent, gfxman: GfxManager):
         gfxman.set_pattern_num(audio.current_pat_num)
         if not LOCAL:
             client.gfx_update(audio_status)
+        if not LOCAL:
+            client.send_pattern_num(audio.current_pat_num)
     for i, item in enumerate(items):
         item.set_content(content[i])
 
@@ -124,6 +126,8 @@ def end_turn_update(items: GetsetItems, gfxman: GfxManager):
         audio_status = audio.check_status()
         gfxman.input(audio_status)
         gfxman.set_pattern_num(audio.current_pat_num)
+        if not LOCAL:
+            client.send_pattern_num(audio.current_pat_num)
     if not LOCAL:
         client.end_turn(content)
 
@@ -134,6 +138,8 @@ def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):
         audio.force_input(reac_card, zone_num)
         gfxman.input(audio.check_status())
         gfxman.set_pattern_num(audio.current_pat_num)
+        if not LOCAL:
+            client.send_pattern_num(audio.current_pat_num)
     if not LOCAL:
         client.end_turn_reactivate(reac_card, zone_num)
 
@@ -326,6 +332,9 @@ def main():
                     seed(client_msg["seed"])
                 elif client_msg["method"] == "screen_flash":
                     check_screen_flash(client_msg["card_num"], screen_flasher, sender=False)
+                elif client_msg["method"] == "pattern_num":
+                    gfx_man.set_pattern_num(client_msg["pat_num"])
+                    print("Updating pattern num via remote call")
                 elif client_msg["method"] == 'quit':
                     quit_all()
 

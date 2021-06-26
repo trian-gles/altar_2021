@@ -211,7 +211,7 @@ class Zone:
         Zone.glob_pat_count += 1
 
     def load(self, filename: str):
-        path = os.path.join("audio/settings", filename)
+        path = os.path.join("resources/settings", filename)
         file = open(path)
         self.dx7.load(file)
 

@@ -79,6 +79,10 @@ if AUDIO:
 WIDTH = 1920
 HEIGHT = 1080
 
+ZONE_COORS = ((750, 245), (175, 665), (1330, 665))
+
+TWINK_LOCS = ((380, 120), (380, 450), (961, 630), (961, 960), (1537, 450), (1537, 120))
+
 BLACK = (55, 55, 55)
 WHITE = (255, 255, 255)
 LIGHT_GREY = (191, 191, 191)
@@ -105,7 +109,9 @@ def set_content(items: GetsetItems, content: GuiContent, gfxman: GfxManager):
         audio.input(content[0:3])
         audio_status = audio.check_status()  # will this be called twice for the user who sends a card?
         gfxman.input(audio_status)
+        gfxman.set_pattern_num(audio.current_pat_num)
         if not LOCAL:
+            client.send_pattern_num(audio.current_pat_num)
             client.gfx_update(audio_status)
     for i, item in enumerate(items):
         item.set_content(content[i])
@@ -118,6 +124,10 @@ def end_turn_update(items: GetsetItems, gfxman: GfxManager):
         audio.input(content[0:3])
         audio_status = audio.check_status()
         gfxman.input(audio_status)
+        gfxman.set_pattern_num(audio.current_pat_num)
+        if not LOCAL:
+            client.send_pattern_num(audio.current_pat_num)
+            client.gfx_update(audio_status)
     if not LOCAL:
         client.end_turn(content)
 
@@ -127,6 +137,11 @@ def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):
     if AUDIO:
         audio.force_input(reac_card, zone_num)
         gfxman.input(audio.check_status())
+        audio_status = audio.check_status()
+        gfxman.set_pattern_num(audio.current_pat_num)
+        if not LOCAL:
+            client.send_pattern_num(audio.current_pat_num)
+            client.gfx_update(audio_status)
     if not LOCAL:
         client.end_turn_reactivate(reac_card, zone_num)
 
@@ -171,10 +186,10 @@ def main():
     # GUI ITEMS
     ###########
 
-    zone_coors = ((750, 245), (175, 665), (1330, 665))
-    drop_c = DropZone(zone_coors[0])
-    drop_r = DropZone(zone_coors[1])
-    drop_l = DropZone(zone_coors[2])
+
+    drop_c = DropZone(ZONE_COORS[0])
+    drop_r = DropZone(ZONE_COORS[1])
+    drop_l = DropZone(ZONE_COORS[2])
     hand = HandZone((685, 850))
     discard = DiscardSpace((50, 50))
     draw = DrawSpace((WIDTH - 150, 50))
@@ -207,7 +222,7 @@ def main():
     eye_anim = EyeAnimation()
     end_anim = EndAnimation(quit_all)
 
-    gfx_man = GfxManager(zone_coors)
+    gfx_man = GfxManager(ZONE_COORS, TWINK_LOCS)
     gfx_gens = (gfx_man, screen_flasher, eye_anim, end_anim)
 
     gui_items += gfx_gens
@@ -293,32 +308,47 @@ def main():
         if not LOCAL:
             client_msg = client.listen()
             if client_msg:
+
                 if client_msg["method"] == 'update':
                     if not piece_started:
                         piece_started = True
                         eye_anim.play()
-                    debug_text.change_msg(client_msg['current_player'] + "'s turn")
                     set_content(getset_items, client_msg["content"], gfx_man)
                     print(f"Server message content: {client_msg['content']}")
                     print(f"Current get content : {get_content(getset_items)}")
                     if get_content(getset_items) == EMPTY_CONTENT:
                         end_anim.play()
 
+                elif client_msg["method"] == 'new_turn':
+                    debug_text.change_msg(client_msg['current_player'] + "'s turn")
+
                 elif client_msg["method"] == "reactivate":
                     debug_text.change_msg(client_msg['current_player'] + "'s turn")
                     card_num = client_msg["content"][0]
                     zone_num = client_msg['content'][1]
+                    reac_zone = getset_items[zone_num]
+                    reac_zone.fade_in_card_num(card_num)
                     if AUDIO:
                         audio.force_input(card_num, zone_num)
                         gfx_man.input(audio.check_status())
+
                 elif (client_msg["method"] == "new_user") and ADMIN:
                     debug_text.append(f"  New user {client_msg['name']}")
+
                 elif (client_msg["method"] == "gfx_update") and not AUDIO:
+                    print(f"Gfx update message: {client_msg}")
                     gfx_man.input(client_msg["content"])
+
                 elif client_msg["method"] == "seed":
                     seed(client_msg["seed"])
+
                 elif client_msg["method"] == "screen_flash":
                     check_screen_flash(client_msg["card_num"], screen_flasher, sender=False)
+
+                elif client_msg["method"] == "pattern_num":
+                    gfx_man.set_pattern_num(client_msg["pat_num"])
+                    print("Updating pattern num via remote call")
+
                 elif client_msg["method"] == 'quit':
                     quit_all()
 

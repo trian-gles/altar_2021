@@ -1,17 +1,25 @@
 import pygame as pg
-from gfx import DustManager, DiamondManager, SmokeManager, BoltSpots, EyeManager
+from gfx import DustManager, DiamondManager, SmokeManager, BoltSpots, EyeManager, TwinkleStar
+from typing import Tuple
+
+TWINKLE_PAIRS = ((0, 4), (2, 3), (1, 5))
 
 
 class GfxManager:
-    def __init__(self, zone_coors: tuple):
+    def __init__(self, zone_coors: Tuple[tuple, tuple, tuple], tree_circles: Tuple[tuple]):
         self.zones = []
+        self.twinkles = [TwinkleStar(coor) for coor in tree_circles]
+        self.twink_pair = TWINKLE_PAIRS[0]
         for zone_coor in zone_coors:
             new_zone = GfxZone(*self.get_bounds(zone_coor))
             self.zones.append(new_zone)
 
     def input(self, msg):
-        for i, zone_msg in enumerate(msg):
+        for i, zone_msg in enumerate(msg[0:3]):
             self.zones[i].input(zone_msg)
+
+    def set_pattern_num(self, pat_num: int):
+        self.twink_pair = TWINKLE_PAIRS[pat_num]
 
     def get_bounds(self, coor):
         x_min = coor[0]
@@ -23,6 +31,9 @@ class GfxManager:
     def draw(self, surf: pg.Surface):
         for zone in self.zones:
             zone.draw(surf)
+
+        for n in self.twink_pair:
+            self.twinkles[n].draw(surf)
 
 
 class GfxZone:

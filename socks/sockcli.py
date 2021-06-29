@@ -44,6 +44,7 @@ class Client:
         self.send_pickle(msg_dict)
 
     def gfx_update(self, content: tuple):
+        print("Sending a GFX Update")
         msg_dict = {"method": "gfx_update", "content": content}
         self.send_pickle(msg_dict)
 
@@ -53,6 +54,10 @@ class Client:
 
     def send_screen_flash(self, card_num: int):
         msg_dict = {"method": "screen_flash", "card_num": card_num}
+        self.send_pickle(msg_dict)
+
+    def send_pattern_num(self, pat_num: int):
+        msg_dict = {"method": "pattern_num", "pat_num": pat_num}
         self.send_pickle(msg_dict)
 
     def listen(self):

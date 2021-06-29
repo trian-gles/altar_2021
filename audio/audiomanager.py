@@ -2,10 +2,11 @@ from pyo import *
 from .dx7 import DX7Poly
 from .audio_cards import ALL_CARDS, AudioCard
 from time import time
-from random import uniform
+from random import uniform, choice
 import os
 from numpy import mean
 from typing import Tuple, Optional, List
+from itertools import cycle
 
 # type aliases
 DropZoneContent = Tuple[Optional[int], Optional[int], Optional[int]]
@@ -20,6 +21,12 @@ class AudioManager:
         self.added_gaps = False
         self.randomized_all = False
         self.all_tonal = False
+        self.GLOB_PATTERNS = cycle(([48, 51, 55, 56, 51, 58],
+                                    [48, 51, 55, 56, 51, 59],
+                                    [49, 51, 55, 56, 51, 58]))
+        Zone.glob_pattern = next(self.GLOB_PATTERNS)
+        self.current_pat_num = 0
+        print(Zone.glob_pattern)
 
         for zone in self.zones:
             # zone.dx7.randomize_all()
@@ -27,6 +34,7 @@ class AudioManager:
                 zone.dx7.set_level(i, uniform(0, .4))
 
     def input(self, msg: Tuple[DropZoneContent, DropZoneContent, DropZoneContent]):
+
         # special cards affecting all zones, checked before normal card applications
         full_msg = msg[0] + msg[1] + msg[2]
         if 21 in full_msg:
@@ -39,16 +47,18 @@ class AudioManager:
                 self.make_tonal_all()
         else:
             self.all_tonal = False
+
+        # this needs work
         if 26 in full_msg:
             if not self.added_gaps:
-                self.add_gaps()
+                self.added_gaps = True
+                self.add_gaps(Zone.glob_pattern)
         else:
-            self.remove_gaps()
+            self.remove_pat_gaps()
 
         for i, zone in enumerate(self.zones):
             zone.input(msg[i])
-
-        self.check_status()
+        self.check_all_acted_on()
 
     def force_input(self, card_num: int, zone_num: int):
         # forces the selected card to have its effect on the indicated zone
@@ -59,13 +69,16 @@ class AudioManager:
         elif card_num == 22:
             self.make_tonal_all()
         elif card_num == 26:
-            self.add_gaps()
+            self.add_gaps(Zone.glob_pattern)
+
+        self.check_all_acted_on()
 
     def randomize_all(self):
         for zone in self.zones:
             zone.dx7.randomize_all()
             zone.pattern.time = uniform(.2, 1.5)
         self.randomized_all = True
+        self.advance_pattern()
 
     def make_tonal_all(self):
         for zone in self.zones:
@@ -75,19 +88,40 @@ class AudioManager:
                 zone.dx7.set_ratio(i, new_rat)
         self.all_tonal = True
 
-    def add_gaps(self):
+        self.advance_pattern()
+
+    def add_gaps(self, p: list):
         for _ in range(3):
             for loc in (1, 5, 6, 8):
-                Zone.glob_pattern.insert(loc, None)
-        self.added_gaps = True
+                p.insert(loc, None)
 
-    def remove_gaps(self):
+    def remove_pat_gaps(self):
         if self.added_gaps:
-            Zone.glob_pattern = [48, 51, 55, 56, 51, 58]
+            Zone.glob_pattern = list(filter(lambda note: note, Zone.glob_pattern))
             self.added_gaps = False
 
     def check_status(self) -> Tuple[AudioZoneStatus, AudioZoneStatus, AudioZoneStatus]:
+        """Get info on each zone for the GFX manager"""
         return tuple([zone.check_status() for zone in self.zones])
+
+    def advance_pattern(self):
+        """Next melodic pattern"""
+        Zone.glob_pattern = next(self.GLOB_PATTERNS)
+        for z in self.zones:
+            z.acted_on = False
+
+        # space out the notes if the tree card is still active
+        if self.added_gaps:
+            self.add_gaps(Zone.glob_pattern)
+
+        self.current_pat_num = (self.current_pat_num + 1) % 3
+
+    def check_all_acted_on(self):
+        """Go to the next melodic pattern if all zones have been acted on"""
+        acted_tups = map(lambda zone: zone.acted_on, self.zones)
+        if all(acted_tups):
+            self.advance_pattern()
+
 
     def test_lag(self):
         pass
@@ -98,7 +132,7 @@ class Zone:
     glob_pat_count = 0
     # shared global pattern that the three zones will loop through together
 
-    def __init__(self, pan: float):
+    def __init__(self, pan: float, zone_num: int):
         self.dx7 = DX7Poly(4, pan=pan)
         self.trans = 0
         self.count = 0
@@ -111,6 +145,8 @@ class Zone:
         self.card_callback = None
         self.callbacks = []
         self.trans_cb = None
+        self.zone_num = zone_num
+        self.acted_on = False
 
     def input(self, msg: Tuple[Optional[int], Optional[int], Optional[int]]):
 
@@ -137,9 +173,17 @@ class Zone:
             if new_card.trans_cb:
                 self.trans_cb = new_card.trans_cb
 
+            # mark this zone as recently updated
+            print(f"Applying card {card_num} to zone {self.zone_num}")
+            self.acted_on = True
+
     def force_apply(self, card_num: int):
         card = ALL_CARDS[card_num]
         card.apply(self.dx7, self.pattern)
+
+        # mark this zone as recently updated
+        print(f"Reactivating {card_num} on zone {self.zone_num}")
+        self.acted_on = True
 
     def remove_card(self, card: AudioCard):
         card.remove(self.dx7, self.pattern)
@@ -167,7 +211,7 @@ class Zone:
         Zone.glob_pat_count += 1
 
     def load(self, filename: str):
-        path = os.path.join("audio/settings", filename)
+        path = os.path.join("resources/settings", filename)
         file = open(path)
         self.dx7.load(file)
 
@@ -208,20 +252,20 @@ class Zone:
 
 class ZoneOne(Zone):
     def __init__(self):
-        super().__init__(0.5)
+        super().__init__(0.5, 0)
         self.load("soft_steel_perc.json")
 
 
 class ZoneTwo(Zone):
     def __init__(self):
-        super().__init__(0.3)
+        super().__init__(0.3, 1)
         self.load("organ_bell.json")
         self.pattern.time = .75
 
 
 class ZoneThree(Zone):
     def __init__(self):
-        super().__init__(0.8)
+        super().__init__(0.8, 2)
         self.load("harmonica.json")
         self.pattern.time = 1.5
 

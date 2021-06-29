@@ -136,12 +136,17 @@ class Server:
                 self.turn_iter.append(sock)
         self.turn_iter = cycle(self.turn_iter)
 
-    def new_turn_update(self, gui_content: tuple):
+    def new_turn_update(self, gui_content: tuple, sender: socket.socket = None):
         current_sock = next(self.turn_iter)
         current_name = self.clients[current_sock]["username"]
-        content_dict = {"method": "update", "content": gui_content,
-                        "current_player": current_name}
-        self.send_all(content_dict)
+        content_dict = {"method": "update", "content": gui_content}
+        if not sender: # this will occur on the first turn
+            self.send_all(content_dict)
+        else:
+            self.send_all_except_sender(content_dict, sender)
+
+        new_player_dict = {"method": "new_turn", "current_player": current_name}
+        self.send_all(new_player_dict)
 
     def new_turn_reactivate(self, reac_content: tuple):
         current_sock = next(self.turn_iter)
@@ -198,7 +203,7 @@ class Server:
                         self.start_piece()
                         self.print_log(f"User {username} has initiated the piece")
                 elif msg_dict["method"] == "end_turn":
-                    self.new_turn_update(msg_dict["content"])
+                    self.new_turn_update(msg_dict["content"], notified_socket)
                 elif msg_dict["method"] == "end_turn_reactivate":
                     self.new_turn_reactivate(msg_dict["content"])
                 elif msg_dict["method"] == "gfx_update":

@@ -52,7 +52,7 @@ class MoveableCard(BasicCard):
         self._id_num = id_num
         self.clicked = False
         self.flipped = flip
-        self.alpha = 0
+        self.alpha = 255
         if image_list[id_num] == "moon_card":
             self.bkg_color = (173, 35, 0)
         elif image_list[id_num] == "sunrise_card":

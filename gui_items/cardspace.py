@@ -73,8 +73,23 @@ class DropZone(CardZone):
         return tuple([space.return_content() for space in self.card_spaces])
 
     def set_content(self, card_nums):
+        """Set the content of each card space, fade in the card if it is new"""
         for i, card_num in enumerate(card_nums):
+            print(f"Previous card = {self.card_spaces[i].card}/"
+                  f"New card = {card_num}")
+            fade_in = False
+
+            if card_num:
+                if not self.card_spaces[i].card:
+                    fade_in = True
+                elif self.card_spaces[i].card:
+                    if self.card_spaces[i].card.id_num != card_num:
+                        fade_in = True
+
             self.card_spaces[i].set_content(card_num)
+            if fade_in:
+                print(f"Fading in card {card_num}")
+                self.card_spaces[i].card.start_fade()
 
     def fade_in_card(self, card: MoveableCard):
         card.start_fade()

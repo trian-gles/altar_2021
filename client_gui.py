@@ -310,12 +310,13 @@ def main():
                     if not piece_started:
                         piece_started = True
                         eye_anim.play()
-                    debug_text.change_msg(client_msg['current_player'] + "'s turn")
                     set_content(getset_items, client_msg["content"], gfx_man)
                     print(f"Server message content: {client_msg['content']}")
                     print(f"Current get content : {get_content(getset_items)}")
                     if get_content(getset_items) == EMPTY_CONTENT:
                         end_anim.play()
+                elif client_msg["method"] == 'new_turn':
+                    debug_text.change_msg(client_msg['current_player'] + "'s turn")
 
                 elif client_msg["method"] == "reactivate":
                     debug_text.change_msg(client_msg['current_player'] + "'s turn")

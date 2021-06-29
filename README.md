@@ -1,11 +1,16 @@
-# ALTAR DRAFT 6-23-21
+# ALTAR DRAFT 6-29-21
 ![Image](resources/ALTAR%20new%20logo.jpg)
 ## About
 Altar is a musical piece for 1+ laptop performers.
 Inspired by card games, indie video games, and electronic music.  Built with Pygame and PYO.
 Performers take turns moving cards around a game board that reacts musically to these actions. 
-## Setup
+## Easy Setup
+A pre-compiled executable for windows can be found at this link:
+https://drive.google.com/drive/folders/1KMxm2jdU8EbsCabT9OrbMU2_6555GGu5?usp=sharing
 
+OSX build coming very soon!
+
+## Running from source
 Requires python 3.8+
 
 The latest version of python can be installed here:
@@ -31,13 +36,20 @@ Once the code is downloaded, from the root altar directory install the required 
 pip install -r requirements.txt
 ```
 
+Finally, run the client script:
+```
+python client_gui.py
+```
+
+For additionally command line options, use `-h`
+
 ## Single Player Launch
 Altar can be performed or practiced in a single player mode, or in a multiplayer mode of any number of performers.
 For single player check the "local" option in the start menu and the piece will begin.
 
 ## Multiplayer Launch
 
-Leaving out the "local" will connect to an already configured external server.
+Leaving out the "local" field will connect to an already configured external server (please contact me if it doesn't work!).
 
 In this mode, one performer should be designated as the ADMIN by selecting the "admin" option.  This player will be
 given special START and QUIT controls to start the piece after all performers have joined, and to end the program for all
@@ -81,15 +93,18 @@ The discard area.  Putting a card here deletes it.  Cards can also be deleted by
 
 ![Image](resources/discard.jpg)
 
-Text appearing only in multiplayer mode annoucing whose turn is up:
+Text appearing only in multiplayer mode annoucing whose turn is up.  The suggested turn order is not enforced, and if
+players 
 
 ![Image](resources/debug_txt.jpg)
 
 ## Coming soon:
-- Many more cards
-- More melodic variety
+- More cards
 - More mysteries
 
 ## !!SPOILERS!!
 - Not all zones have to be active simultaneously.  Sometimes the engine will make noise with completely empty zones!
 - Colored cards affect all zones
+- Some cards will only have their effects the moment they are dropped in a new zone.  Others will continue to effect whatever zone they 
+are dropped in.
+- Repeatedly reapplying(right click) certain cards can have crazy results

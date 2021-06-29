@@ -8,3 +8,7 @@
 
     Add a fade out mechanic?
 
+    Card 0 cannot be reactivated
+
+    Maybe make it so certain cards can't be reactivated?
+

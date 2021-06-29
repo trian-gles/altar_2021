@@ -94,6 +94,14 @@ class DropZone(CardZone):
     def fade_in_card(self, card: MoveableCard):
         card.start_fade()
 
+    def fade_in_card_num(self, card_num: int):
+        if self.card_spaces:
+            for space in self.card_spaces:
+                if not space.card:
+                    continue
+                if space.card.id_num == card_num:
+                    space.card.start_fade()
+
     def try_right_click(self) -> Optional[int]:
         return self.super_try_right_click(self.fade_in_card)
 

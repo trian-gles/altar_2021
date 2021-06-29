@@ -44,6 +44,7 @@ class Client:
         self.send_pickle(msg_dict)
 
     def gfx_update(self, content: tuple):
+        print("Sending a GFX Update")
         msg_dict = {"method": "gfx_update", "content": content}
         self.send_pickle(msg_dict)
 

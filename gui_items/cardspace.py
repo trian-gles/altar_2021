@@ -1,7 +1,7 @@
 import pygame as pg
 import os
 from random import shuffle
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Callable
 from .basic_card import MoveableCard, BasicCard
 
 # type aliases
@@ -35,18 +35,26 @@ class CardZone:
             if result:
                 return result
 
-    def try_right_click(self) -> Optional[int]:
-        """Check if any of the contained spaces are highlighted and contain a card"""
+    def super_try_right_click(self, callback: Callable = None) -> Optional[int]:
+        """Check if any of the contained spaces are highlighted and contain a card.
+        The callback can be used to provide a function to perform on the indicated card
+        """
         for space in self.card_spaces:
             result = space.try_right_click()
             if result:
+                if callback:
+                    callback(space.card)
                 return result
 
-    def drop_card(self, card: MoveableCard) -> bool:
-        """Try to move the held card to all contained spaces, return results"""
+    def super_drop_card(self, card: MoveableCard, callback: Callable = None) -> bool:
+        """Try to move the held card to all contained spaces, return results.
+        The callback can be used to provide a function to perform on the indicated card
+        """
         for space in self.card_spaces:
             result = space.drop_card(card)
             if result:
+                if callback:
+                    callback(space.card)
                 return True
         else:
             return False
@@ -68,6 +76,15 @@ class DropZone(CardZone):
         for i, card_num in enumerate(card_nums):
             self.card_spaces[i].set_content(card_num)
 
+    def fade_in_card(self, card: MoveableCard):
+        card.start_fade()
+
+    def try_right_click(self) -> Optional[int]:
+        return self.super_try_right_click(self.fade_in_card)
+
+    def drop_card(self, card: MoveableCard) -> bool:
+        return self.super_drop_card(card, self.fade_in_card)
+
 
 class HandZone(CardZone):
     """Four card area for the player's hand"""
@@ -83,6 +100,9 @@ class HandZone(CardZone):
 
     def try_right_click(self) -> None:
         pass
+
+    def drop_card(self, card: MoveableCard) -> bool:
+        return self.super_drop_card(card, None)
     
     def draw(self, surf: pg.Surface):
         for card_space in self.card_spaces:

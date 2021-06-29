@@ -1,9 +1,10 @@
     try version where more cards stay functional
 
-    a couple more animations?  make them have low cpu requirements
-
     !!! I think reactivate will be called twice for the user that sends it !!!
 
     server needs to quit on proper end of piece
 
     TwinkleStar still doesn't properly update on reactivation
+
+    Add a fade out mechanic?
+

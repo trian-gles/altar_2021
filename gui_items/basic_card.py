@@ -40,7 +40,8 @@ image_list = ["half_speed", "double_speed", "random_speeds", "long_sustain", "sh
 
 class MoveableCard(BasicCard):
     flip_graphic = pg.image.load(os.path.join('resources/cards', 'flip_card.jpg'))
-    imgs = [pg.image.load(os.path.join('resources/cards', image_list[id_num] + '.PNG')) for id_num in range(TOTAL_CARDS)]
+    imgs = [pg.image.load(os.path.join('resources/cards',
+                                       image_list[id_num] + '.PNG')) for id_num in range(TOTAL_CARDS)]
 
     bkg_color = (0, 0, 0)
     border_color = (55, 55, 55)
@@ -51,6 +52,7 @@ class MoveableCard(BasicCard):
         self._id_num = id_num
         self.clicked = False
         self.flipped = flip
+        self.alpha = 0
         if image_list[id_num] == "moon_card":
             self.bkg_color = (173, 35, 0)
         elif image_list[id_num] == "sunrise_card":
@@ -73,6 +75,15 @@ class MoveableCard(BasicCard):
         else:
             self.rect.center = mouse_coor
 
+    def start_fade(self):
+        self.alpha = 0
+
+    def _fade_in(self):
+        if self.alpha > 255:
+            return
+        self.alpha += 2
+        self.graphic.set_alpha(self.alpha)
+
     def drop(self, coor: Vector2):
         self.rect.topleft = coor
         self.clicked = False
@@ -83,7 +94,7 @@ class MoveableCard(BasicCard):
         self.flipped = not self.flipped
 
     def draw(self, surf: pg.Surface):
-
+        self._fade_in()
         if self.flipped:
             pg.draw.rect(surf, (0, 0, 0), self.rect, width=0, border_radius=5)
             surf.blit(self.flip_graphic, self.rect)

@@ -11,7 +11,7 @@ from pyo import Server
 from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
                        MessageButton, CenterText)
 from gfx import ScreenFlasher, GfxManager, EyeAnimation, EndAnimation
-import menu
+import wxmenu
 from socks import Client, ProjectClient
 
 
@@ -44,11 +44,15 @@ PROJECT = args.project
 FULLSCREEN = args.fullscreen
 
 if not args.nogui:
-    menu_opts = menu.menu()
+    menu_opts = wxmenu.main()
 
     USERNAME = menu_opts["username"]
     AUDIO = menu_opts["audio"]
-    LOCAL = menu_opts["local"]
+    print(menu_opts["local"])
+    if menu_opts["local"] == 0:
+        LOCAL = True
+    else:
+        LOCAL = False
     ADMIN = menu_opts["admin"]
     PROJECT = menu_opts["project"]
     FULLSCREEN = menu_opts["fullscreen"]

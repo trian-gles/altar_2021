@@ -11,7 +11,6 @@ from pyo import Server
 from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
                        MessageButton, CenterText)
 from gfx import ScreenFlasher, GfxManager, EyeAnimation, EndAnimation
-import wxmenu
 from pg_menu import run_menu
 from socks import Client, ProjectClient
 
@@ -43,20 +42,18 @@ LOCAL = args.local
 ADMIN = args.admin
 PROJECT = args.project
 FULLSCREEN = args.fullscreen
+IP = "127.0.0.1"
 
 if not args.nogui:
     menu_opts = run_menu()
 
     USERNAME = menu_opts["username"]
     AUDIO = menu_opts["audio"]
-    print(menu_opts["local"])
-    if menu_opts["local"] == 0:
-        LOCAL = True
-    else:
-        LOCAL = False
+    LOCAL = menu_opts["local"]
     ADMIN = menu_opts["admin"]
     PROJECT = menu_opts["project"]
     FULLSCREEN = menu_opts["fullscreen"]
+    IP = menu_opts["ip"]
 
 if sys.platform == 'win32':
     # On Windows, the monitor scaling can be set to something besides normal 100%.
@@ -66,13 +63,13 @@ if sys.platform == 'win32':
     except AttributeError:
         pass  # Windows XP doesn't support monitor scaling, so just do nothing.
 
+print(f"Local status = {LOCAL}")
+
 if not LOCAL:
-    ip = "127.0.0.1"
-    # ip = "172.104.21.51"
     if PROJECT:
-        client = ProjectClient(USERNAME, ip=ip)
+        client = ProjectClient(USERNAME, ip=IP)
     else:
-        client = Client(USERNAME, ip=ip)
+        client = Client(USERNAME, ip=IP)
 else:
     AUDIO = True
     ADMIN = False

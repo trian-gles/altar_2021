@@ -2,13 +2,10 @@
 
     !!! I think reactivate will be called twice for the user that sends it !!!
 
-    server needs to quit on proper end of piece
-
-    TwinkleStar still doesn't properly update on reactivation
-
-    Add a fade out mechanic?
-
     Card 0 cannot be reactivated
+
+    On mac this is an issue:
+    5031    1.050    0.000   11.538    0.002 screen_flash.py:13(draw)
 
     Maybe make it so certain cards can't be reactivated?
 

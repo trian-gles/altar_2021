@@ -15,6 +15,8 @@ from pg_menu import run_menu
 from socks import Client, ProjectClient
 
 
+pg.init()
+
 # set up some type aliases
 GetsetItems = Tuple[DropZone, DropZone, DropZone, DrawSpace]
 DropZoneContent = Tuple[Optional[int], Optional[int], Optional[int]]
@@ -89,7 +91,7 @@ WHITE = (255, 255, 255)
 LIGHT_GREY = (191, 191, 191)
 RED = (255, 0, 0)
 
-pg.init()
+
 
 
 def load_resource(filename: str) -> str:

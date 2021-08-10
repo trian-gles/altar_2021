@@ -1,11 +1,4 @@
-# -*- coding: utf-8 -*- 
-
-###########################################################################
-## Python code generated with wxFormBuilder (version Jun 17 2015)
-## http://www.wxformbuilder.org/
-##
-## PLEASE DO "NOT" EDIT THIS FILE!
-###########################################################################
+## this menu is not used as it does not work on mac
 
 import wx
 import wx.xrc

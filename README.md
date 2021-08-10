@@ -36,20 +36,26 @@ Once the code is downloaded, from the root altar directory install the required 
 pip install -r requirements.txt
 ```
 
-Finally, run the client script:
+Finally, run the main script:
 ```
-python client_gui.py
+python main.py
 ```
 
 For additionally command line options, use `-h`
 
 ## Single Player Launch
-Altar can be performed or practiced in a single player mode, or in a multiplayer mode of any number of performers.
-For single player check the "local" option in the start menu and the piece will begin.
+Altar can be performed or practiced in a single player mode, or in a multiplayer mode with any number of performers.
+For single player select this option in the start menu and the piece will begin.
 
 ## Multiplayer Launch
 
-Leaving out the "local" field will connect to an already configured external server (please contact me if it doesn't work!).
+For multiplayer mode, all performers must be connected via LAN.
+A machine should host the server by running:
+```
+python lan_server.py
+```
+
+Note - this machine can also be used as a performer by separately running the main.py script.
 
 In this mode, one performer should be designated as the ADMIN by selecting the "admin" option.  This player will be
 given special START and QUIT controls to start the piece after all performers have joined, and to end the program for all
@@ -65,6 +71,7 @@ If this is left out, the performer will be provided with a username of a random 
 
 A machine can be used to run a projector for the audience to view by checking the "Projector view" option.
 This view cannot move cards, and shows no draw/discard piles or hand.
+Again, this machine can separately run an instance of the piece for a performer to use.
 
 ## Inside the game
 On their turn players can click on any card to move it elsewhere.
@@ -94,17 +101,24 @@ The discard area.  Putting a card here deletes it.  Cards can also be deleted by
 ![Image](resources/discard.jpg)
 
 Text appearing only in multiplayer mode annoucing whose turn is up.  The suggested turn order is not enforced, and if
-players 
+players feel they have better ideas
 
 ![Image](resources/debug_txt.jpg)
 
-## Coming soon:
+The piece ends when the draw pile is empty, and all cards have been removed from the boards.  
+Not all cards need to be played, and players can leave cards in their hands at the end of the piece.
+
+## Future updates:
 - More cards
 - More mysteries
 
 ## !!SPOILERS!!
-- Not all zones have to be active simultaneously.  Sometimes the engine will make noise with completely empty zones!
+## !!SPOILERS!!
+## !!SPOILERS!!
+## !!SPOILERS!!
+- Not all zones have to be active simultaneously. 
+- Sometimes the engine will make noise with completely empty zones!
 - Colored cards affect all zones
 - Some cards will only have their effects the moment they are dropped in a new zone.  Others will continue to effect whatever zone they 
 are dropped in.
-- Repeatedly reapplying(right click) certain cards can have crazy results
+- Repeatedly reapplying(right clicking) certain cards can have crazy results

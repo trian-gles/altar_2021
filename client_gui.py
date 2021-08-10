@@ -12,6 +12,7 @@ from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
                        MessageButton, CenterText)
 from gfx import ScreenFlasher, GfxManager, EyeAnimation, EndAnimation
 import wxmenu
+from pg_menu import run_menu
 from socks import Client, ProjectClient
 
 
@@ -46,7 +47,7 @@ PROJECT = args.project
 FULLSCREEN = args.fullscreen
 
 if not args.nogui:
-    menu_opts = wxmenu.main()
+    menu_opts = run_menu()
 
     USERNAME = menu_opts["username"]
     AUDIO = menu_opts["audio"]
@@ -76,6 +77,7 @@ if not LOCAL:
         client = Client(USERNAME, ip=ip)
 else:
     AUDIO = True
+    ADMIN = False
 
 if AUDIO:
     from audio import AudioManager

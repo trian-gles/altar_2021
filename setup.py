@@ -10,6 +10,6 @@ setup(name="ALTAR_6-5" ,
       version="0.1",
       description="",
       options={"build_exe": {"packages": ["pygame", "pyo"]}},
-      executables = [Executable("client_gui.py")])
+      executables = [Executable("main.py")])
 
 

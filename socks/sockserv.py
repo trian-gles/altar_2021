@@ -14,7 +14,7 @@ class Server:
 
     def __init__(self, ip="127.0.0.1", port=8000):
         logging.basicConfig(filename="server.log", level=logging.DEBUG, filemode='w')
-        self.print_log(f"Building server on IP {ip}, PORT {port}")
+        self.print_log(f"Building server on IP {ip}")
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.bind((ip, port))
@@ -103,7 +103,7 @@ class Server:
         self.clients[client_socket] = client_dict
 
         self.print_log(f"accepted new connection from \
-        {client_addr[0]}: {client_addr[1]} username = {client_dict['username']}")
+{client_addr[0]}: {client_addr[1]} username = {client_dict['username']}")
 
         self.new_user(client_dict['username'])
 

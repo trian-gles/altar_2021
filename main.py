@@ -63,8 +63,6 @@ if sys.platform == 'win32':
     except AttributeError:
         pass  # Windows XP doesn't support monitor scaling, so just do nothing.
 
-print(f"Local status = {LOCAL}")
-
 if not LOCAL:
     if PROJECT:
         client = ProjectClient(USERNAME, ip=IP)

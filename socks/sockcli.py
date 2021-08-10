@@ -11,10 +11,14 @@ class Client:
         self.PORT = 8000
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((self.IP, self.PORT))
+        try:
+            self.client_socket.connect((self.IP, self.PORT))
+        except ConnectionRefusedError:
+            print(f"No connection could be made at IP {self.IP} Port {self.PORT}.  Have you configured a server yet?")
+            exit()
         self.client_socket.setblocking(False)
         self.send_register(username)
-        print(f"User {username} listening on IP {self.IP}, PORT {self.PORT}")
+        print(f"User {username} listening on IP {self.IP}")
 
     def send_message(self, message: str):
         enc_message = message.encode('utf-8')

@@ -5,10 +5,7 @@ Altar is a musical piece for 1+ laptop performers.
 Inspired by card games, indie video games, and electronic music.  Built with Pygame and PYO.
 Performers take turns moving cards around a game board that reacts musically to these actions. 
 ## Easy Setup
-A pre-compiled executable for windows can be found at this link:
-https://drive.google.com/drive/folders/1KMxm2jdU8EbsCabT9OrbMU2_6555GGu5?usp=sharing
-
-OSX build coming very soon!
+Pre-compiled executables can be found in the releases sidebar for both Windows and OSX
 
 ## Running from source
 Requires python 3.8+
@@ -44,7 +41,7 @@ python main.py
 For additionally command line options, use `-h`
 
 ## Single Player Launch
-Altar can be performed or practiced in a single player mode, or in a multiplayer mode with any number of performers.
+Altar can be performed/practiced in a single player mode, or in a multiplayer mode with any number of performers.
 For single player select this option in the start menu and the piece will begin.
 
 ## Multiplayer Launch
@@ -116,6 +113,7 @@ Not all cards need to be played, and players can leave cards in their hands at t
 ## !!SPOILERS!!
 ## !!SPOILERS!!
 ## !!SPOILERS!!
+- Don't worry if you're not sure what's going on.  That's my intent
 - Not all zones have to be active simultaneously. 
 - Sometimes the engine will make noise with completely empty zones!
 - Colored cards affect all zones

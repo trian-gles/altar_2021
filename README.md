@@ -1,4 +1,4 @@
-# ALTAR DRAFT 6-29-21
+# ALTAR DRAFT 9-14-21
 ![Image](resources/ALTAR%20new%20logo.jpg)
 ## About
 Altar is a musical piece for 1+ laptop performers.

@@ -37,7 +37,9 @@ class AudioCard:
         dx7.set_algo(self.algo)
 
     def load(self, filename, dx7: DX7Poly):
-        path = os.path.join("audio/settings", filename)
+        full_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
+        relative_path = os.path.relpath(full_path)
+        path = os.path.join(relative_path, "resources/settings", filename)
         file = open(path)
         dx7.load(file)
 

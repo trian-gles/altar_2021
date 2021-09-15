@@ -211,7 +211,11 @@ class Zone:
         Zone.glob_pat_count += 1
 
     def load(self, filename: str):
-        path = os.path.join("resources/settings", filename)
+        print(os.getcwd())
+        full_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
+        relative_path = os.path.relpath(full_path)
+        path = os.path.join(relative_path, "resources/settings", filename)
+        print(path)
         file = open(path)
         self.dx7.load(file)
 

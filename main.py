@@ -5,7 +5,6 @@ import argparse
 from random import randrange, seed
 
 import pygame as pg
-import cProfile as profile
 from pyo import Server
 
 from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
@@ -16,7 +15,6 @@ from socks import Client, ProjectClient
 
 
 pg.init()
-
 # set up some type aliases
 GetsetItems = Tuple[DropZone, DropZone, DropZone, DrawSpace]
 DropZoneContent = Tuple[Optional[int], Optional[int], Optional[int]]
@@ -29,6 +27,7 @@ parser = argparse.ArgumentParser(description='Main script for piece')
 parser.add_argument('-name', help='username for debug and logging purposes', default=f"USER {randrange(0, 100000)}")
 parser.add_argument('--local', action='store_true',
                     help='run the gui in single player setup')
+parser.add_argument('--ip', default="127.0.0.1")
 parser.add_argument('--fullscreen', action='store_true', help='run the gui in a fullscreen display')
 parser.add_argument('--audio', action='store_true', help='connect the audio engine to this client instance')
 parser.add_argument('--admin', action='store_true',
@@ -44,7 +43,8 @@ LOCAL = args.local
 ADMIN = args.admin
 PROJECT = args.project
 FULLSCREEN = args.fullscreen
-IP = "127.0.0.1"
+IP = args.ip
+GFX = True
 
 if not args.nogui:
     menu_opts = run_menu()
@@ -380,4 +380,4 @@ def main():
 
 
 if __name__ == "__main__":
-    profile.run('main()')
+    main()

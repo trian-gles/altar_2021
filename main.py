@@ -54,6 +54,7 @@ if not args.nogui:
     LOCAL = menu_opts["local"]
     ADMIN = menu_opts["admin"]
     PROJECT = menu_opts["project"]
+    GFX = menu_opts["GFX"]
     FULLSCREEN = menu_opts["fullscreen"]
     IP = menu_opts["ip"]
 
@@ -111,8 +112,9 @@ def set_content(items: GetsetItems, content: GuiContent, gfxman: GfxManager):
     if AUDIO:
         audio.input(content[0:3])
         audio_status = audio.check_status()  # will this be called twice for the user who sends a card?
-        gfxman.input(audio_status)
-        gfxman.set_pattern_num(audio.current_pat_num)
+        if GFX:
+            gfxman.input(audio_status)
+            gfxman.set_pattern_num(audio.current_pat_num)
         if not LOCAL:
             client.send_pattern_num(audio.current_pat_num)
             client.gfx_update(audio_status)
@@ -126,11 +128,13 @@ def end_turn_update(items: GetsetItems, gfxman: GfxManager):
     if AUDIO:
         audio.input(content[0:3])
         audio_status = audio.check_status()
-        gfxman.input(audio_status)
-        gfxman.set_pattern_num(audio.current_pat_num)
+        if GFX:
+            gfxman.input(audio_status)
+            gfxman.set_pattern_num(audio.current_pat_num)
         if not LOCAL:
             client.send_pattern_num(audio.current_pat_num)
-            client.gfx_update(audio_status)
+            if GFX:
+                client.gfx_update(audio_status)
     if not LOCAL:
         client.end_turn(content)
 
@@ -139,9 +143,10 @@ def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):
     # reactivate the selected card
     if AUDIO:
         audio.force_input(reac_card, zone_num)
-        gfxman.input(audio.check_status())
-        audio_status = audio.check_status()
-        gfxman.set_pattern_num(audio.current_pat_num)
+        if GFX:
+            gfxman.input(audio.check_status())
+            audio_status = audio.check_status()
+            gfxman.set_pattern_num(audio.current_pat_num)
         if not LOCAL:
             client.send_pattern_num(audio.current_pat_num)
             client.gfx_update(audio_status)
@@ -150,6 +155,8 @@ def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):
 
 
 def check_screen_flash(card_num: int, sf: ScreenFlasher, sender=True):
+    if not GFX:
+        return
     if card_num == 26:
         sf.init_color((11, 82, 3))
     elif card_num == 22:
@@ -227,8 +234,10 @@ def main():
 
     gfx_man = GfxManager(ZONE_COORS, TWINK_LOCS)
     gfx_gens = (gfx_man, screen_flasher, eye_anim, end_anim)
-
     gui_items += gfx_gens
+
+
+
 
     held_card = None
 
@@ -333,14 +342,16 @@ def main():
                     reac_zone.fade_in_card_num(card_num)
                     if AUDIO:
                         audio.force_input(card_num, zone_num)
-                        gfx_man.input(audio.check_status())
+                        if GFX:
+                            gfx_man.input(audio.check_status())
 
                 elif (client_msg["method"] == "new_user") and ADMIN:
                     debug_text.append(f"  New user {client_msg['name']}")
 
                 elif (client_msg["method"] == "gfx_update") and not AUDIO:
                     print(f"Gfx update message: {client_msg}")
-                    gfx_man.input(client_msg["content"])
+                    if GFX:
+                        gfx_man.input(client_msg["content"])
 
                 elif client_msg["method"] == "seed":
                     seed(client_msg["seed"])
@@ -349,7 +360,8 @@ def main():
                     check_screen_flash(client_msg["card_num"], screen_flasher, sender=False)
 
                 elif client_msg["method"] == "pattern_num":
-                    gfx_man.set_pattern_num(client_msg["pat_num"])
+                    if GFX:
+                        gfx_man.set_pattern_num(client_msg["pat_num"])
                     print("Updating pattern num via remote call")
 
                 elif client_msg["method"] == 'quit':

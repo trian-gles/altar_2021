@@ -137,8 +137,15 @@ class Server:
         self.turn_iter = cycle(self.turn_iter)
 
     def new_turn_update(self, gui_content: tuple, sender: socket.socket = None):
-        current_sock = next(self.turn_iter)
-        current_name = self.clients[current_sock]["username"]
+        found_player = False
+        while True:
+            current_sock = next(self.turn_iter)
+            try:
+                current_name = self.clients[current_sock]["username"]
+            except KeyError: # in the event that user has quit
+                continue
+            else:
+                break
         content_dict = {"method": "update", "content": gui_content}
         if not sender: # this will occur on the first turn
             self.send_all(content_dict)

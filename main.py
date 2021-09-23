@@ -176,7 +176,7 @@ def quit_all():
 
 
 if FULLSCREEN:
-    screen = pg.display.set_mode((WIDTH, HEIGHT), pg.FULLSCREEN)
+    screen = pg.display.set_mode((WIDTH, HEIGHT), pg.FULLSCREEN | pg.SCALED)
 else:
     screen = pg.display.set_mode((WIDTH, HEIGHT))
 

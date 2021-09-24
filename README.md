@@ -8,7 +8,7 @@ Performers take turns moving cards around a game board that reacts musically to 
 Pre-compiled executables can be found in the releases sidebar for both Windows and OSX
 
 ## Running from source
-Requires python 3.8+
+Requires python 3.6-3.8
 
 The latest version of python can be installed here:
 https://www.python.org/downloads/
@@ -30,12 +30,12 @@ Use this button on the top right of this github page:
 Once the code is downloaded, from the root altar directory install the required python packages:
 
 ```
-pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 
 Finally, run the main script:
 ```
-python main.py
+python3 main.py
 ```
 
 For additionally command line options, use `-h`
@@ -62,6 +62,7 @@ Performers can chose whether they want their machine to run the audio engine by 
 selecting the "audio" option.
 In a performance with all performers in the same location, one performer should hook up their machine to speakers and 
 use the "audio" option, while all others can leave this out.
+The user hooked up to speakers should turn off the "GFX" option to ensure that their machine devotes full power to audio calculations.
 
 The optional "username" field can inform other players of each other's names during turn rotations.
 If this is left out, the performer will be provided with a username of a random string of digits.
@@ -71,7 +72,7 @@ This view cannot move cards, and shows no draw/discard piles or hand.
 Again, this machine can separately run an instance of the piece for a performer to use.
 
 ## Inside the game
-On their turn players can click on any card to move it elsewhere.
+On their turn players can click on any card to move it elsewhere once.
 Shown here is the full board:
 
 ![Image](resources/full_board.jpg)

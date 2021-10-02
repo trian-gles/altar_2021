@@ -8,7 +8,7 @@ Performers take turns moving cards around a game board that reacts musically to 
 Pre-compiled executables can be found in the releases sidebar for both Windows and OSX
 
 ## Running from source
-Requires python 3.8+
+Requires python 3.6-3.8
 
 The latest version of python can be installed here:
 https://www.python.org/downloads/

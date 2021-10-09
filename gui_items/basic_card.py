@@ -74,6 +74,7 @@ class MoveableCard(BasicCard):
             super().check_mouse(mouse_coor)
         else:
             self.rect.center = mouse_coor
+            self.flip()
 
     def start_fade(self):
         self.alpha = 0
@@ -91,7 +92,7 @@ class MoveableCard(BasicCard):
             self.flip()
 
     def flip(self):
-        self.flipped = not self.flipped
+        self.flipped = False
 
     def draw(self, surf: pg.Surface):
         self._fade_in()

@@ -178,7 +178,7 @@ def quit_all():
 if FULLSCREEN:
     screen = pg.display.set_mode((WIDTH, HEIGHT), pg.FULLSCREEN | pg.SCALED)
 else:
-    screen = pg.display.set_mode((WIDTH, HEIGHT))
+    screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE | pg.SCALED)
 
 
 FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 12)

@@ -1,5 +1,5 @@
 from pyo import *
-from .dx7 import DX7Poly
+from .dx7_gradual import DX7Poly
 from random import uniform, getrandbits, randrange
 from itertools import cycle
 

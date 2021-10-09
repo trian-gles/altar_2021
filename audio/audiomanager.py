@@ -1,5 +1,5 @@
 from pyo import *
-from .dx7 import DX7Poly
+from .dx7_gradual import DX7Poly
 from .audio_cards import ALL_CARDS, AudioCard
 from time import time
 from random import uniform, choice

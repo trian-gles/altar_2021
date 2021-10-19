@@ -143,9 +143,10 @@ def end_turn_reactivate(reac_card: int, zone_num: int, gfxman: GfxManager):
     # reactivate the selected card
     if AUDIO:
         audio.force_input(reac_card, zone_num)
+        audio_status = audio.check_status()
         if GFX:
             gfxman.input(audio.check_status())
-            audio_status = audio.check_status()
+
             gfxman.set_pattern_num(audio.current_pat_num)
         if not LOCAL:
             client.send_pattern_num(audio.current_pat_num)
@@ -212,7 +213,7 @@ def main():
     hover_items = (discard, hand) + getset_items
     # All GUI items
     if PROJECT:
-        gui_items = getset_items[0:2]
+        gui_items = getset_items[0:3]
     else:
         gui_items = hover_items + (debug_text,)
 

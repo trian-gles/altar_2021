@@ -178,6 +178,9 @@ def quit_all():
 
 if FULLSCREEN:
     screen = pg.display.set_mode((WIDTH, HEIGHT), pg.FULLSCREEN | pg.SCALED)
+
+elif sys.platform == "darwin":
+    screen = pg.display.set_mode((WIDTH, HEIGHT))
 else:
     screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE | pg.SCALED)
 

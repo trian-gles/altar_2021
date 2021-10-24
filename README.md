@@ -113,7 +113,7 @@ Not all cards need to be played, and players can leave cards in their hands at t
 ## !!SPOILERS!!
 ## !!SPOILERS!!
 ## !!SPOILERS!!
-- Don't worry if you're not sure what's going on.  That's my intent
+- Video explaining certain cards coming soon
 - Not all zones have to be active simultaneously. 
 - Sometimes the engine will make noise with completely empty zones!
 - Colored cards affect all zones

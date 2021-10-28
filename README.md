@@ -3,7 +3,7 @@
 ## About
 Altar is a musical piece for 1+ laptop performers.
 Inspired by card games, indie video games, and electronic music.  Built with Pygame and PYO.
-Performers take turns moving cards around a game board that reacts musically to these actions. 
+Performers take turns moving cards around a game board that reacts musically. 
 ## Easy Setup
 Pre-compiled executables can be found in the releases sidebar for both Windows and OSX
 
@@ -113,7 +113,7 @@ Not all cards need to be played, and players can leave cards in their hands at t
 ## !!SPOILERS!!
 ## !!SPOILERS!!
 ## !!SPOILERS!!
-- Don't worry if you're not sure what's going on.  That's my intent
+- Video explaining certain cards coming soon
 - Not all zones have to be active simultaneously. 
 - Sometimes the engine will make noise with completely empty zones!
 - Colored cards affect all zones

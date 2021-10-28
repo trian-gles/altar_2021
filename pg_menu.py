@@ -15,6 +15,7 @@ results["fullscreen"] = False
 results["GFX"] = True
 results["project"] = False
 results["admin"] = False
+results["downscale"] = False
 
 
 def set_username(value: str):
@@ -50,6 +51,9 @@ def set_audio(value, audio_status):
 def set_gfx(value, gfx_status):
     results["GFX"] = gfx_status
 
+def set_downscale(value, scale_status):
+    results["downscale"] = scale_status
+
 
 def set_fullscreen(value, f_status):
     results["fullscreen"] = f_status
@@ -83,6 +87,7 @@ projector_widget = menu.add.selector('Projector Mode :', [('Off', False), ('On',
 admin_widget = menu.add.selector('Admin :', [('Off', False), ('On', True)], onchange=set_admin)
 audio_widget = menu.add.selector('Audio :', [('Off', False), ('On', True)], onchange=set_audio)
 gfx_widget = menu.add.selector('GFX :', [('On', True), ('Off', False)], onchange=set_gfx)
+downscale_widget = menu.add.selector('Downscale :', [('Off', False), ('On', True)], onchange=set_downscale)
 menu.add.selector('Fullscreen :', [('Off', False), ('On', True)], onchange=set_fullscreen)
 menu.add.button('Play', menu.close)
 menu.add.button('Quit', quit_menu)

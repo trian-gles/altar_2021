@@ -45,6 +45,7 @@ PROJECT = args.project
 FULLSCREEN = args.fullscreen
 IP = args.ip
 GFX = True
+DOWNSCALED = False
 
 if not args.nogui:
     menu_opts = run_menu()
@@ -57,6 +58,8 @@ if not args.nogui:
     GFX = menu_opts["GFX"]
     FULLSCREEN = menu_opts["fullscreen"]
     IP = menu_opts["ip"]
+    DOWNSCALED = menu_opts["downscale"]
+
 
 if sys.platform == 'win32':
     # On Windows, the monitor scaling can be set to something besides normal 100%.
@@ -175,14 +178,19 @@ def quit_all():
         s.shutdown()
     quit()
 
+scaling_factor = 1
+if DOWNSCALED:
+    scaling_factor = 2
+temp_screen = pg.Surface((WIDTH, HEIGHT))
+scaled_size = (WIDTH // scaling_factor, HEIGHT // scaling_factor)
 
 if FULLSCREEN:
     screen = pg.display.set_mode((WIDTH, HEIGHT), pg.FULLSCREEN | pg.SCALED)
 
 elif sys.platform == "darwin":
-    screen = pg.display.set_mode((WIDTH, HEIGHT))
+    screen = pg.display.set_mode(scaled_size)
 else:
-    screen = pg.display.set_mode((WIDTH, HEIGHT), pg.RESIZABLE | pg.SCALED)
+    screen = pg.display.set_mode(scaled_size, pg.RESIZABLE | pg.SCALED)
 
 
 FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 12)
@@ -232,7 +240,7 @@ def main():
         debug_text.change_msg("Press START when all users have joined.")
 
     # GFX generators
-    screen_flasher = ScreenFlasher(screen)
+    screen_flasher = ScreenFlasher(temp_screen)
     eye_anim = EyeAnimation()
     end_anim = EndAnimation(quit_all)
 
@@ -265,7 +273,7 @@ def main():
         # MOUSE POSITION CHECKS
         #################
 
-        mouse_pos = pg.mouse.get_pos()
+        mouse_pos = tuple(dimension * scaling_factor for dimension in pg.mouse.get_pos())
         for item in hover_items:
             item.check_mouse(mouse_pos)
             if ADMIN:
@@ -374,11 +382,13 @@ def main():
         #################
         # DRAW AND FINISH
         #################
-        screen.blit(BACKGROUND, (0, 0))
+        temp_screen.blit(BACKGROUND, (0, 0))
         for item in gui_items:
-            item.draw(screen)
+            item.draw(temp_screen)
         if held_card:
-            held_card.draw(screen)
+            held_card.draw(temp_screen)
+        resized_screen = pg.transform.scale(temp_screen, scaled_size)
+        screen.blit(resized_screen, (0, 0))
         pg.display.update()
         clock.tick(30)
 

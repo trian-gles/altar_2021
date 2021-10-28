@@ -28,6 +28,7 @@ class Server:
 
         # circular list to be later created
         self.turn_iter = None
+        self.last_user = "FIRST TURN"
         # The mode will go from "sleep" to "play" to "finish" to "quit"
 
         self.current_gfx_content = ()
@@ -137,7 +138,6 @@ class Server:
         self.turn_iter = cycle(self.turn_iter)
 
     def new_turn_update(self, gui_content: tuple, sender: socket.socket = None):
-        found_player = False
         while True:
             current_sock = next(self.turn_iter)
             try:
@@ -146,7 +146,7 @@ class Server:
                 continue
             else:
                 break
-        content_dict = {"method": "update", "content": gui_content}
+        content_dict = {"method": "update", "content": gui_content, "last_user": self.last_user}
         if not sender: # this will occur on the first turn
             self.send_all(content_dict)
         else:
@@ -154,13 +154,15 @@ class Server:
 
         new_player_dict = {"method": "new_turn", "current_player": current_name}
         self.send_all(new_player_dict)
+        self.last_user = current_name
 
     def new_turn_reactivate(self, reac_content: tuple):
         current_sock = next(self.turn_iter)
         current_name = self.clients[current_sock]["username"]
         content_dict = {"method": "reactivate", "content": reac_content,
-                        "current_player": current_name}
+                        "current_player": current_name, "last_user": self.last_user}
         self.send_all(content_dict)
+        self.last_user = current_name
 
     def gui_update_msg(self, gfx_content: tuple):
         if gfx_content != self.current_gfx_content:

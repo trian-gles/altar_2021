@@ -1,2 +1,6 @@
 /socks/server.log
 /server.log
+*__pycache__*
+venv/
+build/
+*.rar

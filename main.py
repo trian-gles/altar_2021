@@ -328,7 +328,7 @@ def main():
                             if active_card:
                                 check_screen_flash(active_card, screen_flasher)
                                 end_turn_reactivate(active_card, i, gfx_man)
-                elif event.type == pg.KEYDOWN:
+                elif event.type == pg.KEYDOWN and LOCAL:
                     if event.scancode == 11:
                         print("Show help menu")
                         help_handle.advance()

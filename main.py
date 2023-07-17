@@ -8,7 +8,7 @@ import pygame as pg
 from pyo import Server
 
 from gui_items import (DiscardSpace, DropZone, HandZone, DrawSpace,
-                       MessageButton, CenterText)
+                       MessageButton, CenterText, HelpHandler)
 from gfx import ScreenFlasher, GfxManager, EyeAnimation, EndAnimation
 from pg_menu import run_menu
 from socks import Client, ProjectClient
@@ -193,7 +193,7 @@ else:
     screen = pg.display.set_mode(scaled_size, pg.RESIZABLE | pg.SCALED)
 
 
-FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 12)
+FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 16)
 BACKGROUND = pg.image.load(load_resource("gameboard.jpg")).convert()
 pg.display.set_caption(f"ALTAR CLIENT username = {USERNAME}")
 
@@ -202,13 +202,14 @@ if AUDIO:
 
 
 def main():
+    print("Configuring clock")
     clock = pg.time.Clock()
 
     ###########
     # GUI ITEMS
     ###########
 
-
+    print("Setting up dropzones")
     drop_c = DropZone(ZONE_COORS[0])
     drop_r = DropZone(ZONE_COORS[1])
     drop_l = DropZone(ZONE_COORS[2])
@@ -216,6 +217,9 @@ def main():
     discard = DiscardSpace((50, 50))
     draw = DrawSpace((WIDTH - 150, 50))
     debug_text = CenterText("Please wait for the ADMIN player to initiate the piece", (960, 50), FONT)
+
+    # HelpHandler
+    help_handle = HelpHandler(debug_text, [drop_c, drop_r, drop_l], hand, draw, discard)
 
     # GUI items that have get and set methods
     getset_items = (drop_c, drop_r, drop_l, draw)
@@ -259,7 +263,7 @@ def main():
     run = True
 
     if LOCAL:
-        debug_text.change_msg("RUNNING IN LOCAL MODE")
+        debug_text.change_msg("Press H for help, R to restart")
         piece_started = True
         eye_anim.play()
 
@@ -324,6 +328,13 @@ def main():
                             if active_card:
                                 check_screen_flash(active_card, screen_flasher)
                                 end_turn_reactivate(active_card, i, gfx_man)
+                elif event.type == pg.KEYDOWN:
+                    if event.scancode == 11:
+                        print("Show help menu")
+                        help_handle.advance()
+                    elif event.scancode == 21:
+                        audio.reset()
+                        return # restart via the for look
 
         #################
         # SERVER MESSAGES
@@ -394,4 +405,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
+        print("restarting")
+    print("finished loop")

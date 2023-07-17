@@ -121,6 +121,10 @@ class AudioManager:
         acted_tups = map(lambda zone: zone.acted_on, self.zones)
         if all(acted_tups):
             self.advance_pattern()
+            
+    def reset(self):
+        for zone in self.zones:
+            zone.reset()
 
 
     def test_lag(self):
@@ -248,26 +252,43 @@ class Zone:
             return "static"
         elif mean(levels) < 0.1:
             return "quiet"
+            
+    def reset(self):
+        pass
 
 
 class ZoneOne(Zone):
     def __init__(self):
         super().__init__(0.5, 0)
+        self.reset()
+    
+    def reset(self):
         self.load("soft_steel_perc.json")
+        self.pattern.time = 1
+        self.pattern.stop()        
+    
 
 
 class ZoneTwo(Zone):
     def __init__(self):
         super().__init__(0.3, 1)
+        self.reset()
+        
+    def reset(self):
         self.load("organ_bell.json")
         self.pattern.time = .75
+        self.pattern.stop()
 
 
 class ZoneThree(Zone):
     def __init__(self):
         super().__init__(0.8, 2)
+        self.reset()
+        
+    def reset(self):
         self.load("harmonica.json")
         self.pattern.time = 1.5
+        self.pattern.stop()
 
 
 def note_to_freq(pitch: float) -> float:

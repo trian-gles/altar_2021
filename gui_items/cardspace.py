@@ -58,6 +58,10 @@ class CardZone:
                 return True
         else:
             return False
+            
+    def set_help(self, new_help: bool):
+        for space in self.card_spaces:
+            space.help = new_help
 
     def draw(self, surf: pg.Surface):
         for card in self.card_spaces:
@@ -189,7 +193,9 @@ class CardSpace(BasicCard):
     def draw(self, surf: pg.Surface):
         if self.card:
             self.card.draw(surf)
-
+            
+        if self.help:
+            pg.draw.rect(surf, (0, 255, 255), self.help_rect, width=2, border_radius=5)
         if self.hover:
             pg.draw.rect(surf, (255, 255, 255), self.rect, width=3, border_radius=5)
 
@@ -201,6 +207,10 @@ class DiscardSpace(CardSpace):
 
     def draw(self, surf: pg.Surface):
         surf.blit(self.graphic, self.rect)
+        
+        if self.help:
+            pg.draw.rect(surf, (0, 255, 255), self.help_rect, width=2, border_radius=5)
+        
         if self.hover:
             pg.draw.rect(surf, (255, 255, 255), self.rect, width=3, border_radius=5)
         else:
@@ -257,6 +267,9 @@ class DrawSpace(BasicCard):
     def draw(self, surf: pg.Surface):
         if self.cards:
             self.cards[0].draw(surf)
+            
+        if self.help:
+            pg.draw.rect(surf, (0, 255, 255), self.help_rect, width=2, border_radius=5)
 
         if self.hover:
             pg.draw.rect(surf, (255, 255, 255), self.rect, width=3, border_radius=5)
@@ -276,3 +289,5 @@ class DrawSpace(BasicCard):
             self.cards = [MoveableCard(self.rect.topleft, card_num, True) for card_num in card_nums]
         else:
             self.cards = []
+            
+    

@@ -70,18 +70,27 @@ class CardZone:
 
 class DropZone(CardZone):
     """Three card area of the main game board"""
-    def __init__(self, coor: Vector2):
+    def __init__(self, coor: Vector2, font: pg.font.Font):
         super(DropZone, self).__init__(coor, num_cards=3)
+        self.font = font
+        self.text = font.render("  ", False, (255, 255, 255))
+        self.alpha = 255
+        self.update_text_offset = 0
+
+    def set_text(self, new_text: str):
+        self.text = self.font.render(new_text, False, (255, 255, 255))
+        self.alpha = 255
 
     def return_content(self) -> Tuple[Optional[int]]:
         return tuple([space.return_content() for space in self.card_spaces])
 
-    def set_content(self, card_nums):
-        """Set the content of each card space, fade in the card if it is new"""
+    def set_content(self, card_nums, username: str):
+        """Set the content of each card space, fade in the card if it is new and display the user that dropped it"""
         for i, card_num in enumerate(card_nums):
             print(f"Previous card = {self.card_spaces[i].card}/"
                   f"New card = {card_num}")
             fade_in = False
+
 
             if card_num:
                 if not self.card_spaces[i].card:
@@ -92,7 +101,9 @@ class DropZone(CardZone):
 
             self.card_spaces[i].set_content(card_num)
             if fade_in:
+                self.update_text_offset = i * 147
                 print(f"Fading in card {card_num}")
+                self.set_text(username)
                 self.card_spaces[i].card.start_fade()
 
     def fade_in_card(self, card: MoveableCard):
@@ -111,6 +122,13 @@ class DropZone(CardZone):
 
     def drop_card(self, card: MoveableCard) -> bool:
         return self.super_drop_card(card, self.fade_in_card)
+
+    def draw(self, surf: pg.Surface):
+        super(DropZone, self).draw(surf)
+        if self.alpha > 0:
+            self.alpha -= 1
+            self.text.set_alpha(self.alpha)
+        surf.blit(self.text, (self.origin[0] + self.update_text_offset, self.origin[1] - 50))
 
 
 class HandZone(CardZone):
@@ -284,7 +302,7 @@ class DrawSpace(BasicCard):
         else:
             return None
 
-    def set_content(self, card_nums: Tuple[int]):
+    def set_content(self, card_nums: Tuple[int], _: str):
         if card_nums:
             self.cards = [MoveableCard(self.rect.topleft, card_num, True) for card_num in card_nums]
         else:

@@ -111,7 +111,7 @@ def get_content(items: GetsetItems) -> GuiContent:
     return content
 
 
-def set_content(items: GetsetItems, content: GuiContent, gfxman: GfxManager):
+def set_content(items: GetsetItems, content: GuiContent, gfxman: GfxManager, username: str):
     if AUDIO:
         audio.input(content[0:3])
         audio_status = audio.check_status()  # will this be called twice for the user who sends a card?
@@ -122,7 +122,7 @@ def set_content(items: GetsetItems, content: GuiContent, gfxman: GfxManager):
             client.send_pattern_num(audio.current_pat_num)
             client.gfx_update(audio_status)
     for i, item in enumerate(items):
-        item.set_content(content[i])
+        item.set_content(content[i], username)
 
 
 def end_turn_update(items: GetsetItems, gfxman: GfxManager):
@@ -194,6 +194,8 @@ else:
 
 
 FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 16)
+BIG_FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 32)
+
 BACKGROUND = pg.image.load(load_resource("gameboard.jpg")).convert()
 pg.display.set_caption(f"ALTAR CLIENT username = {USERNAME}")
 
@@ -209,10 +211,11 @@ def main():
     # GUI ITEMS
     ###########
 
-    print("Setting up dropzones")
-    drop_c = DropZone(ZONE_COORS[0])
-    drop_r = DropZone(ZONE_COORS[1])
-    drop_l = DropZone(ZONE_COORS[2])
+
+    drop_c = DropZone(ZONE_COORS[0], BIG_FONT)
+    drop_r = DropZone(ZONE_COORS[1], BIG_FONT)
+    drop_l = DropZone(ZONE_COORS[2], BIG_FONT)
+
     hand = HandZone((685, 850))
     discard = DiscardSpace((50, 50))
     draw = DrawSpace((WIDTH - 150, 50))
@@ -348,7 +351,7 @@ def main():
                     if not piece_started:
                         piece_started = True
                         eye_anim.play()
-                    set_content(getset_items, client_msg["content"], gfx_man)
+                    set_content(getset_items, client_msg["content"], gfx_man, client_msg["last_user"])
                     print(f"Server message content: {client_msg['content']}")
                     print(f"Current get content : {get_content(getset_items)}")
                     if get_content(getset_items) == EMPTY_CONTENT:
@@ -361,8 +364,9 @@ def main():
                     debug_text.change_msg(client_msg['current_player'] + "'s turn")
                     card_num = client_msg["content"][0]
                     zone_num = client_msg['content'][1]
-                    reac_zone = getset_items[zone_num]
+                    reac_zone: DropZone = getset_items[zone_num]
                     reac_zone.fade_in_card_num(card_num)
+                    reac_zone.set_text(client_msg['last_user'])
                     if AUDIO:
                         audio.force_input(card_num, zone_num)
                         if GFX:

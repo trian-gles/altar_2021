@@ -15,7 +15,9 @@ class BasicCard:
 
     def __init__(self, coor: Vector2):
         self.rect = pg.Rect(coor[0], coor[1], self.CARD_WIDTH, self.CARD_HEIGHT)
+        self.help_rect = pg.Rect(coor[0] - 10, coor[1] - 10, self.CARD_WIDTH + 20, self.CARD_HEIGHT + 20)
         self.hover = False
+        self.help = False
         self.graphic = None
 
     def check_mouse(self, mouse_coor: Vector2):
@@ -23,6 +25,9 @@ class BasicCard:
             self.hover = True
         else:
             self.hover = False
+            
+    def set_help(self, new_help: bool):
+        self.help = new_help
 
     def draw(self, surf: pg.Surface):
         if self.hover:
@@ -93,6 +98,8 @@ class MoveableCard(BasicCard):
 
     def flip(self):
         self.flipped = False
+        
+    
 
     def draw(self, surf: pg.Surface):
         self._fade_in()

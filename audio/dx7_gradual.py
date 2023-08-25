@@ -8,7 +8,7 @@ s = Server()
 
 
 class DXSineModule:
-    def __init__(self, name: int, ratio: float = 1.0, level: float = 1.0, pan: float = 0.5):
+    def __init__(self, master: PyoObject, name: int, ratio: float = 1.0, level: float = 1.0, pan: float = 0.5):
         self.env = Adsr(dur=2)
 
         self.name = name
@@ -21,24 +21,29 @@ class DXSineModule:
         self.output = self.level * self.cos
         self.pan = Pan(self.output, pan=pan, mul=.3)
         self.inputs = [self.phasor]
+        self.final_output = self.pan * master
 
     def patch(self, modding: PyoObject):
         self.inputs += modding
 
     def configure_input(self):
-        self.cos.input = sum(self.inputs) * math.pi*2
+
+        for i in self.inputs:
+            self.cos.input += i
+
+        self.cos.input *= math.pi * 2
 
     def reset(self):
         self.inputs = [self.phasor]
         self.cos.input = self.phasor
-        self.pan.stop()
+        self.final_output.stop()
 
     def change_pitch(self, freq: float):
         self.phasor.freq = freq * self.ratio
         self.env.play()
 
     def out(self):
-        self.pan.out()
+        self.final_output.out()
 
 
 class DX7Mono:
@@ -57,11 +62,11 @@ class DX7Mono:
         ((1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (6, 6))
     )
 
-    def __init__(self, pan: float = 0.5):
+    def __init__(self, master: PyoObject, pan: float = 0.5):
         self.vel = Sig(0)
         self.mod_dict = {}
         for mod_num in range(6):
-            self.mod_dict[mod_num + 1] = DXSineModule(mod_num + 1, pan=pan)
+            self.mod_dict[mod_num + 1] = DXSineModule(master, mod_num + 1, pan=pan)
         self.master_feedback = Sig(1.0)
         # self.master_feedback.ctrl([SLMap(0, 8.0, 'lin', 'value', 1)], title="Master Feedback")
         self.set_algo(0)
@@ -85,6 +90,7 @@ class DX7Mono:
         for mod in self.mod_dict.values():
             mod.reset()
 
+
     def noteon(self, freq, vel):
         self.vel.value = vel
         for module in self.mod_dict.values():
@@ -95,9 +101,9 @@ class DX7Mono:
 
 
 class DX7Poly:
-    def __init__(self, voices: int, rand_seed: int = 10, pan: float = 0.5):
+    def __init__(self, master: PyoObject, voices: int, rand_seed: int = 10, pan: float = 0.5):
         #random.seed(rand_seed)
-        self.voices = [DX7Mono(pan) for _ in range(voices)]
+        self.voices = [DX7Mono(master, pan) for _ in range(voices)]
         self.voice_num = voices
         self.active_voice_num = 0
         self.active_voice = self.voices[0]

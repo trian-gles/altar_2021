@@ -15,8 +15,8 @@ AudioZoneStatus = Tuple[Optional[str], Optional[str], Optional[str]]
 
 class AudioManager:
     def __init__(self):
-        self.zones = (ZoneOne(), ZoneTwo(), ZoneThree())
-
+        self.master = SigTo(value=1, time=1.0)
+        self.zones = (ZoneOne(self.master), ZoneTwo(self.master), ZoneThree(self.master))
         # prevent global colored cards from reapplying every turn
         self.added_gaps = False
         self.randomized_all = False
@@ -126,6 +126,11 @@ class AudioManager:
         for zone in self.zones:
             zone.reset()
 
+    def sleep(self):
+        self.master.value = 0.2
+
+    def wake(self):
+        self.master.value = 1
 
     def test_lag(self):
         pass
@@ -136,8 +141,8 @@ class Zone:
     glob_pat_count = 0
     # shared global pattern that the three zones will loop through together
 
-    def __init__(self, pan: float, zone_num: int):
-        self.dx7 = DX7Poly(4, pan=pan)
+    def __init__(self, master: PyoObject, pan: float, zone_num: int):
+        self.dx7 = DX7Poly(master, 4, pan=pan)
         self.trans = 0
         self.count = 0
         self.pattern_count = 0
@@ -258,8 +263,8 @@ class Zone:
 
 
 class ZoneOne(Zone):
-    def __init__(self):
-        super().__init__(0.5, 0)
+    def __init__(self, master: PyoObject):
+        super().__init__(master, 0.5, 0)
         self.reset()
     
     def reset(self):
@@ -270,8 +275,8 @@ class ZoneOne(Zone):
 
 
 class ZoneTwo(Zone):
-    def __init__(self):
-        super().__init__(0.3, 1)
+    def __init__(self, master: PyoObject):
+        super().__init__(master, 0.3, 1)
         self.reset()
         
     def reset(self):
@@ -281,8 +286,8 @@ class ZoneTwo(Zone):
 
 
 class ZoneThree(Zone):
-    def __init__(self):
-        super().__init__(0.8, 2)
+    def __init__(self, master: PyoObject):
+        super().__init__(master, 0.8, 2)
         self.reset()
         
     def reset(self):

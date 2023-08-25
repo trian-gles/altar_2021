@@ -46,6 +46,7 @@ FULLSCREEN = args.fullscreen
 IP = args.ip
 GFX = True
 DOWNSCALED = False
+SLEEPTIME = 600
 
 if not args.nogui:
     menu_opts = run_menu()
@@ -199,6 +200,7 @@ BIG_FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 32)
 BACKGROUND = pg.image.load(load_resource("gameboard.jpg")).convert()
 pg.display.set_caption(f"ALTAR CLIENT username = {USERNAME}")
 
+
 if AUDIO:
     audio = AudioManager()
 
@@ -220,6 +222,8 @@ def main():
     discard = DiscardSpace((50, 50))
     draw = DrawSpace((WIDTH - 150, 50))
     debug_text = CenterText("Please wait for the ADMIN player to initiate the piece", (960, 50), FONT)
+
+    inactive_frame_count = 0
 
     # HelpHandler
     help_handle = HelpHandler(debug_text, [drop_c, drop_r, drop_l], hand, draw, discard)
@@ -294,6 +298,9 @@ def main():
         #############
 
         for event in pg.event.get():
+            if inactive_frame_count >= SLEEPTIME:
+                audio.wake()
+            inactive_frame_count = 0
             if event.type == pg.QUIT:
                 quit_all()
             if not PROJECT:
@@ -394,6 +401,11 @@ def main():
                 elif client_msg["method"] == 'quit':
                     quit_all()
 
+        ### Sleep handling
+        inactive_frame_count += 1
+        if inactive_frame_count == SLEEPTIME and AUDIO:
+            audio.sleep()
+
         #################
         # DRAW AND FINISH
         #################
@@ -405,6 +417,7 @@ def main():
         resized_screen = pg.transform.scale(temp_screen, scaled_size)
         screen.blit(resized_screen, (0, 0))
         pg.display.update()
+
         clock.tick(30)
 
 

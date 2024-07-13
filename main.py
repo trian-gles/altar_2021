@@ -34,6 +34,7 @@ parser.add_argument('--admin', action='store_true',
                     help="When the player designated as 'ADMIN' exits, the server will restart")
 parser.add_argument('--project', help="Run a projector for the audience", action='store_true')
 parser.add_argument('--nogui', action='store_true')
+parser.add_argument('--installation', action='store_true')
 
 args = parser.parse_args()
 
@@ -47,6 +48,7 @@ IP = args.ip
 GFX = True
 DOWNSCALED = False
 SLEEPTIME = 600
+INSTALLATION = args.installation
 
 if not args.nogui:
     menu_opts = run_menu()
@@ -298,7 +300,7 @@ def main():
         #############
 
         for event in pg.event.get():
-            if inactive_frame_count >= SLEEPTIME:
+            if INSTALLATION and inactive_frame_count >= SLEEPTIME:
                 audio.wake()
             inactive_frame_count = 0
             if event.type == pg.QUIT:
@@ -402,9 +404,10 @@ def main():
                     quit_all()
 
         ### Sleep handling
-        inactive_frame_count += 1
-        if inactive_frame_count == SLEEPTIME and AUDIO:
-            audio.sleep()
+        if INSTALLATION:
+            inactive_frame_count += 1
+            if inactive_frame_count == SLEEPTIME and AUDIO:
+                audio.sleep()
 
         #################
         # DRAW AND FINISH

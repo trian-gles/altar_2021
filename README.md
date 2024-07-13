@@ -6,7 +6,7 @@ Inspired by card games, indie video games, and electronic music.  Built with Pyg
 Performers take turns moving cards around a game board that reacts musically.
 [Watch this video for more details](https://youtu.be/kectE5zKrnc)
 ## Easy Setup
-Pre-compiled executables can be found in the releases sidebar for both Windows and OSX.  These are from the 1.0 release and currently lack some minor features.  They may or may not work on 
+Pre-compiled executables can be found in the releases sidebar for both Windows and Intel (pre M1) OSX.  These are from the 1.0 release and currently lack some minor features.  Updates soon I hope...
 
 ## Running from source
 Requires python 3.11

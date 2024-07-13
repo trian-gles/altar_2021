@@ -186,12 +186,12 @@ temp_screen = pg.Surface((WIDTH, HEIGHT))
 scaled_size = (WIDTH // scaling_factor, HEIGHT // scaling_factor)
 
 if FULLSCREEN:
-    screen = pg.display.set_mode((WIDTH, HEIGHT), pg.FULLSCREEN | pg.SCALED)
+    screen = pg.display.set_mode((WIDTH, HEIGHT), pg.FULLSCREEN)
 
 elif sys.platform == "darwin":
     screen = pg.display.set_mode(scaled_size)
 else:
-    screen = pg.display.set_mode(scaled_size, pg.RESIZABLE | pg.SCALED)
+    screen = pg.display.set_mode(scaled_size)
 
 
 FONT = pg.font.Font(load_resource("JetBrainsMono-Medium.ttf"), 16)
